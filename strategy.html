@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gambling Strategy | Gambling.com</title>
+  <meta name="description" content="Free strategy guides from our expert users. We cover everything you need to know to create a profitable, effective gambling strategy.">
+  <meta property="og:title" content="Gambling Strategy | Gambling.com">
+  <meta property="og:description" content="Free strategy guides from our expert users. We cover everything you need to know to create a profitable, effective gambling strategy.">
+  <meta property="og:type" content="website">
+  <link rel="canonical" href="https://www.gambling.com/guides">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── GDC DESIGN SYSTEM TOKENS ─── */
+    :root {
+      --gdc-blue:#0157FF;--gdc-blue-hover:#003EE6;
+      --gdc-red:#FF0000;--gdc-red-hover:#E50000;
+      --gdc-grey:#ECECEF;--gdc-black:#000000;--gdc-white:#FFFFFF;
+      --gdc-gold:#E1A730;--gdc-gold-hover:#B4841E;
+      --gdc-green:#39B54A;--gdc-green-hover:#2D9238;
+      --gdc-deep-grey:#999999;--gdc-deep-blue-navy:#050A30;
+      --gdc-light-blue:#E6F1FC;
+      --font:'Red Hat Display',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      --sp-xs:4px;--sp-sm:8px;--sp-md:16px;--sp-lg:24px;--sp-xl:32px;--sp-2xl:48px;--sp-3xl:64px;
+      --r-sm:4px;--r-md:6px;--r-lg:8px;--r-xl:12px;
+    }
+
+    /* ─── RESET ─── */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font);font-size:16px;font-weight:400;line-height:26px;color:var(--gdc-black);background:var(--gdc-white)}
+    a{color:var(--gdc-blue);text-decoration:none;font-weight:600;transition:color .2s}
+    a:hover{color:var(--gdc-blue-hover);text-decoration:underline}
+    a:focus-visible{outline:2px solid var(--gdc-blue);outline-offset:2px}
+    img{display:block;max-width:100%}
+    ol,ul{list-style:none}
+    button{font-family:var(--font)}
+
+    /* ─── LAYOUT ─── */
+    .container{max-width:1140px;margin:0 auto;padding:0 var(--sp-lg)}
+
+    /* ─── HEADER ─── */
+    .site-header{background:var(--gdc-white);box-shadow:0px 1px 5px -2px #4e4e4e;position:sticky;top:0;z-index:100}
+    .site-header .container{display:flex;align-items:center;justify-content:space-between;height:56px}
+    .logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}
+    .logo img{height:42px;width:auto}
+    .main-nav{display:flex;align-items:center;gap:0}
+    .main-nav a{font-size:16px;font-weight:500;color:var(--gdc-black);text-decoration:none;padding:0 0 0 16px;white-space:nowrap;line-height:56px;height:56px;display:flex;align-items:center;transition:color .2s}
+    .main-nav a:hover{color:var(--gdc-blue);text-decoration:none}
+    .main-nav a[aria-current="page"]{color:var(--gdc-black)}
+    .header-actions{display:flex;align-items:center;gap:12px}
+    .header-actions .sign-up{display:inline-flex;align-items:center;gap:6px;font-size:16px;font-weight:500;color:var(--gdc-black);text-decoration:none;white-space:nowrap;cursor:pointer}
+    .header-actions .sign-up:hover{text-decoration:underline}
+    .header-actions .sign-up svg{flex-shrink:0}
+    .header-actions .geo-region{display:inline-flex;align-items:center;cursor:pointer;text-decoration:none}
+    .header-actions .geo-region:hover{opacity:.7;text-decoration:none}
+    .header-actions .geo-globe{width:30px;height:54px;background:url('https://objects.kaxmedia.com/auto/o/263246/a8d6548e5d.svg') center/26px no-repeat;flex-shrink:0}
+    .header-actions .geo-text{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:500;color:var(--gdc-black);white-space:nowrap}
+    .header-actions .geo-text svg{flex-shrink:0}
+    .header-actions .search-btn{background:none;border:none;cursor:pointer;padding:0;color:var(--gdc-black);display:flex;align-items:center}
+    .header-actions .search-btn img{width:20px;height:25px}
+
+    /* ─── HERO / TOP SECTION ─── */
+    .top-section{padding:var(--sp-2xl) 0 var(--sp-md)}
+    .top-layout{display:block}
+    .top-left h1{font-size:29px;font-weight:600;line-height:40px;margin-bottom:var(--sp-sm)}
+    .top-left .subtitle{font-size:16px;line-height:26px;color:#6b7280;margin-bottom:var(--sp-xl)}
+    .category-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp-md)}
+    .cat-card{text-decoration:none;color:inherit;border-radius:var(--r-lg);overflow:hidden;transition:box-shadow .2s}
+    .cat-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1);text-decoration:none}
+    .cat-card-img{width:100%;height:120px;object-fit:cover;border-radius:var(--r-lg);background-size:cover;background-position:center}
+    .cat-card-label{display:flex;align-items:center;justify-content:center;gap:4px;font-size:14px;font-weight:600;color:var(--gdc-black);padding:var(--sp-sm) 0;text-align:center}
+    .cat-card-label svg{width:14px;height:14px;color:var(--gdc-deep-grey)}
+
+    /* ─── SECTION CHROME ─── */
+    .section{padding:var(--sp-xl) 0;scroll-margin-top:64px}
+    .section + .section{border-top:1px solid var(--gdc-grey)}
+    .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-lg)}
+    .section-header h2{font-size:23px;font-weight:700;line-height:32px;color:var(--gdc-black)}
+    .carousel-arrows{display:flex;gap:var(--sp-sm)}
+    .arrow-btn{width:32px;height:32px;border:1px solid var(--gdc-grey);border-radius:50%;background:var(--gdc-white);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(--gdc-deep-grey)}
+    .arrow-btn:hover{border-color:var(--gdc-blue);color:var(--gdc-blue)}
+    .arrow-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+    /* ─── CAROUSEL BASE ─── */
+    .carousel{display:flex;gap:var(--sp-md);overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding-bottom:var(--sp-xs);scrollbar-width:none}
+    .carousel::-webkit-scrollbar{display:none}
+
+    /* ─── FEATURED VIDEOS ─── */
+    .featured-layout{display:grid;grid-template-columns:1fr 340px;gap:var(--sp-lg)}
+    .featured-main{border-radius:var(--r-lg);overflow:hidden;position:relative;aspect-ratio:16/9;cursor:pointer}
+    .featured-main img,.featured-main .featured-main-bg{width:100%;height:100%;object-fit:cover}
+    .featured-main-bg{background:linear-gradient(135deg,#1a3a2a,#0a2a1a,#1a4a2a);display:flex;align-items:center;justify-content:center}
+    .featured-play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+    .featured-main:hover .featured-play{transform:translate(-50%,-50%) scale(1.1)}
+    .featured-play svg{width:24px;height:24px;fill:var(--gdc-black);margin-left:3px}
+    .featured-duration{position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,.75);color:var(--gdc-white);font-size:12px;font-weight:600;padding:2px 8px;border-radius:var(--r-sm)}
+    .featured-info{margin-top:var(--sp-sm)}
+    .featured-info-title{font-size:16px;font-weight:600;line-height:22px;color:var(--gdc-black)}
+    .featured-info-meta{font-size:13px;color:var(--gdc-deep-grey);margin-top:2px}
+    .featured-sidebar{display:flex;flex-direction:column;gap:var(--sp-sm)}
+    .featured-sidebar-item{display:flex;gap:var(--sp-sm);padding:var(--sp-sm);border-radius:var(--r-md);cursor:pointer;transition:background .2s;text-decoration:none;color:inherit}
+    .featured-sidebar-item:hover{background:#f9fafb;text-decoration:none}
+    .featured-sidebar-thumb{width:120px;height:68px;border-radius:var(--r-md);flex-shrink:0;position:relative;overflow:hidden;background-size:cover;background-position:center}
+    .featured-sidebar-thumb .play-sm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:28px;height:28px;background:rgba(255,0,0,.9);border-radius:50%;display:flex;align-items:center;justify-content:center}
+    .featured-sidebar-thumb .play-sm svg{width:12px;height:12px;fill:var(--gdc-white);margin-left:1px}
+    .featured-sidebar-dur{position:absolute;bottom:4px;right:4px;background:rgba(0,0,0,.75);color:var(--gdc-white);font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px}
+    .featured-sidebar-info{flex:1;display:flex;flex-direction:column;justify-content:center}
+    .featured-sidebar-title{font-size:13px;font-weight:600;line-height:17px;color:var(--gdc-black)}
+    .featured-sidebar-meta{font-size:12px;color:var(--gdc-deep-grey);margin-top:4px}
+    .featured-sidebar-item.is-active{background:#f0f4ff;outline:2px solid var(--gdc-blue);outline-offset:-2px}
+    .featured-main iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:var(--r-lg)}
+    .featured-main.is-playing .featured-main-bg,
+    .featured-main.is-playing .featured-play,
+    .featured-main.is-playing .featured-duration{display:none}
+
+    /* ─── ARTICLE CARDS (simple: image + title) ─── */
+    .article-card{min-width:220px;flex:1;scroll-snap-align:start;cursor:pointer;text-decoration:none;color:inherit}
+    .article-card:hover{text-decoration:none}
+    .article-card:hover .article-card-title{color:var(--gdc-blue)}
+    .article-card-img{width:100%;height:160px;border-radius:var(--r-lg);overflow:hidden;margin-bottom:var(--sp-sm);background-size:cover;background-position:center}
+    .article-card-title{font-size:14px;font-weight:600;line-height:20px;color:var(--gdc-black);transition:color .2s}
+
+    /* ─── FOOTER ─── */
+    /* ─── FOOTER (matches gambling.com) ─── */
+    .site-footer{background:var(--gdc-white);color:var(--gdc-black);border-top:1px solid #d8d8d8;padding:0}
+    .footer-columns{padding:30px 0;border-bottom:1px solid #d8d8d8}
+    .footer-columns .container{display:flex;flex-wrap:wrap}
+    .footer-col{width:33.333%;padding:0 16px}
+    .footer-col-title{font-size:18px;font-weight:600;color:var(--gdc-black);background:#f7f7f7;border-radius:10px;padding:10px;margin-bottom:16px}
+    .footer-col ul{display:flex;flex-direction:column;gap:0}
+    .footer-col li{padding-bottom:10px}
+    .footer-col a{font-size:13px;font-weight:400;color:var(--gdc-blue);text-decoration:none;line-height:20px;transition:color .2s}
+    .footer-col a:hover{color:var(--gdc-blue-hover);text-decoration:underline}
+    .footer-bottom-section{padding:30px 0 0}
+    .footer-bottom-section .container{display:flex;flex-wrap:wrap;align-items:flex-start}
+    .footer-social{display:flex;flex-wrap:wrap;gap:10px 10px;width:28%;padding-right:16px}
+    .social-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;text-decoration:none;transition:opacity .2s;border-radius:4px;overflow:hidden}
+    .social-icon:hover{opacity:.7;text-decoration:none}
+    .social-icon img{width:32px;height:32px;display:block}
+    .footer-disclaimer{flex:1;font-size:16px;font-weight:400;color:var(--gdc-deep-grey);line-height:24px}
+    .footer-disclaimer p{margin-bottom:12px}
+    .footer-disclaimer a{font-size:16px;color:var(--gdc-deep-grey);text-decoration:none;font-weight:400}
+    .footer-disclaimer a:hover{text-decoration:underline;color:var(--gdc-black)}
+    .footer-flags{padding:20px 0 0}
+    .footer-flags .container{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center}
+    .footer-flag-icon{width:29px;height:29px;border-radius:50%;object-fit:cover;display:block}
+    .footer-flags a{display:inline-flex;text-decoration:none;transition:opacity .2s}
+    .footer-flags a:hover{opacity:.7}
+    .footer-badges{padding:20px 0 30px}
+    .footer-badges .container{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:24px}
+    .footer-badges img{height:40px;width:auto}
+
+    /* ─── RESPONSIVE ─── */
+    @media(max-width:1024px){
+      .main-nav{display:none}
+      .featured-layout{grid-template-columns:1fr}
+      .featured-sidebar{flex-direction:row;overflow-x:auto;gap:var(--sp-md)}
+      .featured-sidebar-item{min-width:280px;flex-shrink:0}
+      .footer-col{width:50%}
+      .footer-social{width:100%;margin-bottom:24px}
+    }
+    @media(max-width:768px){
+      .category-cards{grid-template-columns:1fr 1fr 1fr}
+      .cat-card-img{height:90px}
+      .footer-col{width:100%;padding-bottom:24px}
+    }
+    @media(max-width:480px){
+      .category-cards{grid-template-columns:1fr}
+      .cat-card-img{height:120px}
+    }
+
+    /* ─── UTILITY ─── */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+</head>
+
+<body>
+  <!-- ═══ HEADER ═══ -->
+  <header class="site-header">
+    <div class="container">
+      <a href="https://www.gambling.com" class="logo" aria-label="Gambling.com home">
+        <img src="https://objects.kaxmedia.com/auto/o/105557/8fbf0fa9e7.svg" alt="gambling.com" width="124" height="42">
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="https://www.gambling.com/reviews">Reviews</a>
+        <a href="https://www.gambling.com/online-casinos">Casino</a>
+        <a href="https://www.gambling.com/online-betting">Betting</a>
+        <a href="https://www.gambling.com/free-games">Free Games</a>
+        <a href="https://www.gambling.com/guides" aria-current="page">Guides</a>
+        <a href="https://www.gambling.com/news">News</a>
+        <a href="https://www.gambling.com/inside">Inside Gambling.com</a>
+      </nav>
+      <div class="header-actions">
+        <a href="https://www.gambling.com/sign-up" class="sign-up" aria-label="Sign up">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.2282 20.7349C22.5503 18.5466 24 15.4426 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 15.4426 1.44967 18.5466 3.77185 20.7349C5.92015 22.7593 8.81518 24 12 24C15.1848 24 18.0799 22.7593 20.2282 20.7349ZM4.794 19.1536C6.48568 17.0434 9.08505 15.6923 12 15.6923C14.9149 15.6923 17.5143 17.0434 19.206 19.1536C17.3665 21.0065 14.8172 22.1538 12 22.1538C9.18277 22.1538 6.63351 21.0065 4.794 19.1536ZM16.6154 8.30769C16.6154 10.8567 14.549 12.9231 12 12.9231C9.45099 12.9231 7.38462 10.8567 7.38462 8.30769C7.38462 5.75869 9.45099 3.69231 12 3.69231C14.549 3.69231 16.6154 5.75869 16.6154 8.30769Z" fill="black"/></svg>
+          Sign&nbsp;Up
+        </a>
+        <div class="geo-region" aria-label="Select region" role="button" tabindex="0">
+          <div class="geo-globe"></div>
+          <div class="geo-text">GX <svg xmlns="http://www.w3.org/2000/svg" width="17" height="10" viewBox="0 0 17 10" fill="none"><path d="M16 1L8.5 8.5L0.999999 1" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <button class="search-btn" aria-label="Search">
+          <img src="https://objects.kaxmedia.com/auto/o/139752/7900ca8f22.svg" alt="" width="20" height="25">
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══ TOP SECTION: HERO + ACE AI ═══ -->
+    <section class="top-section">
+      <div class="container">
+        <div class="top-layout">
+          <!-- Left: Title + Category Cards -->
+          <div class="top-left">
+            <h1>Gambling Strategy</h1>
+            <p class="subtitle">Free strategy guides from our experts</p>
+            <div class="category-cards">
+              <a href="#casino-strategy" class="cat-card">
+                <div class="cat-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/106986/df49168be0.png') center/cover"></div>
+                <div class="cat-card-label">Casino Strategy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </a>
+              <a href="#betting-strategy" class="cat-card">
+                <div class="cat-card-img" style="background:url('https://objects.kaxmedia.com/genesis/betting-odds-strategy.webp') center/cover"></div>
+                <div class="cat-card-label">Betting Strategy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </a>
+              <a href="#poker-strategy" class="cat-card">
+                <div class="cat-card-img" style="background:url('https://objects.kaxmedia.com/genesis/how-to-play-stud-poker.webp') center/cover"></div>
+                <div class="cat-card-label">Poker Strategy <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ FEATURED VIDEOS ═══ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Featured Videos</h2>
+        </div>
+        <div class="featured-layout">
+          <div class="featured-main-wrap"
+               data-video-id="DFAhFATiWAg"
+               data-thumb="https://img.youtube.com/vi/DFAhFATiWAg/maxresdefault.jpg"
+               data-title="Does the Martingale System Work? The Surprising Answer"
+               data-meta="232K views"
+               data-duration="2:37">
+            <div class="featured-main">
+              <div class="featured-main-bg" style="background:url('https://img.youtube.com/vi/DFAhFATiWAg/maxresdefault.jpg') center/cover"></div>
+              <div class="featured-play"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+              <span class="featured-duration">2:37</span>
+            </div>
+            <div class="featured-info">
+              <div class="featured-info-title">Does the Martingale System Work? The Surprising Answer</div>
+              <div class="featured-info-meta">232K views</div>
+            </div>
+          </div>
+          <div class="featured-sidebar">
+            <a href="#" class="featured-sidebar-item"
+               data-video-id="VKx2v4LSC5E"
+               data-thumb="https://img.youtube.com/vi/VKx2v4LSC5E/maxresdefault.jpg"
+               data-title="Different Poker Games Explained (Hold'em, Omaha, Stud, Draw)"
+               data-meta="92K views"
+               data-duration="2:47">
+              <div class="featured-sidebar-thumb" style="background:url('https://img.youtube.com/vi/VKx2v4LSC5E/maxresdefault.jpg') center/cover">
+                <div class="play-sm"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <span class="featured-sidebar-dur">2:47</span>
+              </div>
+              <div class="featured-sidebar-info">
+                <div class="featured-sidebar-title">Different Poker Games Explained (Hold'em, Omaha, Stud, Draw)</div>
+                <div class="featured-sidebar-meta">92K views</div>
+              </div>
+            </a>
+            <a href="#" class="featured-sidebar-item"
+               data-video-id="00pE8gr35ng"
+               data-thumb="https://img.youtube.com/vi/00pE8gr35ng/maxresdefault.jpg"
+               data-title="When Should You Double Down in Blackjack?"
+               data-meta="16K views"
+               data-duration="1:59">
+              <div class="featured-sidebar-thumb" style="background:url('https://img.youtube.com/vi/00pE8gr35ng/maxresdefault.jpg') center/cover">
+                <div class="play-sm"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <span class="featured-sidebar-dur">1:59</span>
+              </div>
+              <div class="featured-sidebar-info">
+                <div class="featured-sidebar-title">When Should You Double Down in Blackjack?</div>
+                <div class="featured-sidebar-meta">16K views</div>
+              </div>
+            </a>
+            <a href="#" class="featured-sidebar-item"
+               data-video-id="rLTapLdh6CE"
+               data-thumb="https://img.youtube.com/vi/rLTapLdh6CE/maxresdefault.jpg"
+               data-title="What is a 'Slow Roll' in Poker?"
+               data-meta="16K views"
+               data-duration="1:47">
+              <div class="featured-sidebar-thumb" style="background:url('https://img.youtube.com/vi/rLTapLdh6CE/maxresdefault.jpg') center/cover">
+                <div class="play-sm"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <span class="featured-sidebar-dur">1:47</span>
+              </div>
+              <div class="featured-sidebar-info">
+                <div class="featured-sidebar-title">What is a 'Slow Roll' in Poker?</div>
+                <div class="featured-sidebar-meta">16K views</div>
+              </div>
+            </a>
+            <a href="#" class="featured-sidebar-item"
+               data-video-id="5Qf_17B_J6M"
+               data-thumb="https://img.youtube.com/vi/5Qf_17B_J6M/maxresdefault.jpg"
+               data-title="Learn How to Play Craps in Under 5 Minutes"
+               data-meta="16K views"
+               data-duration="4:29">
+              <div class="featured-sidebar-thumb" style="background:url('https://img.youtube.com/vi/5Qf_17B_J6M/maxresdefault.jpg') center/cover">
+                <div class="play-sm"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <span class="featured-sidebar-dur">4:29</span>
+              </div>
+              <div class="featured-sidebar-info">
+                <div class="featured-sidebar-title">Learn How to Play Craps in Under 5 Minutes</div>
+                <div class="featured-sidebar-meta">16K views</div>
+              </div>
+            </a>
+            <a href="#" class="featured-sidebar-item"
+               data-video-id="USjba19SVlg"
+               data-thumb="https://img.youtube.com/vi/USjba19SVlg/maxresdefault.jpg"
+               data-title="Different Types of Poker Rake Explained"
+               data-meta="16K views"
+               data-duration="2:35">
+              <div class="featured-sidebar-thumb" style="background:url('https://img.youtube.com/vi/USjba19SVlg/maxresdefault.jpg') center/cover">
+                <div class="play-sm"><svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg></div>
+                <span class="featured-sidebar-dur">2:35</span>
+              </div>
+              <div class="featured-sidebar-info">
+                <div class="featured-sidebar-title">Different Types of Poker Rake Explained</div>
+                <div class="featured-sidebar-meta">16K views</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CASINO STRATEGY ═══ -->
+    <section id="casino-strategy" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Casino Strategy</h2>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" aria-label="Previous" onclick="scrollCarousel(this,-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="arrow-btn" aria-label="Next" onclick="scrollCarousel(this,1)"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+          </div>
+        </div>
+        <div class="carousel">
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/blackjack-strategy-the-ultimate-guide-to-online-blackjack-2481500" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/106986/df49168be0.png') center/cover"></div>
+            <div class="article-card-title">Blackjack Strategy: The Ultimate Guide to Online Blackjack</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/roulette-strategy-odds-and-payouts-32400" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2038/46e216d6f6.jpeg') center/cover"></div>
+            <div class="article-card-title">Roulette Strategy: Odds and Payouts</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/craps-odds-explained-28200" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2025/985f5da2b8.jpeg') center/cover"></div>
+            <div class="article-card-title">Craps Odds Explained</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/blackjack-strategy-when-to-double-down-23100" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2018/cf58943f9c.jpeg') center/cover"></div>
+            <div class="article-card-title">Blackjack Strategy: When to Double Down</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/card-counting-what-it-is-and-how-it-works" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/counting-cards.jpeg') center/cover"></div>
+            <div class="article-card-title">Card Counting: What It Is and How It Works</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/the-martingale-system-a-betting-strategy-to-avoid-6200" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/35407/5415dd9044.png') center/cover"></div>
+            <div class="article-card-title">The Martingale System: A Betting Strategy to Avoid</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CASINO GUIDES ═══ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Casino Guides</h2>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" aria-label="Previous" onclick="scrollCarousel(this,-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="arrow-btn" aria-label="Next" onclick="scrollCarousel(this,1)"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+          </div>
+        </div>
+        <div class="carousel">
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/five-of-the-best-casinos-in-london-26300" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2021/34ebcf26e5.png') center/cover"></div>
+            <div class="article-card-title">Five of the Best Casinos in London</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/12-days-of-christmas-slots-610600" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/image-feature-main-6257.png') center/cover"></div>
+            <div class="article-card-title">12 Days of Christmas Slots</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/a-beginner-s-guide-to-the-world-of-land-casinos-8500" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/1943/2954bbc792.jpeg') center/cover"></div>
+            <div class="article-card-title">A Beginner&#39;s Guide to the World of Land Casinos</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/top-10-casinos-in-the-world-38000" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2041/bbc793b034.jpeg') center/cover"></div>
+            <div class="article-card-title">Top 10 Casinos in the World</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/10-casino-games-with-the-lowest-house-edge-2787900" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/2006/22ff69cc7a.png') center/cover"></div>
+            <div class="article-card-title">10 Casino Games With the Lowest House Edge</div>
+          </a>
+          <a href="https://www.gambling.com/uk/online-casinos/strategy/what-is-return-to-player-2092400" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/auto/o/79309/d991479932.png') center/cover"></div>
+            <div class="article-card-title">What Is Return to Player?</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ BETTING STRATEGY ═══ -->
+    <section id="betting-strategy" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Betting Strategy</h2>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" aria-label="Previous" onclick="scrollCarousel(this,-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="arrow-btn" aria-label="Next" onclick="scrollCarousel(this,1)"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+          </div>
+        </div>
+        <div class="carousel">
+          <a href="https://www.gambling.com/strategy/betting/how-odds-work" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/betting-odds-strategy.webp') center/cover"></div>
+            <div class="article-card-title">How do Betting Odds Work?</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/betting/football" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/football-strategy.webp') center/cover"></div>
+            <div class="article-card-title">Best Football Betting Strategies</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/betting/horse-racing" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/horse-racing-betting-strategy-guide.webp') center/cover"></div>
+            <div class="article-card-title">Horse Racing Betting Strategies</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/betting/parlay" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/parlay-betting.webp') center/cover"></div>
+            <div class="article-card-title">Mastering Parlay Betting</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/betting/each-way-bet" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/each-way-betting-strategies-guide.webp') center/cover"></div>
+            <div class="article-card-title">Each-Way Betting: How It Works</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/betting/arbitrage" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/arbitrage-betting-strategy.webp') center/cover"></div>
+            <div class="article-card-title">Arbitrage Betting Strategy</div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ POKER STRATEGY ═══ -->
+    <section id="poker-strategy" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Poker Strategy</h2>
+          <div class="carousel-arrows">
+            <button class="arrow-btn" aria-label="Previous" onclick="scrollCarousel(this,-1)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <button class="arrow-btn" aria-label="Next" onclick="scrollCarousel(this,1)"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></button>
+          </div>
+        </div>
+        <div class="carousel">
+          <a href="https://www.gambling.com/strategy/online-poker/poker-basics-starting-hands" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/how-to-play-stud-poker.webp') center/cover"></div>
+            <div class="article-card-title">Poker Basics: Starting Hands</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/online-poker/explaining-pocket-pairs-and-how-to-play-them" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/pocket-pairs.jpg') center/cover"></div>
+            <div class="article-card-title">Explaining Pocket Pairs and How to Play Them</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/online-poker/tips-for-bluffing-in-poker" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/bluffing-poster.jpg') center/cover"></div>
+            <div class="article-card-title">Tips for Bluffing in Poker</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/online-poker/poker-strategy-the-power-of-position" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/money-on-table.jpg') center/cover"></div>
+            <div class="article-card-title">Poker Strategy: The Power of Position</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/online-poker/poker-math-calculating-texas-hold-em-poker-pot-odds-for-beginners" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/math-calculation.jpg') center/cover"></div>
+            <div class="article-card-title">Poker Math: Calculating Pot Odds For Beginners</div>
+          </a>
+          <a href="https://www.gambling.com/strategy/online-poker/the-benefits-of-effective-poker-bankroll-management" class="article-card">
+            <div class="article-card-img" style="background:url('https://objects.kaxmedia.com/genesis/poker-bankroll-management.jpg') center/cover"></div>
+            <div class="article-card-title">The Benefits of Effective Poker Bankroll Management</div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══ FOOTER (matches gambling.com) ═══ -->
+  <footer class="site-footer">
+    <!-- 3-Column Links -->
+    <div class="footer-columns">
+      <div class="container">
+        <div class="footer-col">
+          <h5 class="footer-col-title">Popular Pages</h5>
+          <ul>
+            <li><a href="https://www.gambling.com/online-casinos">Online Casinos</a></li>
+            <li><a href="https://www.gambling.com/online-betting">Online Betting</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/slots">Online Slots</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/bingo">Bingo Sites</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/new">New Casino Sites</a></li>
+            <li><a href="https://www.gambling.com/poker">Poker Sites</a></li>
+            <li><a href="https://www.gambling.com/reviews">Reviews</a></li>
+            <li><a href="https://www.gambling.com/free-games">Free Games</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5 class="footer-col-title">Quick Links</h5>
+          <ul>
+            <li><a href="https://www.gambling.com/online-casinos/bonuses">Casino Bonuses</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/blackjack">Online Blackjack</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/roulette">Online Roulette</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/best-payout">Best Payout Casino</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/fast-withdrawal">Fast Withdrawal Casino</a></li>
+            <li><a href="https://www.gambling.com/online-casinos/free-spins">Free Spins No Deposit</a></li>
+            <li><a href="https://www.gambling.com/guides">Guides</a></li>
+            <li><a href="https://www.gambling.com/news">News</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5 class="footer-col-title">Support</h5>
+          <ul>
+            <li><a href="https://www.gambling.com/about-us">About Us</a></li>
+            <li><a href="https://www.gambling.com/authors">Authors</a></li>
+            <li><a href="https://www.gambling.com/editorial-guidelines">Editorial Guidelines</a></li>
+            <li><a href="https://www.gambling.com/contact">Contact Us</a></li>
+            <li><a href="https://www.gambling.com/corporate">Corporate</a></li>
+            <li><a href="https://www.gambling.com/responsible-gambling">Responsible Gambling</a></li>
+            <li><a href="https://www.gambling.com/sitemap">Sitemap</a></li>
+            <li><a href="https://www.gambling.com/rewards-terms">Rewards Terms and Conditions</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Social Icons + Disclaimer -->
+    <div class="footer-bottom-section">
+      <div class="container">
+        <div class="footer-social">
+          <a href="https://x.com/gamblingcom" class="social-icon" aria-label="Gambling.com on X"><img src="https://objects.kaxmedia.com/auto/o/163105/6d2bef2635.svg" alt="X" width="32" height="32"></a>
+          <a href="https://www.youtube.com/@GamblingComGroup" class="social-icon" aria-label="Gambling.com on YouTube"><img src="https://objects.kaxmedia.com/auto/o/207713/dd9365d09a.svg" alt="YouTube" width="32" height="32"></a>
+          <a href="https://www.facebook.com/gamblingcom" class="social-icon" aria-label="Gambling.com on Facebook"><img src="https://objects.kaxmedia.com/auto/o/163103/abf741e7a2.svg" alt="Facebook" width="32" height="32"></a>
+          <a href="https://www.instagram.com/gambling.com_official" class="social-icon" aria-label="Gambling.com on Instagram"><img src="https://objects.kaxmedia.com/auto/o/163104/3ccb615a01.svg" alt="Instagram" width="32" height="32"></a>
+          <a href="https://www.tiktok.com/@gambling.com" class="social-icon" aria-label="Gambling.com on TikTok"><img src="https://objects.kaxmedia.com/auto/o/207712/fdc1e4a62c.svg" alt="TikTok" width="32" height="32"></a>
+          <a href="https://twitter.com/gambling_group" class="social-icon" aria-label="Gambling.com Corporate on X"><img src="https://objects.kaxmedia.com/auto/o/163105/6d2bef2635.svg" alt="X Corporate" width="32" height="32"></a>
+        </div>
+        <div class="footer-disclaimer">
+          <p>DISCLAIMER: Online Wagering is illegal in some Jurisdictions. It is your responsibility to check your local regulations before playing online. GDC Media Ltd takes no responsibility for your actions.</p>
+          <p>&copy; 2011-2026 GDC Media Limited. All Rights Reserved. Gambling.com is a registered trademark of GDC Media Limited.</p>
+          <p><a href="https://www.gambling.com/terms">Terms and Conditions</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://www.gambling.com/privacy-policy">Privacy and Cookies Policy</a></p>
+          <p>Gambling can be addictive. Please play Responsibly.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Country Flags -->
+    <div class="footer-flags">
+      <div class="container">
+        <a href="https://www.gambling.com/uk/guides"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31168/01797ff082.svg" alt="United Kingdom" width="29" height="29"></a>
+        <a href="https://www.gambling.com/au"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31174/6503ffd2da.svg" alt="Australia" width="29" height="29"></a>
+        <a href="https://www.gambling.com/at/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/105838/0e088ffbc2.svg" alt="Austria" width="29" height="29"></a>
+        <a href="https://www.gambling.com/be/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150621/315f92da18.svg" alt="Belgium" width="29" height="29"></a>
+        <a href="https://www.gambling.com/be/fr/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/228906/482ba03dde.svg" alt="Belgium FR" width="29" height="29"></a>
+        <a href="https://www.gambling.com/br/estrategia"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150610/cc07d617b6.svg" alt="Brazil" width="29" height="29"></a>
+        <a href="https://www.gambling.com/ca/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31173/1dfb1fd413.svg" alt="Canada" width="29" height="29"></a>
+        <a href="https://www.gambling.com/ca/fr/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/164919/1c81e47a86.svg" alt="Canada FR" width="29" height="29"></a>
+        <a href="https://www.gambling.com/dk/strategi"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/39797/55038f4a0d.png" alt="Denmark" width="29" height="29"></a>
+        <a href="https://www.gambling.com/de/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31180/50ebfcf79b.svg" alt="Germany" width="29" height="29"></a>
+        <a href="https://www.gambling.com/gr/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/105836/eba59012f6.svg" alt="Greece" width="29" height="29"></a>
+        <a href="https://www.gambling.com/in/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/105839/07a23616c1.svg" alt="India" width="29" height="29"></a>
+        <a href="https://www.gambling.com/ie/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31172/289a7c5659.svg" alt="Ireland" width="29" height="29"></a>
+        <a href="https://www.gambling.com/it/strategia"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31184/7a0dc044a9.svg" alt="Italy" width="29" height="29"></a>
+        <a href="https://www.gambling.com/mx/estrategias"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150612/d42de529e8.svg" alt="Mexico" width="29" height="29"></a>
+        <a href="https://www.gambling.com/nl/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/105837/99d1fe9eb5.svg" alt="Netherlands" width="29" height="29"></a>
+        <a href="https://www.gambling.com/nz/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31177/3dabbb82ad.svg" alt="New Zealand" width="29" height="29"></a>
+        <a href="https://www.gambling.com/no/strategi"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31182/98b205880f.svg" alt="Norway" width="29" height="29"></a>
+        <a href="https://www.gambling.com/pe/estrategias"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150699/e134106936.svg" alt="Peru" width="29" height="29"></a>
+        <a href="https://www.gambling.com/ro/strategie"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150700/24bb1aa999.svg" alt="Romania" width="29" height="29"></a>
+        <a href="https://www.gambling.com/es/estrategias"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/150623/5ea20dcd90.svg" alt="Spain" width="29" height="29"></a>
+        <a href="https://www.gambling.com/se/strategi"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31183/98165493bc.svg" alt="Sweden" width="29" height="29"></a>
+        <a href="https://www.gambling.com/us/strategy"><img class="footer-flag-icon" src="https://objects.kaxmedia.com/auto/o/31206/1d224877ce.svg" alt="United States" width="29" height="29"></a>
+      </div>
+    </div>
+
+    <!-- Certification Badges -->
+    <div class="footer-badges">
+      <div class="container">
+        <img src="https://objects.kaxmedia.com/auto/o/163122/a668aabbbd.svg" alt="GAMB | Nasdaq Listed" height="40">
+        <img src="https://objects.kaxmedia.com/auto/o/163119/d9f4d5eb90.svg" alt="GamStop" height="48">
+        <img src="https://objects.kaxmedia.com/auto/o/163118/df5e1b2ddd.svg" alt="GamCare" height="51">
+        <img src="https://objects.kaxmedia.com/auto/o/209377/e0932ff1ed.svg" alt="GambleAware" height="21">
+        <img src="https://objects.kaxmedia.com/auto/o/163106/6830429ae0.svg" alt="18+" height="51">
+        <img src="https://objects.kaxmedia.com/auto/o/163115/4c822cd29c.svg" alt="eCOGRA" height="51">
+        <img src="https://objects.kaxmedia.com/auto/o/163120/4564d6de5f.svg" alt="Gambling.com Group" height="40">
+        <img src="https://objects.kaxmedia.com/auto/o/163127/26fee6df5b.svg" alt="GPWA Approved Portal" height="40">
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══ JAVASCRIPT ═══ -->
+  <script>
+    /* ── Carousel arrow scrolling ── */
+    function scrollCarousel(btn, direction) {
+      var section = btn.closest('.section') || btn.closest('section');
+      var carousel = section.querySelector('.carousel');
+      if (!carousel) return;
+      var scrollAmount = carousel.offsetWidth * 0.75;
+      carousel.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+
+    /* ── Featured Video Player ── */
+    (function() {
+      var wrap = document.querySelector('.featured-main-wrap');
+      if (!wrap) return;
+      var main = wrap.querySelector('.featured-main');
+      var bg = wrap.querySelector('.featured-main-bg');
+      var playBtn = wrap.querySelector('.featured-play');
+      var dur = wrap.querySelector('.featured-duration');
+      var titleEl = wrap.querySelector('.featured-info-title');
+      var metaEl = wrap.querySelector('.featured-info-meta');
+      var sidebar = document.querySelector('.featured-sidebar');
+
+      function playVideo(videoId) {
+        /* Remove any existing iframe */
+        var old = main.querySelector('iframe');
+        if (old) old.remove();
+        /* Create YouTube embed */
+        var iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1&rel=0';
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.allowFullscreen = true;
+        iframe.title = titleEl.textContent;
+        main.appendChild(iframe);
+        main.classList.add('is-playing');
+      }
+
+      function stopVideo() {
+        var iframe = main.querySelector('iframe');
+        if (iframe) iframe.remove();
+        main.classList.remove('is-playing');
+      }
+
+      function loadIntoMain(videoId, thumb, title, meta, duration) {
+        /* Stop current playback */
+        stopVideo();
+        /* Update thumbnail, title, meta */
+        bg.style.background = "url('" + thumb + "') center/cover";
+        titleEl.textContent = title;
+        metaEl.textContent = meta;
+        dur.textContent = duration;
+        /* Update data attributes on wrap */
+        wrap.dataset.videoId = videoId;
+        wrap.dataset.thumb = thumb;
+        wrap.dataset.title = title;
+        wrap.dataset.meta = meta;
+        wrap.dataset.duration = duration;
+        /* Play immediately */
+        playVideo(videoId);
+      }
+
+      /* Click main player → play current video */
+      main.addEventListener('click', function() {
+        if (main.classList.contains('is-playing')) return;
+        playVideo(wrap.dataset.videoId);
+      });
+
+      /* Click sidebar item → swap into main and play */
+      sidebar.addEventListener('click', function(e) {
+        var item = e.target.closest('.featured-sidebar-item');
+        if (!item) return;
+        e.preventDefault();
+        /* Highlight active sidebar item */
+        sidebar.querySelectorAll('.featured-sidebar-item').forEach(function(el) {
+          el.classList.remove('is-active');
+        });
+        item.classList.add('is-active');
+        /* Load into main player */
+        loadIntoMain(
+          item.dataset.videoId,
+          item.dataset.thumb,
+          item.dataset.title,
+          item.dataset.meta,
+          item.dataset.duration
+        );
+      });
+    })();
+
+  </script>
+</body>
+</html>
