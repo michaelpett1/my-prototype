@@ -1,612 +1,345 @@
-export default function Home() {
-  const partnerLogos = [
-    "FL", "TX", "CA", "NY", "OH", "GA", "WA", "CO", "AZ",
-  ];
+import { auth } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import getDb from '@/lib/db';
+import { ROUNDS, DRIVERS, TEAMS, SEASON_PREDICTION_WINDOWS } from '@/lib/f1-data';
+import {
+  getQualifyingPrediction,
+  getRacePrediction,
+  getSprintPrediction,
+} from '@/lib/db/queries/predictions';
+import HowToPlay from '@/components/HowToPlay';
+import NavBar from '@/components/NavBar';
 
-  const barHeights = [40, 55, 48, 70, 62, 80, 68, 90, 78, 95, 82, 88, 96, 85, 100];
+function getNextRound() {
+  const now = new Date().toISOString().split('T')[0];
+  return ROUNDS.find(r => r.raceDate >= now) || ROUNDS[ROUNDS.length - 1];
+}
+
+function getUserScores(userId: number) {
+  const db = getDb();
+  const result = db.prepare(
+    'SELECT COALESCE(SUM(total), 0) as totalPoints, COUNT(*) as roundsPlayed FROM scores WHERE user_id = ?'
+  ).get(userId) as { totalPoints: number; roundsPlayed: number };
+  return result;
+}
+
+function getUserRank(userId: number) {
+  const db = getDb();
+  const rows = db.prepare(
+    'SELECT user_id, SUM(total) as total_points FROM scores GROUP BY user_id ORDER BY total_points DESC'
+  ).all() as { user_id: number; total_points: number }[];
+  const idx = rows.findIndex(r => r.user_id === userId);
+  return idx >= 0 ? idx + 1 : null;
+}
+
+function getSeasonPredictionWindowInfo() {
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Find which window is currently open
+  // A window N is open if:
+  // - today < qualifying date of SEASON_PREDICTION_WINDOWS[N-1]
+  // - AND either it's the first window, or today >= qualifying date of the PREVIOUS window round
+  for (let i = 0; i < SEASON_PREDICTION_WINDOWS.length; i++) {
+    const windowRound = ROUNDS.find(r => r.id === SEASON_PREDICTION_WINDOWS[i]);
+    if (!windowRound) continue;
+
+    if (today < windowRound.qualifyingDate) {
+      // Check if this is the correct window (not a future one)
+      // If it's window 1, it's always the right one if we're before R1 qualifying
+      // Otherwise, we should be past the previous window's round qualifying
+      if (i === 0) {
+        // Window 1: always open before R1 qualifying
+        const daysLeft = Math.ceil(
+          (new Date(windowRound.qualifyingDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+        return { windowNumber: 1, isOpen: true, closesDate: windowRound.qualifyingDate, closesRound: windowRound, daysLeft };
+      }
+      // For windows 2-4: open only if we're past the previous window's closing round qualifying
+      const prevWindowRound = ROUNDS.find(r => r.id === SEASON_PREDICTION_WINDOWS[i - 1]);
+      if (prevWindowRound && today >= prevWindowRound.qualifyingDate) {
+        const daysLeft = Math.ceil(
+          (new Date(windowRound.qualifyingDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+        return { windowNumber: i + 1, isOpen: true, closesDate: windowRound.qualifyingDate, closesRound: windowRound, daysLeft };
+      }
+      // We're before this window's round qualifying but haven't reached the gap yet — window not yet open
+      break;
+    }
+  }
+  return { windowNumber: null, isOpen: false, closesDate: null, closesRound: null, daysLeft: 0 };
+}
+
+function getDriverLabel(driverId: number) {
+  const d = DRIVERS.find(dr => dr.id === driverId);
+  if (!d) return '???';
+  const t = TEAMS.find(tm => tm.id === d.teamId);
+  return { code: d.code, name: `${d.firstName} ${d.lastName}`, color: t?.color || '#666', imageUrl: d.imageUrl };
+}
+
+export default async function HomePage() {
+  const session = await auth();
+  if (!session?.user) redirect('/login');
+
+  const userId = parseInt(session.user.id!);
+  const nextRound = getNextRound();
+  const stats = getUserScores(userId);
+  const rank = getUserRank(userId);
+
+  // Check if user has predictions for next round
+  const db = getDb();
+  const hasPrediction = db.prepare(
+    'SELECT id FROM qualifying_predictions WHERE user_id = ? AND round_id = ?'
+  ).get(userId, nextRound.id);
+
+  const qualPrediction = getQualifyingPrediction(userId, nextRound.id);
+  const racePrediction = getRacePrediction(userId, nextRound.id);
+  const sprintPrediction = nextRound.isSprint ? getSprintPrediction(userId, nextRound.id) : null;
+
+  const daysUntilRace = Math.ceil(
+    (new Date(nextRound.raceDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+  );
+
+  const seasonWindow = getSeasonPredictionWindowInfo();
 
   return (
-    <main style={{ fontFamily: "Inter, sans-serif", backgroundColor: "#101722" }}>
-      {/* ── NAV ── */}
-      <header style={{ backgroundColor: "#101722" }}>
-        <div
-          style={{
-            maxWidth: "87.5rem",
-            margin: "0 auto",
-            padding: "0 1.5rem",
-            height: "64px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          {/* Logo */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-              <circle cx="16" cy="16" r="16" fill="#4541fe" />
-              <circle cx="16" cy="16" r="8" fill="none" stroke="white" strokeWidth="2" />
-              <path d="M12 16 C12 12 20 12 20 16" stroke="#fe0e83" strokeWidth="2.5" strokeLinecap="round" fill="none" />
-            </svg>
-            <span style={{ color: "white", fontWeight: 600, fontSize: "0.9rem" }}>
-              Healthy Together
-            </span>
-          </div>
+    <div className="min-h-screen bg-gradient-main">
+      {/* Nav — shared across all pages */}
+      <NavBar />
 
-          {/* Nav links */}
-          <nav style={{ display: "flex", gap: "2rem" }}>
-            {["Solutions", "Company", "Resources"].map((link) => (
-              <a
-                key={link}
-                href="#"
-                style={{
-                  color: "rgba(255,255,255,0.7)",
-                  fontSize: "0.9rem",
-                  textDecoration: "none",
-                  fontWeight: 500,
-                }}
-              >
-                {link}
-              </a>
-            ))}
-          </nav>
-
-          {/* CTA */}
-          <a
-            href="#"
-            style={{
-              backgroundColor: "#4541fe",
-              color: "white",
-              fontWeight: 700,
-              fontSize: "0.9rem",
-              padding: "0.55em 1.25em",
-              borderRadius: "0.5rem",
-              textDecoration: "none",
-              display: "inline-block",
-            }}
-          >
-            Start Now!
-          </a>
-        </div>
-      </header>
-
-      {/* ── HERO ── */}
-      <section
-        style={{ backgroundColor: "#101722", position: "relative", overflow: "hidden" }}
-      >
-        {/* Headline + CTA */}
-        <div
-          style={{
-            maxWidth: "56rem",
-            margin: "0 auto",
-            padding: "6rem 1.5rem 0",
-            textAlign: "center",
-            position: "relative",
-            zIndex: 10,
-          }}
-        >
-          <h1
-            style={{
-              color: "white",
-              fontWeight: 700,
-              fontSize: "clamp(2.75rem, 6vw, 4.75rem)",
-              lineHeight: 1,
-              letterSpacing: "-0.05em",
-              marginBottom: "2rem",
-            }}
-          >
-            Systems that deliver{" "}
-            <span
-              style={{
-                background: "linear-gradient(90deg, #fe0e83 0%, #a855f7 60%, #4541fe 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              outcomes
-            </span>{" "}
-            for government.
-          </h1>
-
-          <a
-            href="#"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              border: "1.5px solid rgba(255,255,255,0.35)",
-              color: "white",
-              fontWeight: 600,
-              fontSize: "1rem",
-              padding: "0.65em 1.75em",
-              borderRadius: "9999px",
-              textDecoration: "none",
-            }}
-          >
-            Schedule a Demo
-          </a>
-        </div>
-
-        {/* Gradient ribbon wave */}
-        <div
-          style={{
-            position: "relative",
-            marginTop: "3.5rem",
-            height: "130px",
-            pointerEvents: "none",
-          }}
-        >
-          <svg
-            viewBox="0 0 1440 130"
-            preserveAspectRatio="none"
-            style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}
-            aria-hidden="true"
-          >
-            <defs>
-              <linearGradient id="ribbonGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#fe0e83" />
-                <stop offset="45%" stopColor="#a855f7" />
-                <stop offset="100%" stopColor="#4541fe" />
-              </linearGradient>
-              <linearGradient id="ribbonShadow" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stopColor="#7b0a3d" />
-                <stop offset="45%" stopColor="#4a2080" />
-                <stop offset="100%" stopColor="#1e1a80" />
-              </linearGradient>
-            </defs>
-            {/* Depth / shadow layer */}
-            <path
-              d="M-60 105 C180 100 380 25 720 60 C1060 95 1260 20 1500 45"
-              stroke="url(#ribbonShadow)"
-              strokeWidth="58"
-              strokeLinecap="round"
-              fill="none"
-              opacity="0.45"
-              transform="translate(6, 10)"
-            />
-            {/* Main ribbon */}
-            <path
-              d="M-60 105 C180 100 380 25 720 60 C1060 95 1260 20 1500 45"
-              stroke="url(#ribbonGrad)"
-              strokeWidth="52"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </svg>
-        </div>
-
-        {/* Partner logos */}
-        <div style={{ backgroundColor: "#0c1019", padding: "2rem 1.5rem" }}>
-          <div
-            style={{
-              maxWidth: "56rem",
-              margin: "0 auto",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "1.5rem",
-              flexWrap: "wrap",
-            }}
-          >
-            {partnerLogos.map((code) => (
-              <div
-                key={code}
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "9999px",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "rgba(255,255,255,0.45)",
-                  fontSize: "0.65rem",
-                  fontWeight: 700,
-                  letterSpacing: "0.05em",
-                }}
-                aria-label={`${code} partner`}
-              >
-                {code}
-              </div>
-            ))}
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        {/* Welcome */}
+        <div className="animate-fade-in">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold mb-1">
+                Welcome back, <span className="text-gradient">{session.user.name}</span>
+              </h1>
+              <p className="text-[--color-text-secondary]">2026 Formula 1 Season</p>
+            </div>
+            <HowToPlay variant="home" />
           </div>
         </div>
-      </section>
 
-      {/* ── PRODUCT SHOWCASE ── */}
-      <section style={{ backgroundColor: "#101722", padding: "4rem 1.5rem 8rem" }}>
-        <div style={{ maxWidth: "87.5rem", margin: "0 auto" }}>
-          <div
-            style={{
-              background: "linear-gradient(145deg, #3d39f0 0%, #2318a8 45%, #160e6e 100%)",
-              borderRadius: "1.5rem",
-              padding: "2.5rem",
-              overflow: "hidden",
-            }}
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+          <div className="bg-gradient-card rounded-xl p-6">
+            <p className="text-sm text-[--color-text-muted] mb-1">Total Points</p>
+            <p className="text-3xl font-bold text-[--color-accent-blue]">{stats.totalPoints}</p>
+          </div>
+          <div className="bg-gradient-card rounded-xl p-6">
+            <p className="text-sm text-[--color-text-muted] mb-1">Rank</p>
+            <p className="text-3xl font-bold text-[--color-accent-violet]">
+              {rank ? `#${rank}` : '--'}
+            </p>
+          </div>
+          <div className="bg-gradient-card rounded-xl p-6">
+            <p className="text-sm text-[--color-text-muted] mb-1">Rounds Played</p>
+            <p className="text-3xl font-bold text-[--color-accent-teal]">{stats.roundsPlayed}</p>
+          </div>
+        </div>
+
+        {/* Season Predictions Window Banner */}
+        {seasonWindow.isOpen && (
+          <Link
+            href="/special"
+            className="block animate-slide-up"
+            style={{ animationDelay: '0.15s' }}
           >
-            {/* Mock dashboard UI */}
-            <div
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                borderRadius: "0.875rem",
-                overflow: "hidden",
-                border: "1px solid rgba(255,255,255,0.1)",
-              }}
-            >
-              {/* Browser chrome */}
-              <div
-                style={{
-                  background: "rgba(0,0,0,0.35)",
-                  padding: "0.65rem 1rem",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                }}
-              >
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#ff5f57" }} />
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#febc2e" }} />
-                <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#28c840" }} />
-                <div
-                  style={{
-                    flex: 1,
-                    background: "rgba(255,255,255,0.08)",
-                    borderRadius: 4,
-                    height: 20,
-                    marginLeft: "0.75rem",
-                  }}
-                />
-              </div>
-
-              {/* Dashboard body */}
-              <div style={{ display: "flex", minHeight: 320 }}>
-                {/* Sidebar */}
-                <div
-                  style={{
-                    width: 180,
-                    background: "rgba(0,0,0,0.25)",
-                    padding: "1.25rem 1rem",
-                    flexShrink: 0,
-                  }}
-                >
-                  {["Dashboard", "Applications", "Residents", "Reports", "Settings"].map((item, i) => (
-                    <div
-                      key={item}
-                      style={{
-                        padding: "0.55rem 0.75rem",
-                        borderRadius: "0.4rem",
-                        marginBottom: "0.25rem",
-                        background: i === 0 ? "rgba(69,65,254,0.4)" : "transparent",
-                        color: i === 0 ? "white" : "rgba(255,255,255,0.45)",
-                        fontSize: "0.8rem",
-                        fontWeight: i === 0 ? 600 : 400,
-                      }}
-                    >
-                      {item}
-                    </div>
-                  ))}
+            <div className="bg-gradient-to-r from-[--color-accent-violet]/15 to-[--color-accent-blue]/15 rounded-xl p-5 border border-[--color-accent-violet]/30 hover:border-[--color-accent-violet]/50 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏆</span>
+                  <div>
+                    <p className="font-semibold text-[--color-text-primary]">
+                      Season Predictions Window {seasonWindow.windowNumber} Open
+                    </p>
+                    <p className="text-sm text-[--color-text-secondary]">
+                      Pick your Drivers&apos; &amp; Constructors&apos; Champions — closes before R{seasonWindow.closesRound!.id} qualifying
+                    </p>
+                  </div>
                 </div>
-
-                {/* Main content */}
-                <div style={{ flex: 1, padding: "1.25rem" }}>
-                  {/* Stat cards */}
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: "0.875rem",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    {[
-                      { label: "Applications", value: "2,847", change: "↑ 12% this week", up: true },
-                      { label: "Approved", value: "1,923", change: "↑ 8% this week", up: true },
-                      { label: "Avg. Processing", value: "2.3 days", change: "↓ 65% faster", up: true },
-                    ].map(({ label, value, change, up }) => (
-                      <div
-                        key={label}
-                        style={{
-                          background: "rgba(0,0,0,0.3)",
-                          borderRadius: "0.75rem",
-                          padding: "1rem 1.1rem",
-                        }}
-                      >
-                        <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.7rem", marginBottom: 6 }}>
-                          {label}
-                        </div>
-                        <div
-                          style={{
-                            color: "white",
-                            fontWeight: 700,
-                            fontSize: "1.5rem",
-                            lineHeight: 1,
-                            marginBottom: 6,
-                          }}
-                        >
-                          {value}
-                        </div>
-                        <div style={{ color: up ? "#33c458" : "#fe0e83", fontSize: "0.7rem" }}>
-                          {change}
-                        </div>
-                      </div>
-                    ))}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <div className="text-right hidden sm:block">
+                    <p className="text-xl font-bold text-[--color-accent-violet]">{seasonWindow.daysLeft}d</p>
+                    <p className="text-xs text-[--color-text-muted]">remaining</p>
                   </div>
-
-                  {/* Chart */}
-                  <div
-                    style={{
-                      background: "rgba(0,0,0,0.3)",
-                      borderRadius: "0.75rem",
-                      padding: "1rem 1.1rem",
-                    }}
-                  >
-                    <div style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.7rem", marginBottom: 12 }}>
-                      Applications over time
-                    </div>
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: 4, height: 80 }}>
-                      {barHeights.map((h, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            flex: 1,
-                            height: `${h}%`,
-                            borderRadius: "3px 3px 0 0",
-                            background: "linear-gradient(to top, #4541fe, #fe0e83)",
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
+                  <span className="text-[--color-accent-violet] font-semibold text-sm">
+                    Predict →
+                  </span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
+          </Link>
+        )}
 
-      {/* ── SPEED & EFFICIENCY ── */}
-      <section style={{ backgroundColor: "#ece4fe", padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: "68rem", margin: "0 auto" }}>
-          {/* Section headline */}
-          <h2
-            style={{
-              textAlign: "center",
-              fontWeight: 700,
-              fontSize: "clamp(2.25rem, 5vw, 3.5rem)",
-              lineHeight: 1.1,
-              letterSpacing: "-0.05em",
-              marginBottom: "4rem",
-            }}
-          >
-            <span
-              style={{
-                background: "linear-gradient(90deg, #fe0e83 0%, #4541fe 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
-            >
-              Speed &amp; Efficiency
-            </span>{" "}
-            <span style={{ color: "#101722" }}>are our priority.</span>
-          </h2>
-
-          {/* Device mockup */}
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: "4.5rem" }}>
-            <div style={{ position: "relative", width: "100%", maxWidth: 580 }}>
-              {/* Laptop body */}
-              <div style={{ position: "relative" }}>
-                <div
-                  style={{
-                    background: "#1c1c2e",
-                    borderRadius: "12px 12px 0 0",
-                    padding: "8px 8px 0",
-                    aspectRatio: "16/10",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#f4f4f6",
-                      borderRadius: "6px 6px 0 0",
-                      width: "100%",
-                      height: "100%",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {/* App bar */}
-                    <div
-                      style={{
-                        background: "#fe0e83",
-                        height: 28,
-                        display: "flex",
-                        alignItems: "center",
-                        padding: "0 10px",
-                        gap: 6,
-                      }}
-                    >
-                      {[1, 2, 3].map((i) => (
-                        <div
-                          key={i}
-                          style={{ width: 7, height: 7, borderRadius: "50%", background: "rgba(255,255,255,0.5)" }}
-                        />
-                      ))}
-                    </div>
-                    {/* Layout */}
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "60px 1fr",
-                        height: "calc(100% - 28px)",
-                        gap: 0,
-                      }}
-                    >
-                      <div style={{ background: "#4541fe", opacity: 0.9 }} />
-                      <div style={{ padding: 8, display: "grid", gridTemplateRows: "1fr 1fr", gap: 6 }}>
-                        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 5 }}>
-                          {[1, 2, 3].map((i) => (
-                            <div key={i} style={{ background: "white", borderRadius: 4 }} />
-                          ))}
-                        </div>
-                        <div style={{ background: "white", borderRadius: 4 }} />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div style={{ background: "#1c1c2e", height: 10, borderRadius: "0 0 8px 8px" }} />
-                <div
-                  style={{
-                    background: "#2c2c3e",
-                    height: 3,
-                    width: "28%",
-                    margin: "0 auto",
-                    borderRadius: "0 0 4px 4px",
-                  }}
-                />
-              </div>
-
-              {/* Phone */}
-              <div
-                style={{
-                  position: "absolute",
-                  right: 0,
-                  bottom: 10,
-                  width: 85,
-                }}
-              >
-                <div
-                  style={{
-                    background: "#1c1c2e",
-                    borderRadius: 14,
-                    padding: 5,
-                    aspectRatio: "9/19",
-                    boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#f4f4f6",
-                      borderRadius: 10,
-                      width: "100%",
-                      height: "100%",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div style={{ background: "#4541fe", height: "22%" }} />
-                    <div style={{ padding: 4, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 3 }}>
-                      {[1, 2, 3, 4, 5, 6].map((i) => (
-                        <div key={i} style={{ background: "white", borderRadius: 3, height: 14 }} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* Next Race Card */}
+        <div className="bg-gradient-card rounded-xl p-8 glow-blue animate-slide-up" style={{ animationDelay: '0.2s' }}>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <p className="text-xs text-[--color-accent-blue] uppercase tracking-wider font-semibold mb-1">
+                Round {nextRound.id} of 24
+                {nextRound.isSprint && (
+                  <span className="ml-2 px-2 py-0.5 bg-[--color-accent-violet]/20 text-[--color-accent-violet] rounded text-xs">
+                    Sprint
+                  </span>
+                )}
+              </p>
+              <h2 className="text-2xl font-bold">{nextRound.flag} {nextRound.name}</h2>
+              <p className="text-[--color-text-secondary] mt-1">{nextRound.location}, {nextRound.country}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-3xl font-bold text-[--color-accent-blue]">{daysUntilRace}</p>
+              <p className="text-xs text-[--color-text-muted]">days away</p>
             </div>
           </div>
 
-          {/* 3 feature columns */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-              gap: "2.5rem",
-            }}
-          >
-            {[
-              {
-                heading: "Deploy faster than any other platform.",
-                body: "Our platform is purpose-built to deliver government solutions in record time, with dedicated deployment partners.",
-              },
-              {
-                heading: "Deliver the best experience for residents and workers.",
-                body: "We create using our platform.",
-              },
-              {
-                heading: "Long term, ROI positive deployments that you can grow with.",
-                body: "Millions in tax savings for our partners.",
-              },
-            ].map(({ heading, body }) => (
-              <div key={heading}>
-                <h3
-                  style={{
-                    fontWeight: 700,
-                    fontSize: "1.05rem",
-                    color: "#101722",
-                    marginBottom: "0.5rem",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {heading}
-                </h3>
-                <p style={{ fontSize: "0.875rem", color: "#101722", opacity: 0.65, lineHeight: 1.6 }}>
-                  {body}
-                </p>
-              </div>
-            ))}
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Link
+              href={`/predict/${nextRound.id}`}
+              className="flex-1 text-center py-3 bg-gradient-accent rounded-lg font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity"
+            >
+              {hasPrediction ? 'Edit Predictions' : 'Make Predictions'}
+            </Link>
+            {nextRound.id > 1 && (
+              <Link
+                href={`/results/${nextRound.id - 1}`}
+                className="flex-1 text-center py-3 border border-[--color-border-bright] rounded-lg font-semibold text-[--color-text-secondary] uppercase tracking-wider hover:bg-[--color-bg-card-hover] transition-colors"
+              >
+                Last Results
+              </Link>
+            )}
           </div>
         </div>
-      </section>
 
-      {/* ── DARK CTA ── */}
-      <section
-        style={{
-          backgroundColor: "#101722",
-          padding: "8rem 1.5rem",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        {/* Radial glow */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse 60% 55% at 50% 80%, rgba(69,65,254,0.35) 0%, transparent 70%)",
-            pointerEvents: "none",
-          }}
-        />
+        {/* Prediction Summary */}
+        {(qualPrediction || racePrediction || sprintPrediction) && (
+          <div className="bg-gradient-card rounded-xl p-6 animate-slide-up" style={{ animationDelay: '0.25s' }}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Your Predictions — R{nextRound.id}</h3>
+              <Link
+                href={`/predict/${nextRound.id}`}
+                className="text-sm text-[--color-accent-blue] hover:underline"
+              >
+                Edit →
+              </Link>
+            </div>
 
-        <div
-          style={{
-            maxWidth: "52rem",
-            margin: "0 auto",
-            textAlign: "center",
-            position: "relative",
-            zIndex: 10,
-          }}
-        >
-          <h2
-            style={{
-              color: "white",
-              fontWeight: 700,
-              fontSize: "clamp(2rem, 5vw, 3.5rem)",
-              lineHeight: 1.1,
-              letterSpacing: "-0.05em",
-              marginBottom: "1.5rem",
-            }}
-          >
-            Ready to transform how government works?
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.55)", fontSize: "1.125rem", marginBottom: "2.5rem" }}>
-            Join leading government agencies delivering faster, better outcomes for residents.
-          </p>
-          <a
-            href="#"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              backgroundColor: "#4541fe",
-              color: "white",
-              fontWeight: 700,
-              padding: "0.85em 2em",
-              borderRadius: "0.5rem",
-              fontSize: "1rem",
-              textDecoration: "none",
-            }}
-          >
-            Schedule a Demo
-          </a>
+            <div className="space-y-4">
+              {/* Qualifying Summary */}
+              {qualPrediction && (
+                <div>
+                  <p className="text-xs text-[--color-text-muted] uppercase tracking-wider font-semibold mb-2">Qualifying Top 3</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {[qualPrediction.p1, qualPrediction.p2, qualPrediction.p3].map((dId, i) => {
+                      const info = getDriverLabel(dId);
+                      if (typeof info === 'string') return null;
+                      return (
+                        <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ backgroundColor: `${info.color}15`, borderLeft: `3px solid ${info.color}` }}>
+                          <img src={info.imageUrl} alt={info.code} className="w-6 h-6 rounded-full object-cover bg-[--color-bg-secondary]" />
+                          <span className="text-[--color-text-muted] text-xs">P{i + 1}</span>
+                          <span className="font-semibold">{info.code}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Race Summary */}
+              {racePrediction && (
+                <div>
+                  <p className="text-xs text-[--color-text-muted] uppercase tracking-wider font-semibold mb-2">Race Top 10</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {[racePrediction.p1, racePrediction.p2, racePrediction.p3, racePrediction.p4, racePrediction.p5,
+                      racePrediction.p6, racePrediction.p7, racePrediction.p8, racePrediction.p9, racePrediction.p10].map((dId, i) => {
+                      const info = getDriverLabel(dId);
+                      if (typeof info === 'string') return null;
+                      return (
+                        <div key={i} className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-sm" style={{ backgroundColor: `${info.color}15`, borderLeft: `3px solid ${info.color}` }}>
+                          <img src={info.imageUrl} alt={info.code} className="w-5 h-5 rounded-full object-cover bg-[--color-bg-secondary]" />
+                          <span className="text-[--color-text-muted] text-xs">P{i + 1}</span>
+                          <span className="font-semibold">{info.code}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-xs text-[--color-text-muted] mt-2">Finishers predicted: <span className="font-semibold text-[--color-text-secondary]">{racePrediction.num_finishers}</span></p>
+                </div>
+              )}
+
+              {/* Sprint Summary */}
+              {sprintPrediction && (
+                <div>
+                  <p className="text-xs text-[--color-text-muted] uppercase tracking-wider font-semibold mb-2">Sprint Top 5</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {[sprintPrediction.p1, sprintPrediction.p2, sprintPrediction.p3, sprintPrediction.p4, sprintPrediction.p5].map((dId, i) => {
+                      const info = getDriverLabel(dId);
+                      if (typeof info === 'string') return null;
+                      return (
+                        <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm" style={{ backgroundColor: `${info.color}15`, borderLeft: `3px solid ${info.color}` }}>
+                          <img src={info.imageUrl} alt={info.code} className="w-6 h-6 rounded-full object-cover bg-[--color-bg-secondary]" />
+                          <span className="text-[--color-text-muted] text-xs">P{i + 1}</span>
+                          <span className="font-semibold">{info.code}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Status indicators */}
+              <div className="flex gap-3 pt-2 border-t border-[--color-border]">
+                <span className={`text-xs font-medium px-2 py-1 rounded ${qualPrediction ? 'bg-[--color-success]/15 text-[--color-success]' : 'bg-[--color-bg-secondary] text-[--color-text-muted]'}`}>
+                  {qualPrediction ? '✓ Qualifying' : '○ Qualifying'}
+                </span>
+                <span className={`text-xs font-medium px-2 py-1 rounded ${racePrediction ? 'bg-[--color-success]/15 text-[--color-success]' : 'bg-[--color-bg-secondary] text-[--color-text-muted]'}`}>
+                  {racePrediction ? '✓ Race' : '○ Race'}
+                </span>
+                {nextRound.isSprint && (
+                  <span className={`text-xs font-medium px-2 py-1 rounded ${sprintPrediction ? 'bg-[--color-success]/15 text-[--color-success]' : 'bg-[--color-bg-secondary] text-[--color-text-muted]'}`}>
+                    {sprintPrediction ? '✓ Sprint' : '○ Sprint'}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Calendar preview */}
+        <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
+          <h3 className="text-lg font-semibold mb-4">Upcoming Rounds</h3>
+          <div className="space-y-2">
+            {ROUNDS.filter(r => r.raceDate >= new Date().toISOString().split('T')[0])
+              .slice(0, 5)
+              .map(round => (
+                <Link
+                  key={round.id}
+                  href={`/predict/${round.id}`}
+                  className="flex items-center justify-between p-4 bg-[--color-bg-card]/50 hover:bg-[--color-bg-card-hover] rounded-lg border border-[--color-border] transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm text-[--color-text-muted] w-6">R{round.id}</span>
+                    <div>
+                      <p className="font-medium">{round.flag} {round.name}</p>
+                      <p className="text-sm text-[--color-text-muted]">{round.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {round.isSprint && (
+                      <span className="px-2 py-0.5 bg-[--color-accent-violet]/20 text-[--color-accent-violet] rounded text-xs font-medium">
+                        Sprint
+                      </span>
+                    )}
+                    <span className="text-sm text-[--color-text-secondary]">
+                      {new Date(round.raceDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+          </div>
         </div>
-      </section>
-    </main>
+      </main>
+    </div>
   );
 }
