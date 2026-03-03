@@ -19,17 +19,17 @@ export async function POST(request: Request) {
 
   const normalizedCode = code.trim().toUpperCase();
 
-  const league = getLeagueByCode(normalizedCode);
+  const league = await getLeagueByCode(normalizedCode);
   if (!league) {
     return NextResponse.json({ error: 'League not found. Check the code and try again.' }, { status: 404 });
   }
 
   // Check if already a member
-  if (isLeagueMember(league.id, userId)) {
+  if (await isLeagueMember(league.id, userId)) {
     return NextResponse.json({ error: 'You are already a member of this league' }, { status: 409 });
   }
 
-  const success = joinLeague(league.id, userId);
+  const success = await joinLeague(league.id, userId);
   if (!success) {
     return NextResponse.json({ error: 'You are already a member of this league' }, { status: 409 });
   }

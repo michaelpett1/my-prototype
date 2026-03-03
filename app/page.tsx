@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import getDb from '@/lib/db';
+import { getSupabase } from '@/lib/db';
 import { ROUNDS, DRIVERS, TEAMS, SEASON_PREDICTION_WINDOWS } from '@/lib/f1-data';
 import {
   getQualifyingPrediction,
@@ -16,20 +16,24 @@ function getNextRound() {
   return ROUNDS.find(r => r.raceDate >= now) || ROUNDS[ROUNDS.length - 1];
 }
 
-function getUserScores(userId: number) {
-  const db = getDb();
-  const result = db.prepare(
-    'SELECT COALESCE(SUM(total), 0) as totalPoints, COUNT(*) as roundsPlayed FROM scores WHERE user_id = ?'
-  ).get(userId) as { totalPoints: number; roundsPlayed: number };
-  return result;
+async function getUserScores(userId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('scores')
+    .select('total')
+    .eq('user_id', userId);
+  const rows = data || [];
+  return {
+    totalPoints: rows.reduce((sum: number, r: any) => sum + (r.total || 0), 0),
+    roundsPlayed: rows.length,
+  };
 }
 
-function getUserRank(userId: number) {
-  const db = getDb();
-  const rows = db.prepare(
-    'SELECT user_id, SUM(total) as total_points FROM scores GROUP BY user_id ORDER BY total_points DESC'
-  ).all() as { user_id: number; total_points: number }[];
-  const idx = rows.findIndex(r => r.user_id === userId);
+async function getUserRank(userId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase.rpc('get_global_leaderboard');
+  const rows = data || [];
+  const idx = rows.findIndex((r: any) => r.user_id === userId);
   return idx >= 0 ? idx + 1 : null;
 }
 
@@ -83,18 +87,21 @@ export default async function HomePage() {
 
   const userId = parseInt(session.user.id!);
   const nextRound = getNextRound();
-  const stats = getUserScores(userId);
-  const rank = getUserRank(userId);
+  const stats = await getUserScores(userId);
+  const rank = await getUserRank(userId);
 
   // Check if user has predictions for next round
-  const db = getDb();
-  const hasPrediction = db.prepare(
-    'SELECT id FROM qualifying_predictions WHERE user_id = ? AND round_id = ?'
-  ).get(userId, nextRound.id);
+  const supabase = getSupabase();
+  const { data: hasPrediction } = await supabase
+    .from('qualifying_predictions')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('round_id', nextRound.id)
+    .maybeSingle();
 
-  const qualPrediction = getQualifyingPrediction(userId, nextRound.id);
-  const racePrediction = getRacePrediction(userId, nextRound.id);
-  const sprintPrediction = nextRound.isSprint ? getSprintPrediction(userId, nextRound.id) : null;
+  const qualPrediction = await getQualifyingPrediction(userId, nextRound.id);
+  const racePrediction = await getRacePrediction(userId, nextRound.id);
+  const sprintPrediction = nextRound.isSprint ? await getSprintPrediction(userId, nextRound.id) : null;
 
   const daysUntilRace = Math.ceil(
     (new Date(nextRound.raceDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
-import getDb from '@/lib/db';
+import getSupabase from '@/lib/db';
 
 export async function POST(request: Request) {
   try {
@@ -23,29 +23,44 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 });
     }
 
-    const db = getDb();
+    const supabase = getSupabase();
 
     // Check if email already exists
-    const existingEmail = db.prepare('SELECT id FROM users WHERE email = ?').get(email);
+    const { data: existingEmail } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle();
     if (existingEmail) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
     }
 
     // Check if username already exists
-    const existingUsername = db.prepare('SELECT id FROM users WHERE username = ?').get(username);
+    const { data: existingUsername } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', username)
+      .maybeSingle();
     if (existingUsername) {
       return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
     }
 
     // Hash password and create user
     const passwordHash = await bcrypt.hash(password, 12);
-    const result = db.prepare(
-      'INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)'
-    ).run(username, email.toLowerCase(), passwordHash);
+    const { data, error } = await supabase
+      .from('users')
+      .insert({ username, email: email.toLowerCase(), password_hash: passwordHash })
+      .select('id, username, email')
+      .single();
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 
     return NextResponse.json({
       success: true,
-      user: { id: result.lastInsertRowid, username, email },
+      user: { id: data.id, username, email },
     }, { status: 201 });
   } catch (error) {
     console.error('Registration error:', error);

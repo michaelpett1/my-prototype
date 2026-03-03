@@ -26,18 +26,18 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid league ID' }, { status: 400 });
   }
 
-  const league = getLeagueById(leagueId);
+  const league = await getLeagueById(leagueId);
   if (!league) {
     return NextResponse.json({ error: 'League not found' }, { status: 404 });
   }
 
   // Must be a member to view
-  if (!isLeagueMember(leagueId, userId)) {
+  if (!await isLeagueMember(leagueId, userId)) {
     return NextResponse.json({ error: 'You are not a member of this league' }, { status: 403 });
   }
 
-  const leaderboard = getLeagueLeaderboard(leagueId);
-  const memberCount = getLeagueMemberCount(leagueId);
+  const leaderboard = await getLeagueLeaderboard(leagueId);
+  const memberCount = await getLeagueMemberCount(leagueId);
 
   return NextResponse.json({
     league: {
@@ -66,7 +66,7 @@ export async function DELETE(
     return NextResponse.json({ error: 'Invalid league ID' }, { status: 400 });
   }
 
-  const league = getLeagueById(leagueId);
+  const league = await getLeagueById(leagueId);
   if (!league) {
     return NextResponse.json({ error: 'League not found' }, { status: 404 });
   }
@@ -75,6 +75,6 @@ export async function DELETE(
     return NextResponse.json({ error: 'Only the league creator can delete it' }, { status: 403 });
   }
 
-  deleteLeague(leagueId);
+  await deleteLeague(leagueId);
   return NextResponse.json({ success: true });
 }

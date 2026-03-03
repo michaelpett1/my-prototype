@@ -25,12 +25,12 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid league ID' }, { status: 400 });
   }
 
-  const league = getLeagueById(leagueId);
+  const league = await getLeagueById(leagueId);
   if (!league) {
     return NextResponse.json({ error: 'League not found' }, { status: 404 });
   }
 
-  if (!isLeagueMember(leagueId, userId)) {
+  if (!await isLeagueMember(leagueId, userId)) {
     return NextResponse.json({ error: 'You are not a member of this league' }, { status: 403 });
   }
 
@@ -56,7 +56,7 @@ export async function GET(
     );
   }
 
-  const predictions = getLeagueMemberPredictions(leagueId, roundId);
+  const predictions = await getLeagueMemberPredictions(leagueId, roundId);
 
   return NextResponse.json({ predictions });
 }

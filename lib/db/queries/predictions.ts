@@ -1,122 +1,180 @@
-import getDb from '../index';
+import getSupabase from '../index';
 
 // Qualifying predictions
-export function getQualifyingPrediction(userId: number, roundId: number) {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM qualifying_predictions WHERE user_id = ? AND round_id = ?'
-  ).get(userId, roundId) as { p1: number; p2: number; p3: number } | undefined;
+export async function getQualifyingPrediction(userId: number, roundId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('qualifying_predictions')
+    .select('p1, p2, p3')
+    .eq('user_id', userId)
+    .eq('round_id', roundId)
+    .maybeSingle();
+
+  return data as { p1: number; p2: number; p3: number } | null;
 }
 
-export function upsertQualifyingPrediction(userId: number, roundId: number, p1: number, p2: number, p3: number) {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO qualifying_predictions (user_id, round_id, p1, p2, p3, updated_at)
-    VALUES (?, ?, ?, ?, ?, datetime('now'))
-    ON CONFLICT(user_id, round_id) DO UPDATE SET
-      p1 = excluded.p1, p2 = excluded.p2, p3 = excluded.p3, updated_at = datetime('now')
-  `).run(userId, roundId, p1, p2, p3);
+export async function upsertQualifyingPrediction(userId: number, roundId: number, p1: number, p2: number, p3: number) {
+  const supabase = getSupabase();
+  await supabase
+    .from('qualifying_predictions')
+    .upsert(
+      {
+        user_id: userId,
+        round_id: roundId,
+        p1,
+        p2,
+        p3,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,round_id' }
+    );
 }
 
 // Race predictions
-export function getRacePrediction(userId: number, roundId: number) {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM race_predictions WHERE user_id = ? AND round_id = ?'
-  ).get(userId, roundId) as {
+export async function getRacePrediction(userId: number, roundId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('race_predictions')
+    .select('p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, num_finishers')
+    .eq('user_id', userId)
+    .eq('round_id', roundId)
+    .maybeSingle();
+
+  return data as {
     p1: number; p2: number; p3: number; p4: number; p5: number;
     p6: number; p7: number; p8: number; p9: number; p10: number;
     num_finishers: number;
-  } | undefined;
+  } | null;
 }
 
-export function upsertRacePrediction(
+export async function upsertRacePrediction(
   userId: number, roundId: number,
   positions: number[], numFinishers: number
 ) {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO race_predictions (user_id, round_id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, num_finishers, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-    ON CONFLICT(user_id, round_id) DO UPDATE SET
-      p1 = excluded.p1, p2 = excluded.p2, p3 = excluded.p3, p4 = excluded.p4, p5 = excluded.p5,
-      p6 = excluded.p6, p7 = excluded.p7, p8 = excluded.p8, p9 = excluded.p9, p10 = excluded.p10,
-      num_finishers = excluded.num_finishers, updated_at = datetime('now')
-  `).run(userId, roundId, ...positions, numFinishers);
+  const supabase = getSupabase();
+  await supabase
+    .from('race_predictions')
+    .upsert(
+      {
+        user_id: userId,
+        round_id: roundId,
+        p1: positions[0],
+        p2: positions[1],
+        p3: positions[2],
+        p4: positions[3],
+        p5: positions[4],
+        p6: positions[5],
+        p7: positions[6],
+        p8: positions[7],
+        p9: positions[8],
+        p10: positions[9],
+        num_finishers: numFinishers,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,round_id' }
+    );
 }
 
 // Sprint predictions
-export function getSprintPrediction(userId: number, roundId: number) {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM sprint_predictions WHERE user_id = ? AND round_id = ?'
-  ).get(userId, roundId) as { p1: number; p2: number; p3: number; p4: number; p5: number } | undefined;
+export async function getSprintPrediction(userId: number, roundId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('sprint_predictions')
+    .select('p1, p2, p3, p4, p5')
+    .eq('user_id', userId)
+    .eq('round_id', roundId)
+    .maybeSingle();
+
+  return data as { p1: number; p2: number; p3: number; p4: number; p5: number } | null;
 }
 
-export function upsertSprintPrediction(userId: number, roundId: number, positions: number[]) {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO sprint_predictions (user_id, round_id, p1, p2, p3, p4, p5, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
-    ON CONFLICT(user_id, round_id) DO UPDATE SET
-      p1 = excluded.p1, p2 = excluded.p2, p3 = excluded.p3, p4 = excluded.p4, p5 = excluded.p5,
-      updated_at = datetime('now')
-  `).run(userId, roundId, ...positions);
+export async function upsertSprintPrediction(userId: number, roundId: number, positions: number[]) {
+  const supabase = getSupabase();
+  await supabase
+    .from('sprint_predictions')
+    .upsert(
+      {
+        user_id: userId,
+        round_id: roundId,
+        p1: positions[0],
+        p2: positions[1],
+        p3: positions[2],
+        p4: positions[3],
+        p5: positions[4],
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,round_id' }
+    );
 }
 
 // Teammate predictions
-export function getTeammatePredictions(userId: number) {
-  const db = getDb();
-  return db.prepare(
-    'SELECT team_id, winner_driver_id FROM teammate_predictions WHERE user_id = ?'
-  ).all(userId) as { team_id: number; winner_driver_id: number }[];
+export async function getTeammatePredictions(userId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('teammate_predictions')
+    .select('team_id, winner_driver_id')
+    .eq('user_id', userId);
+
+  return (data ?? []) as { team_id: number; winner_driver_id: number }[];
 }
 
-export function upsertTeammatePredictions(userId: number, picks: { teamId: number; driverId: number }[]) {
-  const db = getDb();
-  const insert = db.prepare(`
-    INSERT INTO teammate_predictions (user_id, team_id, winner_driver_id)
-    VALUES (?, ?, ?)
-    ON CONFLICT(user_id, team_id) DO UPDATE SET winner_driver_id = excluded.winner_driver_id
-  `);
-  const tx = db.transaction(() => {
-    for (const pick of picks) {
-      insert.run(userId, pick.teamId, pick.driverId);
-    }
-  });
-  tx();
+export async function upsertTeammatePredictions(userId: number, picks: { teamId: number; driverId: number }[]) {
+  const supabase = getSupabase();
+  for (const pick of picks) {
+    await supabase
+      .from('teammate_predictions')
+      .upsert(
+        {
+          user_id: userId,
+          team_id: pick.teamId,
+          winner_driver_id: pick.driverId,
+        },
+        { onConflict: 'user_id,team_id' }
+      );
+  }
 }
 
 // Season predictions
-export function getSeasonPrediction(userId: number, windowNumber: number) {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM season_predictions WHERE user_id = ? AND window_number = ?'
-  ).get(userId, windowNumber) as {
+export async function getSeasonPrediction(userId: number, windowNumber: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('season_predictions')
+    .select('drivers_champion_id, constructors_champion_id, window_number')
+    .eq('user_id', userId)
+    .eq('window_number', windowNumber)
+    .maybeSingle();
+
+  return data as {
     drivers_champion_id: number;
     constructors_champion_id: number;
     window_number: number;
-  } | undefined;
+  } | null;
 }
 
-export function getSeasonPredictionCount(userId: number) {
-  const db = getDb();
-  const result = db.prepare(
-    'SELECT COUNT(*) as count FROM season_predictions WHERE user_id = ?'
-  ).get(userId) as { count: number };
-  return result.count;
+export async function getSeasonPredictionCount(userId: number) {
+  const supabase = getSupabase();
+  const { count } = await supabase
+    .from('season_predictions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  return count ?? 0;
 }
 
-export function upsertSeasonPrediction(
+export async function upsertSeasonPrediction(
   userId: number, windowNumber: number,
   driversChampionId: number, constructorsChampionId: number
 ) {
-  const db = getDb();
-  db.prepare(`
-    INSERT INTO season_predictions (user_id, window_number, drivers_champion_id, constructors_champion_id)
-    VALUES (?, ?, ?, ?)
-    ON CONFLICT(user_id, window_number) DO UPDATE SET
-      drivers_champion_id = excluded.drivers_champion_id,
-      constructors_champion_id = excluded.constructors_champion_id
-  `).run(userId, windowNumber, driversChampionId, constructorsChampionId);
+  const supabase = getSupabase();
+  await supabase
+    .from('season_predictions')
+    .upsert(
+      {
+        user_id: userId,
+        window_number: windowNumber,
+        drivers_champion_id: driversChampionId,
+        constructors_champion_id: constructorsChampionId,
+      },
+      { onConflict: 'user_id,window_number' }
+    );
 }

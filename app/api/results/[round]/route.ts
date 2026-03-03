@@ -27,9 +27,9 @@ export async function GET(
     return NextResponse.json({ error: 'Round not found' }, { status: 404 });
   }
 
-  const qualifying = getQualifyingResults(roundId);
-  const race = getRaceResults(roundId);
-  const sprint = getSprintResults(roundId);
+  const qualifying = await getQualifyingResults(roundId);
+  const race = await getRaceResults(roundId);
+  const sprint = await getSprintResults(roundId);
 
   return NextResponse.json({
     qualifying: qualifying ? [qualifying.p1, qualifying.p2, qualifying.p3] : null,
@@ -72,7 +72,7 @@ export async function POST(
     if (q.length !== 3 || !q.every(id => driverIds.has(id))) {
       return NextResponse.json({ error: 'Invalid qualifying results' }, { status: 400 });
     }
-    insertQualifyingResults(roundId, q[0], q[1], q[2]);
+    await insertQualifyingResults(roundId, q[0], q[1], q[2]);
   }
 
   // Validate and insert race results
@@ -85,7 +85,7 @@ export async function POST(
     if (typeof numFinishers !== 'number' || numFinishers < 0 || numFinishers > 22) {
       return NextResponse.json({ error: 'Invalid number of finishers' }, { status: 400 });
     }
-    insertRaceResults(roundId, positions, numFinishers);
+    await insertRaceResults(roundId, positions, numFinishers);
   }
 
   // Validate and insert sprint results
@@ -97,11 +97,11 @@ export async function POST(
     if (!roundData.isSprint) {
       return NextResponse.json({ error: 'This round has no sprint' }, { status: 400 });
     }
-    insertSprintResults(roundId, s);
+    await insertSprintResults(roundId, s);
   }
 
   // Calculate scores for all users for this round
-  calculateScoresForRound(roundId);
+  await calculateScoresForRound(roundId);
 
   return NextResponse.json({ success: true });
 }

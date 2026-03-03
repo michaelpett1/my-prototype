@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       if (new Set(qualifying).size !== 3) {
         return NextResponse.json({ error: 'Duplicate drivers in qualifying prediction' }, { status: 400 });
       }
-      upsertQualifyingPrediction(userId, roundId, p1, p2, p3);
+      await upsertQualifyingPrediction(userId, roundId, p1, p2, p3);
     }
 
     // Save race predictions (P1-P10 + num_finishers)
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
       if (race.numFinishers < 0 || race.numFinishers > 22) {
         return NextResponse.json({ error: 'Invalid number of finishers' }, { status: 400 });
       }
-      upsertRacePrediction(userId, roundId, race.positions, race.numFinishers);
+      await upsertRacePrediction(userId, roundId, race.positions, race.numFinishers);
     }
 
     // Save sprint predictions (P1-P5) if sprint round
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       if (new Set(sprint).size !== 5) {
         return NextResponse.json({ error: 'Duplicate drivers in sprint prediction' }, { status: 400 });
       }
-      upsertSprintPrediction(userId, roundId, sprint);
+      await upsertSprintPrediction(userId, roundId, sprint);
     }
 
     return NextResponse.json({ success: true });

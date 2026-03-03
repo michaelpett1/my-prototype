@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import getDb from '@/lib/db';
+import getSupabase from '@/lib/db';
 
 export async function GET() {
   const session = await auth();
@@ -9,68 +9,79 @@ export async function GET() {
   }
 
   const userId = parseInt(session.user.id!);
-  const db = getDb();
+  const supabase = getSupabase();
 
   // Get user info
-  const user = db.prepare('SELECT id, username, email, created_at FROM users WHERE id = ?').get(userId) as {
-    id: number;
-    username: string;
-    email: string;
-    created_at: string;
-  };
+  const { data: user } = await supabase
+    .from('users')
+    .select('id, username, email, created_at')
+    .eq('id', userId)
+    .single();
 
-  // Get scores per round
-  const scores = db.prepare(`
-    SELECT s.*, r.name as round_name, r.race_date, r.is_sprint
-    FROM scores s
-    JOIN rounds r ON s.round_id = r.id
-    WHERE s.user_id = ?
-    ORDER BY s.round_id ASC
-  `).all(userId) as {
-    round_id: number;
-    qualifying_pts: number;
-    qualifying_bonus: number;
-    race_pts: number;
-    race_bonus: number;
-    sprint_pts: number;
-    sprint_bonus: number;
-    finisher_pts: number;
-    total: number;
-    round_name: string;
-    race_date: string;
-    is_sprint: number;
-  }[];
+  // Get scores per round with round info
+  const { data: scores } = await supabase
+    .from('scores')
+    .select('*, rounds!inner(name, race_date, is_sprint)')
+    .eq('user_id', userId)
+    .order('round_id');
 
-  // Get overall rank
-  const rankings = db.prepare(`
-    SELECT user_id, SUM(total) as total_points
-    FROM scores
-    GROUP BY user_id
-    ORDER BY total_points DESC
-  `).all() as { user_id: number; total_points: number }[];
+  // Map joined fields to match the old response shape
+  const mappedScores = (scores || []).map((s: Record<string, unknown>) => {
+    const round = s.rounds as { name: string; race_date: string; is_sprint: number } | null;
+    return {
+      round_id: s.round_id,
+      qualifying_pts: s.qualifying_pts,
+      qualifying_bonus: s.qualifying_bonus,
+      race_pts: s.race_pts,
+      race_bonus: s.race_bonus,
+      sprint_pts: s.sprint_pts,
+      sprint_bonus: s.sprint_bonus,
+      finisher_pts: s.finisher_pts,
+      total: s.total,
+      round_name: round?.name,
+      race_date: round?.race_date,
+      is_sprint: round?.is_sprint,
+    };
+  });
 
-  const rank = rankings.findIndex(r => r.user_id === userId) + 1;
-  const totalUsers = rankings.length;
-  const totalPoints = rankings.find(r => r.user_id === userId)?.total_points || 0;
+  // Get overall rank via RPC leaderboard
+  const { data: rankings } = await supabase.rpc('get_global_leaderboard');
+
+  const rankingsList = rankings || [];
+  const userRanking = rankingsList.find((r: { user_id: number }) => r.user_id === userId);
+  const rank = rankingsList.findIndex((r: { user_id: number }) => r.user_id === userId) + 1;
+  const totalUsers = rankingsList.length;
+  const totalPoints = userRanking?.total_points || 0;
 
   // Count predictions made
-  const qualCount = (db.prepare('SELECT COUNT(*) as count FROM qualifying_predictions WHERE user_id = ?').get(userId) as { count: number }).count;
-  const raceCount = (db.prepare('SELECT COUNT(*) as count FROM race_predictions WHERE user_id = ?').get(userId) as { count: number }).count;
-  const sprintCount = (db.prepare('SELECT COUNT(*) as count FROM sprint_predictions WHERE user_id = ?').get(userId) as { count: number }).count;
+  const { count: qualCount } = await supabase
+    .from('qualifying_predictions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  const { count: raceCount } = await supabase
+    .from('race_predictions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
+
+  const { count: sprintCount } = await supabase
+    .from('sprint_predictions')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId);
 
   return NextResponse.json({
     user: {
-      username: user.username,
-      email: user.email,
-      createdAt: user.created_at,
+      username: user?.username,
+      email: user?.email,
+      createdAt: user?.created_at,
     },
     stats: {
       totalPoints,
       rank: rank || '-',
       totalUsers,
-      roundsPlayed: scores.length,
-      predictionsCount: qualCount + raceCount + sprintCount,
+      roundsPlayed: mappedScores.length,
+      predictionsCount: (qualCount || 0) + (raceCount || 0) + (sprintCount || 0),
     },
-    roundScores: scores,
+    roundScores: mappedScores,
   });
 }

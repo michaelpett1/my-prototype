@@ -25,9 +25,9 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid round' }, { status: 400 });
   }
 
-  const qualifying = getQualifyingPrediction(userId, roundId);
-  const race = getRacePrediction(userId, roundId);
-  const sprint = round.isSprint ? getSprintPrediction(userId, roundId) : null;
+  const qualifying = await getQualifyingPrediction(userId, roundId);
+  const race = await getRacePrediction(userId, roundId);
+  const sprint = round.isSprint ? await getSprintPrediction(userId, roundId) : null;
 
   return NextResponse.json({
     roundId,

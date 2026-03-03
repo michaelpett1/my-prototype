@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const userId = parseInt(session.user.id!);
-  const predictions = getTeammatePredictions(userId);
+  const predictions = await getTeammatePredictions(userId);
 
   // Convert to a map of teamId -> winnerDriverId
   const picks: Record<number, number> = {};
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     validPicks.push({ teamId, driverId });
   }
 
-  upsertTeammatePredictions(userId, validPicks);
+  await upsertTeammatePredictions(userId, validPicks);
 
   return NextResponse.json({ success: true });
 }

@@ -28,14 +28,14 @@ export async function GET() {
   // Get all predictions
   const predictions: Record<number, { driversChampionId: number; constructorsChampionId: number } | null> = {};
   for (let w = 1; w <= SEASON_PREDICTION_WINDOWS.length; w++) {
-    const pred = getSeasonPrediction(userId, w);
+    const pred = await getSeasonPrediction(userId, w);
     predictions[w] = pred ? {
       driversChampionId: pred.drivers_champion_id,
       constructorsChampionId: pred.constructors_champion_id,
     } : null;
   }
 
-  const changeCount = getSeasonPredictionCount(userId);
+  const changeCount = await getSeasonPredictionCount(userId);
 
   return NextResponse.json({
     currentWindow,
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid driver or team' }, { status: 400 });
   }
 
-  upsertSeasonPrediction(userId, currentWindow, driversChampionId, constructorsChampionId);
+  await upsertSeasonPrediction(userId, currentWindow, driversChampionId, constructorsChampionId);
 
   return NextResponse.json({ success: true });
 }

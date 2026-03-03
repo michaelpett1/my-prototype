@@ -1,4 +1,4 @@
-import getDb from '../index';
+import getSupabase from '../index';
 
 // Characters that avoid confusion (no O/0/I/1/L)
 const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
@@ -24,126 +24,123 @@ export interface LeagueWithMeta extends League {
   creator_username: string;
 }
 
-export function createLeague(name: string, userId: number): League {
-  const db = getDb();
+export async function createLeague(name: string, userId: number): Promise<League> {
+  const supabase = getSupabase();
 
   // Generate a unique join code (retry if collision)
-  let joinCode: string;
+  let joinCode: string = '';
   let attempts = 0;
-  do {
+  while (attempts < 10) {
     joinCode = generateJoinCode();
-    const existing = db.prepare('SELECT id FROM leagues WHERE join_code = ?').get(joinCode);
+    const { data: existing } = await supabase
+      .from('leagues')
+      .select('id')
+      .eq('join_code', joinCode)
+      .maybeSingle();
     if (!existing) break;
     attempts++;
-  } while (attempts < 10);
+  }
 
   if (attempts >= 10) {
     throw new Error('Failed to generate unique join code');
   }
 
-  const result = db.prepare(
-    'INSERT INTO leagues (name, join_code, created_by) VALUES (?, ?, ?)'
-  ).run(name, joinCode, userId);
+  const { data: league } = await supabase
+    .from('leagues')
+    .insert({ name, join_code: joinCode, created_by: userId })
+    .select()
+    .single();
 
-  const leagueId = result.lastInsertRowid as number;
+  if (!league) {
+    throw new Error('Failed to create league');
+  }
 
   // Auto-add creator as member
-  db.prepare(
-    'INSERT INTO league_members (league_id, user_id) VALUES (?, ?)'
-  ).run(leagueId, userId);
+  await supabase
+    .from('league_members')
+    .insert({ league_id: league.id, user_id: userId });
 
-  return {
-    id: leagueId,
-    name,
-    join_code: joinCode,
-    created_by: userId,
-    created_at: new Date().toISOString(),
-  };
+  return league as League;
 }
 
-export function getLeagueByCode(code: string): League | undefined {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM leagues WHERE join_code = ?'
-  ).get(code.toUpperCase()) as League | undefined;
+export async function getLeagueByCode(code: string): Promise<League | null> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('leagues')
+    .select('*')
+    .eq('join_code', code.toUpperCase())
+    .maybeSingle();
+
+  return data as League | null;
 }
 
-export function getLeagueById(id: number): League | undefined {
-  const db = getDb();
-  return db.prepare(
-    'SELECT * FROM leagues WHERE id = ?'
-  ).get(id) as League | undefined;
+export async function getLeagueById(id: number): Promise<League | null> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('leagues')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
+
+  return data as League | null;
 }
 
-export function deleteLeague(leagueId: number): void {
-  const db = getDb();
-  db.prepare('DELETE FROM leagues WHERE id = ?').run(leagueId);
+export async function deleteLeague(leagueId: number): Promise<void> {
+  const supabase = getSupabase();
+  await supabase
+    .from('leagues')
+    .delete()
+    .eq('id', leagueId);
 }
 
-export function joinLeague(leagueId: number, userId: number): boolean {
-  const db = getDb();
-  try {
-    db.prepare(
-      'INSERT INTO league_members (league_id, user_id) VALUES (?, ?)'
-    ).run(leagueId, userId);
-    return true;
-  } catch {
-    // Duplicate entry — already a member
+export async function joinLeague(leagueId: number, userId: number): Promise<boolean> {
+  const supabase = getSupabase();
+  const { error } = await supabase
+    .from('league_members')
+    .insert({ league_id: leagueId, user_id: userId });
+
+  if (error) {
+    // Duplicate entry — already a member (unique constraint violation)
     return false;
   }
+  return true;
 }
 
-export function leaveLeague(leagueId: number, userId: number): void {
-  const db = getDb();
-  db.prepare(
-    'DELETE FROM league_members WHERE league_id = ? AND user_id = ?'
-  ).run(leagueId, userId);
+export async function leaveLeague(leagueId: number, userId: number): Promise<void> {
+  const supabase = getSupabase();
+  await supabase
+    .from('league_members')
+    .delete()
+    .eq('league_id', leagueId)
+    .eq('user_id', userId);
 }
 
-export function isLeagueMember(leagueId: number, userId: number): boolean {
-  const db = getDb();
-  const row = db.prepare(
-    'SELECT 1 FROM league_members WHERE league_id = ? AND user_id = ?'
-  ).get(leagueId, userId);
-  return !!row;
+export async function isLeagueMember(leagueId: number, userId: number): Promise<boolean> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from('league_members')
+    .select('league_id')
+    .eq('league_id', leagueId)
+    .eq('user_id', userId)
+    .maybeSingle();
+
+  return !!data;
 }
 
-export function getUserLeagues(userId: number): LeagueWithMeta[] {
-  const db = getDb();
-  return db.prepare(`
-    SELECT
-      l.*,
-      u.username as creator_username,
-      (SELECT COUNT(*) FROM league_members WHERE league_id = l.id) as member_count
-    FROM leagues l
-    JOIN league_members lm ON lm.league_id = l.id AND lm.user_id = ?
-    JOIN users u ON u.id = l.created_by
-    ORDER BY l.created_at DESC
-  `).all(userId) as LeagueWithMeta[];
+export async function getUserLeagues(userId: number): Promise<LeagueWithMeta[]> {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .rpc('get_user_leagues', { p_user_id: userId });
+
+  return (data ?? []) as LeagueWithMeta[];
 }
 
-export function getLeagueLeaderboard(leagueId: number) {
-  const db = getDb();
-  return db.prepare(`
-    SELECT
-      u.id as user_id,
-      u.username,
-      COALESCE(SUM(s.qualifying_pts), 0) as qualifying_pts,
-      COALESCE(SUM(s.qualifying_bonus), 0) as qualifying_bonus,
-      COALESCE(SUM(s.race_pts), 0) as race_pts,
-      COALESCE(SUM(s.race_bonus), 0) as race_bonus,
-      COALESCE(SUM(s.sprint_pts), 0) as sprint_pts,
-      COALESCE(SUM(s.sprint_bonus), 0) as sprint_bonus,
-      COALESCE(SUM(s.finisher_pts), 0) as finisher_pts,
-      COALESCE(SUM(s.total), 0) as total_points,
-      COUNT(s.round_id) as rounds_played
-    FROM league_members lm
-    JOIN users u ON u.id = lm.user_id
-    LEFT JOIN scores s ON u.id = s.user_id
-    WHERE lm.league_id = ?
-    GROUP BY u.id
-    ORDER BY total_points DESC
-  `).all(leagueId) as {
+export async function getLeagueLeaderboard(leagueId: number) {
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .rpc('get_league_leaderboard', { p_league_id: leagueId });
+
+  return (data ?? []) as {
     user_id: number;
     username: string;
     qualifying_pts: number;
@@ -158,12 +155,14 @@ export function getLeagueLeaderboard(leagueId: number) {
   }[];
 }
 
-export function getLeagueMemberCount(leagueId: number): number {
-  const db = getDb();
-  const result = db.prepare(
-    'SELECT COUNT(*) as count FROM league_members WHERE league_id = ?'
-  ).get(leagueId) as { count: number };
-  return result.count;
+export async function getLeagueMemberCount(leagueId: number): Promise<number> {
+  const supabase = getSupabase();
+  const { count } = await supabase
+    .from('league_members')
+    .select('*', { count: 'exact', head: true })
+    .eq('league_id', leagueId);
+
+  return count ?? 0;
 }
 
 export interface LeagueMemberPrediction {
@@ -174,41 +173,81 @@ export interface LeagueMemberPrediction {
   sprint: number[] | null;
 }
 
-export function getLeagueMemberPredictions(leagueId: number, roundId: number): LeagueMemberPrediction[] {
-  const db = getDb();
+export async function getLeagueMemberPredictions(leagueId: number, roundId: number): Promise<LeagueMemberPrediction[]> {
+  const supabase = getSupabase();
 
-  const members = db.prepare(`
-    SELECT lm.user_id, u.username
-    FROM league_members lm
-    JOIN users u ON u.id = lm.user_id
-    WHERE lm.league_id = ?
-    ORDER BY u.username
-  `).all(leagueId) as { user_id: number; username: string }[];
+  // Get all members
+  const { data: members } = await supabase
+    .from('league_members')
+    .select('user_id, users!inner(username)')
+    .eq('league_id', leagueId);
 
-  return members.map(member => {
-    const qualRow = db.prepare(
-      'SELECT p1, p2, p3 FROM qualifying_predictions WHERE user_id = ? AND round_id = ?'
-    ).get(member.user_id, roundId) as { p1: number; p2: number; p3: number } | undefined;
+  if (!members || members.length === 0) return [];
 
-    const raceRow = db.prepare(
-      'SELECT p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, num_finishers FROM race_predictions WHERE user_id = ? AND round_id = ?'
-    ).get(member.user_id, roundId) as {
-      p1: number; p2: number; p3: number; p4: number; p5: number;
-      p6: number; p7: number; p8: number; p9: number; p10: number;
-      num_finishers: number;
-    } | undefined;
+  const memberIds = members.map((m: { user_id: number }) => m.user_id);
 
-    const sprintRow = db.prepare(
-      'SELECT p1, p2, p3, p4, p5 FROM sprint_predictions WHERE user_id = ? AND round_id = ?'
-    ).get(member.user_id, roundId) as { p1: number; p2: number; p3: number; p4: number; p5: number } | undefined;
+  // Batch-fetch all predictions for these members and round
+  const { data: qualRows } = await supabase
+    .from('qualifying_predictions')
+    .select('user_id, p1, p2, p3')
+    .eq('round_id', roundId)
+    .in('user_id', memberIds);
+
+  const { data: raceRows } = await supabase
+    .from('race_predictions')
+    .select('user_id, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, num_finishers')
+    .eq('round_id', roundId)
+    .in('user_id', memberIds);
+
+  const { data: sprintRows } = await supabase
+    .from('sprint_predictions')
+    .select('user_id, p1, p2, p3, p4, p5')
+    .eq('round_id', roundId)
+    .in('user_id', memberIds);
+
+  // Build lookup maps
+  const qualMap = new Map<number, { p1: number; p2: number; p3: number }>();
+  (qualRows ?? []).forEach((r: { user_id: number; p1: number; p2: number; p3: number }) => {
+    qualMap.set(r.user_id, r);
+  });
+
+  const raceMap = new Map<number, {
+    p1: number; p2: number; p3: number; p4: number; p5: number;
+    p6: number; p7: number; p8: number; p9: number; p10: number;
+    num_finishers: number;
+  }>();
+  (raceRows ?? []).forEach((r: {
+    user_id: number;
+    p1: number; p2: number; p3: number; p4: number; p5: number;
+    p6: number; p7: number; p8: number; p9: number; p10: number;
+    num_finishers: number;
+  }) => {
+    raceMap.set(r.user_id, r);
+  });
+
+  const sprintMap = new Map<number, { p1: number; p2: number; p3: number; p4: number; p5: number }>();
+  (sprintRows ?? []).forEach((r: { user_id: number; p1: number; p2: number; p3: number; p4: number; p5: number }) => {
+    sprintMap.set(r.user_id, r);
+  });
+
+  // Build results
+  return members.map((member: any) => {
+    const qualRow = qualMap.get(member.user_id);
+    const raceRow = raceMap.get(member.user_id);
+    const sprintRow = sprintMap.get(member.user_id);
+
+    // Supabase returns joined relations as arrays; extract first element
+    const usersData = Array.isArray(member.users) ? member.users[0] : member.users;
 
     return {
       user_id: member.user_id,
-      username: member.username,
+      username: usersData?.username ?? 'Unknown',
       qualifying: qualRow ? [qualRow.p1, qualRow.p2, qualRow.p3] : null,
       race: raceRow ? {
-        positions: [raceRow.p1, raceRow.p2, raceRow.p3, raceRow.p4, raceRow.p5,
-                    raceRow.p6, raceRow.p7, raceRow.p8, raceRow.p9, raceRow.p10],
+        positions: [
+          raceRow.p1, raceRow.p2, raceRow.p3, raceRow.p4, raceRow.p5,
+          raceRow.p6, raceRow.p7, raceRow.p8, raceRow.p9, raceRow.p10,
+        ],
         numFinishers: raceRow.num_finishers,
       } : null,
       sprint: sprintRow ? [sprintRow.p1, sprintRow.p2, sprintRow.p3, sprintRow.p4, sprintRow.p5] : null,

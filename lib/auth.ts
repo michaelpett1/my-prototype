@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import getDb from './db';
+import getSupabase from './db';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -15,12 +15,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!credentials?.email || !credentials?.password) return null;
 
         const identifier = (credentials.email as string).trim();
-        const db = getDb();
+        const supabase = getSupabase();
 
         // Accept either email or username
-        const user = db.prepare(
-          'SELECT id, username, email, password_hash FROM users WHERE email = ? OR username = ?'
-        ).get(identifier, identifier) as { id: number; username: string; email: string; password_hash: string } | undefined;
+        const { data: user } = await supabase
+          .from('users')
+          .select('id, username, email, password_hash')
+          .or(`email.eq.${identifier},username.eq.${identifier}`)
+          .maybeSingle();
 
         if (!user) return null;
 

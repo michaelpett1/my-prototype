@@ -10,7 +10,7 @@ export async function GET() {
   }
 
   const userId = parseInt(session.user.id);
-  const leagues = getUserLeagues(userId);
+  const leagues = await getUserLeagues(userId);
 
   return NextResponse.json({ leagues });
 }
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const league = createLeague(name.trim(), userId);
+    const league = await createLeague(name.trim(), userId);
     return NextResponse.json({ league });
   } catch (error) {
     console.error('Create league error:', error);

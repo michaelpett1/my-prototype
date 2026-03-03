@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import getDb from '@/lib/db';
+import getSupabase from '@/lib/db';
 import { ROUNDS } from '@/lib/f1-data';
-import {
-  getQualifyingResults,
-  getRaceResults,
-  getSprintResults,
-} from '@/lib/db/queries/results';
 import {
   scoreQualifying,
   scoreRace,
@@ -31,11 +26,26 @@ export async function GET(
   }
 
   const userId = parseInt(session.user.id!);
-  const db = getDb();
+  const supabase = getSupabase();
 
-  const qualResults = getQualifyingResults(roundId);
-  const raceResults = getRaceResults(roundId);
-  const sprintResults = getSprintResults(roundId);
+  // Get actual results
+  const { data: qualResults } = await supabase
+    .from('actual_qualifying')
+    .select('p1, p2, p3')
+    .eq('round_id', roundId)
+    .maybeSingle();
+
+  const { data: raceResults } = await supabase
+    .from('actual_race')
+    .select('*')
+    .eq('round_id', roundId)
+    .maybeSingle();
+
+  const { data: sprintResults } = await supabase
+    .from('actual_sprint')
+    .select('*')
+    .eq('round_id', roundId)
+    .maybeSingle();
 
   if (!qualResults && !raceResults && !sprintResults) {
     return NextResponse.json({ error: 'No results yet for this round' }, { status: 404 });
@@ -48,7 +58,12 @@ export async function GET(
 
   // Score qualifying
   if (qualResults) {
-    const pred = db.prepare('SELECT p1, p2, p3 FROM qualifying_predictions WHERE user_id = ? AND round_id = ?').get(userId, roundId) as { p1: number; p2: number; p3: number } | undefined;
+    const { data: pred } = await supabase
+      .from('qualifying_predictions')
+      .select('p1, p2, p3')
+      .eq('user_id', userId)
+      .eq('round_id', roundId)
+      .maybeSingle();
     if (pred) {
       const actual = [qualResults.p1, qualResults.p2, qualResults.p3];
       qualifyingBreakdown = scoreQualifying([pred.p1, pred.p2, pred.p3], actual);
@@ -57,11 +72,12 @@ export async function GET(
 
   // Score race
   if (raceResults) {
-    const pred = db.prepare('SELECT * FROM race_predictions WHERE user_id = ? AND round_id = ?').get(userId, roundId) as {
-      p1: number; p2: number; p3: number; p4: number; p5: number;
-      p6: number; p7: number; p8: number; p9: number; p10: number;
-      num_finishers: number;
-    } | undefined;
+    const { data: pred } = await supabase
+      .from('race_predictions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('round_id', roundId)
+      .maybeSingle();
     if (pred) {
       const actual = [raceResults.p1, raceResults.p2, raceResults.p3, raceResults.p4, raceResults.p5,
         raceResults.p6, raceResults.p7, raceResults.p8, raceResults.p9, raceResults.p10];
@@ -77,7 +93,12 @@ export async function GET(
 
   // Score sprint
   if (sprintResults) {
-    const pred = db.prepare('SELECT p1, p2, p3, p4, p5 FROM sprint_predictions WHERE user_id = ? AND round_id = ?').get(userId, roundId) as { p1: number; p2: number; p3: number; p4: number; p5: number } | undefined;
+    const { data: pred } = await supabase
+      .from('sprint_predictions')
+      .select('p1, p2, p3, p4, p5')
+      .eq('user_id', userId)
+      .eq('round_id', roundId)
+      .maybeSingle();
     if (pred) {
       const actual = [sprintResults.p1, sprintResults.p2, sprintResults.p3, sprintResults.p4, sprintResults.p5];
       sprintBreakdown = scoreSprint([pred.p1, pred.p2, pred.p3, pred.p4, pred.p5], actual);
@@ -85,7 +106,12 @@ export async function GET(
   }
 
   // Get stored total
-  const storedScore = db.prepare('SELECT total FROM scores WHERE user_id = ? AND round_id = ?').get(userId, roundId) as { total: number } | undefined;
+  const { data: storedScore } = await supabase
+    .from('scores')
+    .select('total')
+    .eq('user_id', userId)
+    .eq('round_id', roundId)
+    .maybeSingle();
 
   return NextResponse.json({
     roundId,

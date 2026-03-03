@@ -20,12 +20,12 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid league ID' }, { status: 400 });
   }
 
-  const league = getLeagueById(leagueId);
+  const league = await getLeagueById(leagueId);
   if (!league) {
     return NextResponse.json({ error: 'League not found' }, { status: 404 });
   }
 
-  if (!isLeagueMember(leagueId, userId)) {
+  if (!await isLeagueMember(leagueId, userId)) {
     return NextResponse.json({ error: 'You are not a member of this league' }, { status: 400 });
   }
 
@@ -37,6 +37,6 @@ export async function POST(
     );
   }
 
-  leaveLeague(leagueId, userId);
+  await leaveLeague(leagueId, userId);
   return NextResponse.json({ success: true });
 }
