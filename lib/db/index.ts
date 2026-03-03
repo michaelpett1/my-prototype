@@ -4,7 +4,10 @@ import fs from 'fs';
 import { initSchema } from './schema';
 import { seedData } from './seed';
 
-const DB_PATH = path.join(process.cwd(), 'data', 'f1predictor.db');
+// In production (Vercel), use /tmp for writable filesystem; locally use ./data
+const DB_PATH = process.env.NODE_ENV === 'production'
+  ? path.join('/tmp', 'f1predictor.db')
+  : path.join(process.cwd(), 'data', 'f1predictor.db');
 
 let db: Database.Database | null = null;
 
