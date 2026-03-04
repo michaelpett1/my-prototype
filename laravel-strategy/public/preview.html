@@ -96,7 +96,7 @@
             </section>
 
             <!-- Casino Strategy -->
-            <section id="casino-strategy">
+            <section id="casino-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
                     <article-carousel title="Casino Strategy" :articles="pageData.casinoStrategy" :first="true"></article-carousel>
                 </div>
@@ -110,19 +110,22 @@
             </section>
 
             <!-- Betting Strategy -->
-            <section id="betting-strategy">
+            <section id="betting-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
                     <article-carousel title="Betting Strategy" :articles="pageData.bettingStrategy"></article-carousel>
                 </div>
             </section>
 
             <!-- Poker Strategy -->
-            <section id="poker-strategy">
+            <section id="poker-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
                     <article-carousel title="Poker Strategy" :articles="pageData.pokerStrategy"></article-carousel>
                 </div>
             </section>
         </main>
+
+        <!-- Rewards Banner -->
+        <rewards-banner></rewards-banner>
 
         <!-- Footer Component -->
         <site-footer></site-footer>
@@ -136,8 +139,8 @@
            ═══════════════════════════════════════════════ */
         const pageData = {
             categories: [
-                { id: 'casino-strategy', label: 'Casino Strategy', image: 'https://objects.kaxmedia.com/auto/o/106986/df49168be0.png' },
-                { id: 'betting-strategy', label: 'Betting Strategy', image: 'https://objects.kaxmedia.com/genesis/betting-odds-strategy.webp' },
+                { id: 'casino-strategy', label: 'Casino Strategy', image: 'https://objects.kaxmedia.com/auto/o/2038/46e216d6f6.jpeg' },
+                { id: 'betting-strategy', label: 'Betting Strategy', image: 'https://objects.kaxmedia.com/genesis/football-strategy.webp' },
                 { id: 'poker-strategy', label: 'Poker Strategy', image: 'https://objects.kaxmedia.com/genesis/how-to-play-stud-poker.webp' },
             ],
             mainVideo: {
@@ -153,6 +156,13 @@
                 { videoId: 'rLTapLdh6CE', thumb: 'https://img.youtube.com/vi/rLTapLdh6CE/maxresdefault.jpg', title: "What is a 'Slow Roll' in Poker?", meta: '16K views', duration: '1:47' },
                 { videoId: '5Qf_17B_J6M', thumb: 'https://img.youtube.com/vi/5Qf_17B_J6M/maxresdefault.jpg', title: 'Learn How to Play Craps in Under 5 Minutes', meta: '16K views', duration: '4:29' },
                 { videoId: 'USjba19SVlg', thumb: 'https://img.youtube.com/vi/USjba19SVlg/maxresdefault.jpg', title: 'Different Types of Poker Rake Explained', meta: '16K views', duration: '2:35' },
+                { videoId: 'Po_tAPF0F60', thumb: 'https://img.youtube.com/vi/Po_tAPF0F60/maxresdefault.jpg', title: 'Blackjack Basics: How & When to Double Down', meta: '', duration: '3:12' },
+                { videoId: '5HEzr4sBj60', thumb: 'https://img.youtube.com/vi/5HEzr4sBj60/maxresdefault.jpg', title: 'Counting Cards in Blackjack: Explained', meta: '', duration: '4:15' },
+                { videoId: 'fbD0o_kBzww', thumb: 'https://img.youtube.com/vi/fbD0o_kBzww/maxresdefault.jpg', title: 'Quick & Easy Blackjack Guide', meta: '', duration: '3:00' },
+                { videoId: 'X1W_5Bb5PG4', thumb: 'https://img.youtube.com/vi/X1W_5Bb5PG4/maxresdefault.jpg', title: 'What Is RTP? The Casino Term Every Player Should Know', meta: '', duration: '2:20' },
+                { videoId: 'SlZMP-AYCHQ', thumb: 'https://img.youtube.com/vi/SlZMP-AYCHQ/maxresdefault.jpg', title: 'How to Play Omaha Poker', meta: '', duration: '3:45' },
+                { videoId: '9oYbFuOwJaI', thumb: 'https://img.youtube.com/vi/9oYbFuOwJaI/maxresdefault.jpg', title: 'Learn How to Play 3 Card Poker in Under 2 Minutes', meta: '', duration: '1:50' },
+                { videoId: 'Qw9CwJHiRVo', thumb: 'https://img.youtube.com/vi/Qw9CwJHiRVo/maxresdefault.jpg', title: 'Poker Hand Rankings Explained', meta: '', duration: '2:30' },
             ],
             casinoStrategy: [
                 { title: 'Blackjack Strategy: The Ultimate Guide to Online Blackjack', url: 'https://www.gambling.com/uk/online-casinos/strategy/blackjack-strategy-the-ultimate-guide-to-online-blackjack-2481500', image: 'https://objects.kaxmedia.com/auto/o/106986/df49168be0.png' },
@@ -243,13 +253,13 @@
         const CategoryCards = {
             props: { categories: { type: Array, required: true } },
             template: `
-            <div class="grid grid-cols-3 gap-4 max-[480px]:grid-cols-1">
+            <div class="grid grid-cols-3 gap-4 max-md:grid-cols-3 max-[480px]:grid-cols-3 max-[480px]:gap-2">
                 <a v-for="card in categories" :key="card.id" :href="'#' + card.id"
                    class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
-                    <div class="w-full h-[120px] max-md:h-[90px] max-[480px]:h-[120px] rounded-lg bg-cover bg-center" :style="{ backgroundImage: 'url(' + card.image + ')' }"></div>
-                    <div class="flex items-center justify-center gap-1 text-sm font-semibold text-black py-2 text-center">
+                    <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" :style="{ backgroundImage: 'url(' + card.image + ')' }"></div>
+                    <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">
                         {{ card.label }}
-                        <svg class="w-3.5 h-3.5 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        <svg class="w-3.5 h-3.5 max-[480px]:w-3 max-[480px]:h-3 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                 </a>
             </div>`,
@@ -302,22 +312,33 @@
                             <div class="text-[13px] text-[#999] mt-0.5">{{ currentVideo.meta }}</div>
                         </div>
                     </div>
-                    <div class="flex flex-col gap-2 max-lg:flex-row max-lg:overflow-x-auto max-lg:gap-4">
-                        <a v-for="(video, index) in sidebarVideos" :key="video.videoId" href="#"
-                           class="flex gap-2 p-2 rounded-md cursor-pointer transition-colors duration-200 no-underline text-inherit hover:bg-gray-50 hover:no-underline max-lg:min-w-[280px] max-lg:shrink-0"
-                           :class="{ 'bg-blue-50 outline outline-2 outline-[#0157FF] -outline-offset-2': activeIndex === index }"
-                           @click.prevent="selectVideo(video, index)">
-                            <div class="w-[120px] h-[68px] rounded-md shrink-0 relative overflow-hidden bg-cover bg-center" :style="{ backgroundImage: 'url(' + video.thumb + ')' }">
-                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-red-600/90 rounded-full flex items-center justify-center">
-                                    <svg class="w-3 h-3 fill-white ml-[1px]" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                    <!-- Desktop: vertical scroll list; Mobile: horizontal scroll -->
+                    <div class="relative">
+                        <div ref="videoSidebar" class="flex flex-col gap-2 max-h-[420px] overflow-y-auto hide-scrollbar max-lg:flex-row max-lg:max-h-none max-lg:overflow-y-visible max-lg:overflow-x-auto max-lg:gap-3 max-lg:pb-3">
+                            <a v-for="(video, index) in sidebarVideos" :key="video.videoId" href="#"
+                               class="flex gap-2 p-2 rounded-md cursor-pointer transition-colors duration-200 no-underline text-inherit hover:bg-gray-50 hover:no-underline max-lg:min-w-[260px] max-lg:shrink-0"
+                               :class="{ 'bg-blue-50 outline outline-2 outline-[#0157FF] -outline-offset-2': activeIndex === index }"
+                               @click.prevent="selectVideo(video, index)">
+                                <div class="w-[120px] h-[68px] rounded-md shrink-0 relative overflow-hidden bg-cover bg-center" :style="{ backgroundImage: 'url(' + video.thumb + ')' }">
+                                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 bg-red-600/90 rounded-full flex items-center justify-center">
+                                        <svg class="w-3 h-3 fill-white ml-[1px]" viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                                    </div>
+                                    <span class="absolute bottom-1 right-1 bg-black/75 text-white text-[10px] font-semibold px-1.5 py-px rounded-sm">{{ video.duration }}</span>
                                 </div>
-                                <span class="absolute bottom-1 right-1 bg-black/75 text-white text-[10px] font-semibold px-1.5 py-px rounded-sm">{{ video.duration }}</span>
-                            </div>
-                            <div class="flex-1 flex flex-col justify-center">
-                                <div class="text-[13px] font-semibold leading-[17px] text-black">{{ video.title }}</div>
-                                <div class="text-xs text-[#999] mt-1">{{ video.meta }}</div>
-                            </div>
-                        </a>
+                                <div class="flex-1 flex flex-col justify-center">
+                                    <div class="text-[13px] font-semibold leading-[17px] text-black">{{ video.title }}</div>
+                                    <div v-if="video.meta" class="text-xs text-[#999] mt-1">{{ video.meta }}</div>
+                                </div>
+                            </a>
+                        </div>
+                        <!-- Mobile scroll indicator -->
+                        <div class="hidden max-lg:flex items-center justify-center gap-2 mt-2 text-[#999]">
+                            <svg class="w-4 h-4 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+                            <span class="text-xs font-medium">Swipe for more videos</span>
+                            <svg class="w-4 h-4 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
+                        </div>
+                        <!-- Desktop: bottom fade gradient to indicate more content -->
+                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none max-lg:hidden"></div>
                     </div>
                 </div>
             </div>`,
@@ -338,7 +359,7 @@
                 },
             },
             template: `
-            <div class="py-8 scroll-mt-16" :class="{ 'border-t border-[#ECECEF]': !first }">
+            <div class="py-8 scroll-mt-24" :class="{ 'border-t border-[#ECECEF]': !first }">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-[23px] font-bold leading-8 text-black">{{ title }}</h2>
                     <div class="flex gap-2">
@@ -358,6 +379,119 @@
                     </a>
                 </div>
             </div>`,
+        };
+
+        /* ── RewardsBanner ── */
+        const RewardsBanner = {
+            data() {
+                return {
+                    isLoggedIn: false,
+                    chips: 215,
+                    rewardTickets: [
+                        { title: 'Submitted a review', desc: 'Leave a review on our review pages.', points: '+10' },
+                        { title: 'Playing Daily Slots', desc: 'Participate in our Daily Slot Games', points: '+20' },
+                        { title: 'Enter Giveaways with Chips', desc: 'Enter our Giveaways using gambling.com chips.', points: '+20' },
+                        { title: 'Play Our Tournaments', desc: 'Participate in our daily/weekly/monthly tournament', points: '+20' },
+                    ],
+                };
+            },
+            template: `
+            <section class="py-6">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <!-- Toggle for prototype demo -->
+                    <div class="flex justify-end mb-2">
+                        <button @click="isLoggedIn = !isLoggedIn" class="text-xs text-[#999] border border-[#ECECEF] rounded px-3 py-1 bg-white hover:bg-gray-50 cursor-pointer">
+                            Preview: {{ isLoggedIn ? 'Logged In' : 'Signed Out' }}
+                        </button>
+                    </div>
+
+                    <!-- ═══ SIGNED OUT BANNER ═══ -->
+                    <div v-if="!isLoggedIn" class="relative rounded-[20px] overflow-hidden h-[272px] max-md:h-[320px]">
+                        <!-- Background -->
+                        <img src="assets/rewards-bg-dark.png" alt="" class="absolute inset-0 w-full h-full object-cover">
+                        <!-- Cosmo mascot -->
+                        <img src="assets/cosmo-mascot.png" alt="" class="absolute right-[15%] max-md:right-[2%] top-[-20px] h-[304px] max-md:h-[240px] w-auto pointer-events-none">
+                        <!-- Large chip -->
+                        <img src="assets/chip-large.png" alt="" class="absolute right-[5%] max-md:right-[-2%] top-[60px] max-md:top-[40px] w-[100px] max-md:w-[70px] h-auto pointer-events-none">
+                        <!-- Small chip (rotated) -->
+                        <img src="assets/chip-small.png" alt="" class="absolute left-[38%] max-md:left-[60%] top-[-10px] w-[70px] max-md:w-[50px] h-auto pointer-events-none" style="transform: rotate(-43deg);">
+
+                        <!-- Content -->
+                        <div class="relative z-10 flex flex-col items-start justify-center h-full pl-6 max-w-[550px] max-md:max-w-[220px] max-md:pt-4">
+                            <!-- Logo + Rewards -->
+                            <div class="flex items-center gap-2 mb-3">
+                                <img src="assets/gdc-logo-white.png" alt="gambling.com" class="h-[60px] max-md:h-[44px] w-auto">
+                                <span class="text-white text-[37px] max-md:text-[25px] font-normal" style="text-shadow: 0px 4px 24px black;">Rewards</span>
+                            </div>
+                            <!-- Tagline -->
+                            <p class="text-white text-[22px] max-md:text-[18px] font-semibold leading-8 max-md:leading-6 mb-4" style="text-shadow: 0px 4px 24px black;">
+                                Register with us, earn chips, get FREE stuff.
+                            </p>
+                            <!-- Register button -->
+                            <a href="https://www.gambling.com/rewards" class="bg-white border border-black text-black text-base font-semibold capitalize text-center py-3 px-16 max-md:px-10 rounded no-underline hover:no-underline hover:bg-gray-100 transition-colors">
+                                Register Now
+                            </a>
+                            <!-- Login link -->
+                            <p class="text-white text-sm mt-2" style="text-shadow: 0px 4px 24px black;">
+                                Already registered. <a href="https://www.gambling.com/login" class="text-white font-bold underline hover:text-white">Log in</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- ═══ LOGGED IN BANNER ═══ -->
+                    <div v-else class="relative rounded-[16px] overflow-hidden h-[300px] max-md:h-[385px]">
+                        <!-- Background -->
+                        <img src="assets/rewards-bg-loggedin.png" alt="" class="absolute inset-0 w-full h-full object-cover">
+                        <!-- Cosmo mascot -->
+                        <img src="assets/cosmo-mascot-loggedin.png" alt="" class="absolute right-[12%] max-md:right-[0%] top-[-37px] max-md:top-[60px] h-[334px] max-md:h-[245px] w-auto pointer-events-none">
+                        <!-- Large chip -->
+                        <img src="assets/chip-large-loggedin.png" alt="" class="absolute right-[0%] top-[10px] w-[100px] max-md:w-[70px] h-auto pointer-events-none">
+
+                        <!-- Content -->
+                        <div class="relative z-10 flex flex-col gap-12 max-md:gap-10 pl-6 max-md:pl-4 py-6 h-full">
+                            <!-- Top: Logo + Chips counter -->
+                            <div class="flex items-center gap-2 pl-2">
+                                <div class="flex items-center gap-2">
+                                    <img src="assets/gdc-logo-white.png" alt="gambling.com" class="h-[60px] max-md:h-[48px] w-auto">
+                                    <span class="text-white text-[37px] max-md:text-[29px] font-normal">Rewards</span>
+                                </div>
+                                <div class="backdrop-blur-sm bg-black/60 rounded-xl p-4 ml-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <img src="assets/chip-icon-small.png" alt="" class="w-6 h-6">
+                                        <span class="text-white text-[26px] font-black leading-8">{{ chips }} Chips</span>
+                                    </div>
+                                    <div class="h-px bg-white/30 mb-2"></div>
+                                    <a href="https://www.gambling.com/rewards" class="flex items-center gap-1 text-white text-lg font-bold no-underline hover:no-underline hover:opacity-80">
+                                        Go to Rewards
+                                        <svg class="w-5 h-5 fill-none stroke-white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Bottom: Reward tickets (scrollable) -->
+                            <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2 pr-6">
+                                <div v-for="ticket in rewardTickets" :key="ticket.title"
+                                     class="backdrop-blur-sm bg-[rgba(22,22,22,0.7)] rounded-xl p-3 flex items-center gap-4 shrink-0 min-w-[310px]">
+                                    <div class="flex flex-col items-center shrink-0 w-[66px]">
+                                        <img src="assets/favicon-chip.png" alt="" class="w-[45px] h-[45px] -mb-2">
+                                        <span class="bg-[#0157FF] text-white text-base font-black rounded-full px-4 py-1 -mt-1 block text-center whitespace-nowrap">{{ ticket.points }}</span>
+                                    </div>
+                                    <div>
+                                        <p class="text-white text-base font-bold leading-[26px]">{{ ticket.title }}</p>
+                                        <p class="text-white text-[13px] leading-[18px]">{{ ticket.desc }}</p>
+                                    </div>
+                                </div>
+                                <!-- Next arrow -->
+                                <div class="flex items-center shrink-0 pl-1">
+                                    <div class="bg-[#E6F1FC] rounded-full p-2">
+                                        <svg class="w-5 h-5 fill-none stroke-black" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>`,
         };
 
         /* ── SiteFooter ── */
@@ -499,6 +633,7 @@
         app.component('category-cards', CategoryCards);
         app.component('featured-video-player', FeaturedVideoPlayer);
         app.component('article-carousel', ArticleCarousel);
+        app.component('rewards-banner', RewardsBanner);
 
         app.mount('#app');
     </script>
