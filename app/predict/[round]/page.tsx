@@ -6,7 +6,7 @@ import Link from 'next/link';
 import NavBar from '@/components/NavBar';
 import DriverAvatar from '@/components/DriverAvatar';
 import TeamLogo from '@/components/TeamLogo';
-import { ROUNDS, DRIVERS, TEAMS, type Driver } from '@/lib/f1-data';
+import { ROUNDS, DRIVERS, TEAMS, type Driver, isPredictionLocked, getLockDate } from '@/lib/f1-data';
 import HowToPlay from '@/components/HowToPlay';
 
 type Tab = 'qualifying' | 'race' | 'sprint';
@@ -100,7 +100,11 @@ export default function PredictPage() {
   const roundId = parseInt(params.round as string);
   const round = ROUNDS.find(r => r.id === roundId);
 
-  const [tab, setTab] = useState<Tab>('qualifying');
+  const locked = round ? isPredictionLocked(round) : false;
+  const lockDate = round ? getLockDate(round) : '';
+
+  // Sprint weekends start on Sprint tab; normal weekends start on Qualifying
+  const [tab, setTab] = useState<Tab>(round?.isSprint ? 'sprint' : 'qualifying');
   const [qualPicks, setQualPicks] = useState<(number | null)[]>([null, null, null]);
   const [racePicks, setRacePicks] = useState<(number | null)[]>(Array(10).fill(null));
   const [sprintPicks, setSprintPicks] = useState<(number | null)[]>(Array(5).fill(null));
@@ -138,6 +142,7 @@ export default function PredictPage() {
   }, [tab]);
 
   const handleDriverClick = (driverId: number) => {
+    if (locked) return;
     const picks = getCurrentPicks();
     const nextEmpty = picks.indexOf(null);
     if (nextEmpty === -1) return;
@@ -147,6 +152,7 @@ export default function PredictPage() {
   };
 
   const handleClearSlot = (index: number) => {
+    if (locked) return;
     const picks = getCurrentPicks();
     const newPicks = [...picks];
     newPicks[index] = null;
@@ -182,18 +188,23 @@ export default function PredictPage() {
       if (res.ok) {
         setSaved(true);
 
-        // Auto-advance: qualifying → race, race → home
-        if (tab === 'qualifying') {
-          setTimeout(() => {
-            setSaved(false);
-            setTab('race');
-          }, 800);
-        } else if (tab === 'race') {
-          setTimeout(() => {
-            router.push('/');
-          }, 800);
-        } else if (tab === 'sprint') {
-          setTimeout(() => setSaved(false), 3000);
+        // Auto-advance through tabs, then home when done
+        // Sprint weekend order: Sprint → Qualifying → Race → Home
+        // Normal weekend order: Qualifying → Race → Home
+        if (round?.isSprint) {
+          if (tab === 'sprint') {
+            setTimeout(() => { setSaved(false); setTab('qualifying'); }, 800);
+          } else if (tab === 'qualifying') {
+            setTimeout(() => { setSaved(false); setTab('race'); }, 800);
+          } else if (tab === 'race') {
+            setTimeout(() => { router.push('/'); }, 800);
+          }
+        } else {
+          if (tab === 'qualifying') {
+            setTimeout(() => { setSaved(false); setTab('race'); }, 800);
+          } else if (tab === 'race') {
+            setTimeout(() => { router.push('/'); }, 800);
+          }
         }
       }
     } catch {
@@ -214,11 +225,18 @@ export default function PredictPage() {
     );
   }
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: 'qualifying', label: 'Qualifying' },
-    { key: 'race', label: 'Race' },
-    ...(round.isSprint ? [{ key: 'sprint' as Tab, label: 'Sprint' }] : []),
-  ];
+  // Sprint weekends: Sprint → Qualifying → Race
+  // Normal weekends: Qualifying → Race
+  const tabs: { key: Tab; label: string }[] = round.isSprint
+    ? [
+        { key: 'sprint', label: 'Sprint' },
+        { key: 'qualifying', label: 'Qualifying' },
+        { key: 'race', label: 'Race' },
+      ]
+    : [
+        { key: 'qualifying', label: 'Qualifying' },
+        { key: 'race', label: 'Race' },
+      ];
 
   const positions = tab === 'qualifying' ? 3 : tab === 'race' ? 10 : 5;
   const picks = getCurrentPicks();
@@ -246,7 +264,28 @@ export default function PredictPage() {
             <HowToPlay variant="predict" />
           </div>
           <p className="text-[--color-text-secondary] mt-1">{round.location}, {round.country}</p>
+          {!locked && (
+            <p className="text-xs text-[--color-text-muted] mt-2">
+              🔓 Predictions lock on {new Date(lockDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}
+              {round.isSprint ? ' (sprint qualifying day)' : ' (qualifying day)'}
+            </p>
+          )}
         </div>
+
+        {/* Locked banner */}
+        {locked && (
+          <div className="mb-6 p-4 bg-[--color-error]/10 border border-[--color-error]/30 rounded-xl flex items-center gap-3">
+            <span className="text-2xl">🔒</span>
+            <div>
+              <p className="font-semibold text-[--color-error]">Predictions Locked</p>
+              <p className="text-sm text-[--color-text-secondary]">
+                {round.isSprint
+                  ? 'Sprint qualifying has started — predictions are now locked for this round.'
+                  : 'Qualifying has started — predictions are now locked for this round.'}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex border-b border-[--color-border] mb-6">
@@ -302,7 +341,8 @@ export default function PredictPage() {
                       max={22}
                       value={numFinishers}
                       onChange={e => setNumFinishers(parseInt(e.target.value))}
-                      className="flex-1 accent-[--color-accent-blue]"
+                      disabled={locked}
+                      className="flex-1 accent-[--color-accent-blue] disabled:opacity-50"
                     />
                     <span className="text-2xl font-bold text-[--color-accent-blue] w-10 text-center">{numFinishers}</span>
                   </div>
@@ -312,29 +352,51 @@ export default function PredictPage() {
 
               {/* Save button */}
               <div className="mt-6 flex gap-3">
-                <button
-                  onClick={handleSave}
-                  disabled={saving || getCurrentPicks().some(p => p === null)}
-                  className="flex-1 py-3 bg-gradient-accent rounded-lg font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50"
-                >
-                  {saving
-                    ? 'Saving...'
-                    : saved
-                    ? tab === 'qualifying'
-                      ? '✓ Saved — Opening Race...'
-                      : tab === 'race'
-                      ? '✓ Saved — Going Home...'
-                      : '✓ Saved!'
-                    : tab === 'qualifying'
-                    ? 'Save & Continue to Race →'
-                    : tab === 'race'
-                    ? 'Save & Finish'
-                    : 'Save Sprint Predictions'}
-                </button>
+                {locked ? (
+                  <div className="flex-1 py-3 bg-[--color-bg-secondary] rounded-lg font-semibold uppercase tracking-wider text-center text-[--color-text-muted] opacity-60">
+                    🔒 Locked
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleSave}
+                    disabled={saving || getCurrentPicks().some(p => p === null)}
+                    className="flex-1 py-3 bg-gradient-accent rounded-lg font-semibold uppercase tracking-wider hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {saving
+                      ? 'Saving...'
+                      : saved
+                      ? (() => {
+                          if (round?.isSprint) {
+                            if (tab === 'sprint') return '✓ Saved — Opening Qualifying...';
+                            if (tab === 'qualifying') return '✓ Saved — Opening Race...';
+                            return '✓ Saved — Going Home...';
+                          }
+                          if (tab === 'qualifying') return '✓ Saved — Opening Race...';
+                          return '✓ Saved — Going Home...';
+                        })()
+                      : (() => {
+                          if (round?.isSprint) {
+                            if (tab === 'sprint') return 'Save & Continue to Qualifying →';
+                            if (tab === 'qualifying') return 'Save & Continue to Race →';
+                            return 'Save & Finish';
+                          }
+                          if (tab === 'qualifying') return 'Save & Continue to Race →';
+                          return 'Save & Finish';
+                        })()}
+                  </button>
+                )}
               </div>
-              {saved && (
+              {saved && !locked && (
                 <p className="text-sm text-[--color-success] mt-2 text-center">
-                  {tab === 'qualifying' ? 'Qualifying saved! Moving to race predictions...' : tab === 'race' ? 'All predictions saved!' : 'Sprint predictions saved!'}
+                  {(() => {
+                    if (round?.isSprint) {
+                      if (tab === 'sprint') return 'Sprint saved! Moving to qualifying...';
+                      if (tab === 'qualifying') return 'Qualifying saved! Moving to race...';
+                      return 'All predictions saved!';
+                    }
+                    if (tab === 'qualifying') return 'Qualifying saved! Moving to race predictions...';
+                    return 'All predictions saved!';
+                  })()}
                 </p>
               )}
             </div>

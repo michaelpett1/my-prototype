@@ -14,6 +14,7 @@ const CONTENT = {
       { icon: '🏆', title: 'Season Predictions', desc: 'Predict the Drivers\' & Constructors\' Champions. Windows open 4 times per season.' },
       { icon: '🤝', title: 'Teammate Battles', desc: 'Pick which driver in each team will finish higher in the championship.' },
       { icon: '📊', title: 'Earn Points', desc: 'Exact position = 5pts, one off = 3pts, in top 3/10 = 1pt. Bonus for exact finisher count.' },
+      { icon: '🔒', title: 'Deadlines', desc: 'Normal weekends: predictions lock at qualifying start (Saturday). Sprint weekends: all predictions lock at sprint qualifying start (Friday).' },
       { icon: '🏅', title: 'Compete', desc: 'Climb the global leaderboard or create private leagues with friends.' },
     ],
   },
@@ -22,9 +23,9 @@ const CONTENT = {
     items: [
       { icon: '👆', title: 'Tap to Select', desc: 'Tap a driver from the pool to fill the next empty position slot.' },
       { icon: '❌', title: 'Remove & Reorder', desc: 'Click × on any slot to clear it and pick a different driver.' },
-      { icon: '🏁', title: 'Qualifying → Race', desc: 'Save qualifying picks and you\'ll automatically advance to race predictions.' },
+      { icon: '🏁', title: 'Tab Order', desc: 'Sprint weekends: Sprint → Qualifying → Race. Normal weekends: Qualifying → Race. Saving auto-advances to the next tab.' },
       { icon: '🔢', title: 'Finisher Count', desc: 'On the race tab, predict how many drivers will finish. Exact = 5 bonus points!' },
-      { icon: '⏰', title: 'Deadline', desc: 'Predictions lock when qualifying starts. Edit anytime before then.' },
+      { icon: '🔒', title: 'Deadline', desc: 'Normal weekends: lock at qualifying start (Saturday). Sprint weekends: ALL predictions lock at sprint qualifying start (Friday). Edit anytime before then.' },
     ],
   },
   season: {

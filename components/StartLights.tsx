@@ -10,7 +10,12 @@ export default function StartLights({ onComplete }: { onComplete: () => void }) 
   const [activeLights, setActiveLights] = useState(0);
   const [lightsOut, setLightsOut] = useState(false);
   const [phase, setPhase] = useState<'lights' | 'go' | 'fadeout' | 'done'>('lights');
+  const [muted, setMuted] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const mutedRef = useRef(false);
+
+  // Keep ref in sync so callbacks read the latest value
+  useEffect(() => { mutedRef.current = muted; }, [muted]);
 
   const getAudioCtx = useCallback(() => {
     if (!audioCtxRef.current) {
@@ -21,6 +26,7 @@ export default function StartLights({ onComplete }: { onComplete: () => void }) 
 
   // Play identical beep tone for each light activation — same pitch every time
   const playLightTone = useCallback(() => {
+    if (mutedRef.current) return;
     try {
       const ctx = getAudioCtx();
       const osc = ctx.createOscillator();
@@ -40,6 +46,7 @@ export default function StartLights({ onComplete }: { onComplete: () => void }) 
 
   // Aggressive F1 engine rev on lights out — multi-layered for realism
   const playEngineRev = useCallback(() => {
+    if (mutedRef.current) return;
     try {
       const ctx = getAudioCtx();
       const duration = 3.0;
@@ -296,6 +303,27 @@ export default function StartLights({ onComplete }: { onComplete: () => void }) 
           </p>
         </div>
       )}
+
+      {/* Mute button */}
+      <button
+        onClick={() => setMuted(m => !m)}
+        className="absolute top-6 right-6 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors text-white/70 hover:text-white"
+        aria-label={muted ? 'Unmute' : 'Mute'}
+      >
+        {muted ? (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        ) : (
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        )}
+      </button>
 
       {/* Red glow ambiance when lights are on */}
       {!lightsOut && activeLights > 0 && (

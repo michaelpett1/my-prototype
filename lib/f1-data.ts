@@ -32,10 +32,11 @@ export interface Round {
   location: string;
   country: string;
   flag: string; // emoji flag
-  qualifyingDate: string; // ISO date
+  qualifyingDate: string; // ISO date (Saturday for GP qualifying)
   raceDate: string;
   isSprint: boolean;
   sprintDate: string | null;
+  sprintQualifyingDate: string | null; // Friday (sprint shootout day)
 }
 
 export const TEAMS: Team[] = [
@@ -93,30 +94,30 @@ export const ROUNDS: Round[] = [
   // Standard weekend: Qualifying = Saturday, Race = Sunday
   // Sprint weekend: Sprint Qualifying = Friday, Sprint = Saturday, Qualifying = Saturday, Race = Sunday
   // Azerbaijan: Race on Saturday (Remembrance Day accommodation)
-  { id: 1,  name: 'Australian Grand Prix',          location: 'Melbourne',       country: 'Australia',      flag: '🇦🇺', qualifyingDate: '2026-03-07', raceDate: '2026-03-08', isSprint: false, sprintDate: null },
-  { id: 2,  name: 'Chinese Grand Prix',             location: 'Shanghai',        country: 'China',          flag: '🇨🇳', qualifyingDate: '2026-03-14', raceDate: '2026-03-15', isSprint: true,  sprintDate: '2026-03-14' },
-  { id: 3,  name: 'Japanese Grand Prix',            location: 'Suzuka',          country: 'Japan',          flag: '🇯🇵', qualifyingDate: '2026-03-28', raceDate: '2026-03-29', isSprint: false, sprintDate: null },
-  { id: 4,  name: 'Bahrain Grand Prix',             location: 'Sakhir',          country: 'Bahrain',        flag: '🇧🇭', qualifyingDate: '2026-04-11', raceDate: '2026-04-12', isSprint: false, sprintDate: null },
-  { id: 5,  name: 'Saudi Arabian Grand Prix',       location: 'Jeddah',          country: 'Saudi Arabia',   flag: '🇸🇦', qualifyingDate: '2026-04-18', raceDate: '2026-04-19', isSprint: false, sprintDate: null },
-  { id: 6,  name: 'Miami Grand Prix',               location: 'Miami',           country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-05-02', raceDate: '2026-05-03', isSprint: true,  sprintDate: '2026-05-02' },
-  { id: 7,  name: 'Canadian Grand Prix',            location: 'Montreal',        country: 'Canada',         flag: '🇨🇦', qualifyingDate: '2026-05-23', raceDate: '2026-05-24', isSprint: true,  sprintDate: '2026-05-23' },
-  { id: 8,  name: 'Monaco Grand Prix',              location: 'Monaco',          country: 'Monaco',         flag: '🇲🇨', qualifyingDate: '2026-06-06', raceDate: '2026-06-07', isSprint: false, sprintDate: null },
-  { id: 9,  name: 'Barcelona-Catalunya Grand Prix', location: 'Barcelona',       country: 'Spain',          flag: '🇪🇸', qualifyingDate: '2026-06-13', raceDate: '2026-06-14', isSprint: false, sprintDate: null },
-  { id: 10, name: 'Austrian Grand Prix',            location: 'Spielberg',       country: 'Austria',        flag: '🇦🇹', qualifyingDate: '2026-06-27', raceDate: '2026-06-28', isSprint: false, sprintDate: null },
-  { id: 11, name: 'British Grand Prix',             location: 'Silverstone',     country: 'United Kingdom', flag: '🇬🇧', qualifyingDate: '2026-07-04', raceDate: '2026-07-05', isSprint: true,  sprintDate: '2026-07-04' },
-  { id: 12, name: 'Belgian Grand Prix',             location: 'Spa',             country: 'Belgium',        flag: '🇧🇪', qualifyingDate: '2026-07-18', raceDate: '2026-07-19', isSprint: false, sprintDate: null },
-  { id: 13, name: 'Hungarian Grand Prix',           location: 'Budapest',        country: 'Hungary',        flag: '🇭🇺', qualifyingDate: '2026-07-25', raceDate: '2026-07-26', isSprint: false, sprintDate: null },
-  { id: 14, name: 'Dutch Grand Prix',               location: 'Zandvoort',       country: 'Netherlands',    flag: '🇳🇱', qualifyingDate: '2026-08-22', raceDate: '2026-08-23', isSprint: true,  sprintDate: '2026-08-22' },
-  { id: 15, name: 'Italian Grand Prix',             location: 'Monza',           country: 'Italy',          flag: '🇮🇹', qualifyingDate: '2026-09-05', raceDate: '2026-09-06', isSprint: false, sprintDate: null },
-  { id: 16, name: 'Spanish Grand Prix',             location: 'Madrid',          country: 'Spain',          flag: '🇪🇸', qualifyingDate: '2026-09-12', raceDate: '2026-09-13', isSprint: false, sprintDate: null },
-  { id: 17, name: 'Azerbaijan Grand Prix',          location: 'Baku',            country: 'Azerbaijan',     flag: '🇦🇿', qualifyingDate: '2026-09-25', raceDate: '2026-09-26', isSprint: false, sprintDate: null },
-  { id: 18, name: 'Singapore Grand Prix',           location: 'Singapore',       country: 'Singapore',      flag: '🇸🇬', qualifyingDate: '2026-10-10', raceDate: '2026-10-11', isSprint: true,  sprintDate: '2026-10-10' },
-  { id: 19, name: 'United States Grand Prix',       location: 'Austin',          country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-10-24', raceDate: '2026-10-25', isSprint: false, sprintDate: null },
-  { id: 20, name: 'Mexico City Grand Prix',         location: 'Mexico City',     country: 'Mexico',         flag: '🇲🇽', qualifyingDate: '2026-10-31', raceDate: '2026-11-01', isSprint: false, sprintDate: null },
-  { id: 21, name: 'São Paulo Grand Prix',           location: 'São Paulo',       country: 'Brazil',         flag: '🇧🇷', qualifyingDate: '2026-11-07', raceDate: '2026-11-08', isSprint: false, sprintDate: null },
-  { id: 22, name: 'Las Vegas Grand Prix',           location: 'Las Vegas',       country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-11-20', raceDate: '2026-11-21', isSprint: false, sprintDate: null },
-  { id: 23, name: 'Qatar Grand Prix',               location: 'Lusail',          country: 'Qatar',          flag: '🇶🇦', qualifyingDate: '2026-11-28', raceDate: '2026-11-29', isSprint: false, sprintDate: null },
-  { id: 24, name: 'Abu Dhabi Grand Prix',           location: 'Yas Marina',      country: 'UAE',            flag: '🇦🇪', qualifyingDate: '2026-12-05', raceDate: '2026-12-06', isSprint: false, sprintDate: null },
+  { id: 1,  name: 'Australian Grand Prix',          location: 'Melbourne',       country: 'Australia',      flag: '🇦🇺', qualifyingDate: '2026-03-07', raceDate: '2026-03-08', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 2,  name: 'Chinese Grand Prix',             location: 'Shanghai',        country: 'China',          flag: '🇨🇳', qualifyingDate: '2026-03-14', raceDate: '2026-03-15', isSprint: true,  sprintDate: '2026-03-14', sprintQualifyingDate: '2026-03-13' },
+  { id: 3,  name: 'Japanese Grand Prix',            location: 'Suzuka',          country: 'Japan',          flag: '🇯🇵', qualifyingDate: '2026-03-28', raceDate: '2026-03-29', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 4,  name: 'Bahrain Grand Prix',             location: 'Sakhir',          country: 'Bahrain',        flag: '🇧🇭', qualifyingDate: '2026-04-11', raceDate: '2026-04-12', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 5,  name: 'Saudi Arabian Grand Prix',       location: 'Jeddah',          country: 'Saudi Arabia',   flag: '🇸🇦', qualifyingDate: '2026-04-18', raceDate: '2026-04-19', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 6,  name: 'Miami Grand Prix',               location: 'Miami',           country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-05-02', raceDate: '2026-05-03', isSprint: true,  sprintDate: '2026-05-02', sprintQualifyingDate: '2026-05-01' },
+  { id: 7,  name: 'Canadian Grand Prix',            location: 'Montreal',        country: 'Canada',         flag: '🇨🇦', qualifyingDate: '2026-05-23', raceDate: '2026-05-24', isSprint: true,  sprintDate: '2026-05-23', sprintQualifyingDate: '2026-05-22' },
+  { id: 8,  name: 'Monaco Grand Prix',              location: 'Monaco',          country: 'Monaco',         flag: '🇲🇨', qualifyingDate: '2026-06-06', raceDate: '2026-06-07', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 9,  name: 'Barcelona-Catalunya Grand Prix', location: 'Barcelona',       country: 'Spain',          flag: '🇪🇸', qualifyingDate: '2026-06-13', raceDate: '2026-06-14', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 10, name: 'Austrian Grand Prix',            location: 'Spielberg',       country: 'Austria',        flag: '🇦🇹', qualifyingDate: '2026-06-27', raceDate: '2026-06-28', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 11, name: 'British Grand Prix',             location: 'Silverstone',     country: 'United Kingdom', flag: '🇬🇧', qualifyingDate: '2026-07-04', raceDate: '2026-07-05', isSprint: true,  sprintDate: '2026-07-04', sprintQualifyingDate: '2026-07-03' },
+  { id: 12, name: 'Belgian Grand Prix',             location: 'Spa',             country: 'Belgium',        flag: '🇧🇪', qualifyingDate: '2026-07-18', raceDate: '2026-07-19', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 13, name: 'Hungarian Grand Prix',           location: 'Budapest',        country: 'Hungary',        flag: '🇭🇺', qualifyingDate: '2026-07-25', raceDate: '2026-07-26', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 14, name: 'Dutch Grand Prix',               location: 'Zandvoort',       country: 'Netherlands',    flag: '🇳🇱', qualifyingDate: '2026-08-22', raceDate: '2026-08-23', isSprint: true,  sprintDate: '2026-08-22', sprintQualifyingDate: '2026-08-21' },
+  { id: 15, name: 'Italian Grand Prix',             location: 'Monza',           country: 'Italy',          flag: '🇮🇹', qualifyingDate: '2026-09-05', raceDate: '2026-09-06', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 16, name: 'Spanish Grand Prix',             location: 'Madrid',          country: 'Spain',          flag: '🇪🇸', qualifyingDate: '2026-09-12', raceDate: '2026-09-13', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 17, name: 'Azerbaijan Grand Prix',          location: 'Baku',            country: 'Azerbaijan',     flag: '🇦🇿', qualifyingDate: '2026-09-25', raceDate: '2026-09-26', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 18, name: 'Singapore Grand Prix',           location: 'Singapore',       country: 'Singapore',      flag: '🇸🇬', qualifyingDate: '2026-10-10', raceDate: '2026-10-11', isSprint: true,  sprintDate: '2026-10-10', sprintQualifyingDate: '2026-10-09' },
+  { id: 19, name: 'United States Grand Prix',       location: 'Austin',          country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-10-24', raceDate: '2026-10-25', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 20, name: 'Mexico City Grand Prix',         location: 'Mexico City',     country: 'Mexico',         flag: '🇲🇽', qualifyingDate: '2026-10-31', raceDate: '2026-11-01', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 21, name: 'São Paulo Grand Prix',           location: 'São Paulo',       country: 'Brazil',         flag: '🇧🇷', qualifyingDate: '2026-11-07', raceDate: '2026-11-08', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 22, name: 'Las Vegas Grand Prix',           location: 'Las Vegas',       country: 'USA',            flag: '🇺🇸', qualifyingDate: '2026-11-20', raceDate: '2026-11-21', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 23, name: 'Qatar Grand Prix',               location: 'Lusail',          country: 'Qatar',          flag: '🇶🇦', qualifyingDate: '2026-11-28', raceDate: '2026-11-29', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
+  { id: 24, name: 'Abu Dhabi Grand Prix',           location: 'Yas Marina',      country: 'UAE',            flag: '🇦🇪', qualifyingDate: '2026-12-05', raceDate: '2026-12-06', isSprint: false, sprintDate: null, sprintQualifyingDate: null },
 ];
 
 // Season standings prediction windows (before these rounds)
@@ -143,4 +144,20 @@ export function getDriver(driverId: number): Driver | undefined {
 // Helper: get drivers for a team
 export function getTeamDrivers(teamId: number): Driver[] {
   return DRIVERS.filter(d => d.teamId === teamId);
+}
+
+// Helper: get the date predictions lock for a round
+// Sprint weekends: lock when sprint qualifying starts (Friday)
+// Normal weekends: lock when qualifying starts (Saturday)
+export function getLockDate(round: Round): string {
+  if (round.isSprint && round.sprintQualifyingDate) {
+    return round.sprintQualifyingDate;
+  }
+  return round.qualifyingDate;
+}
+
+// Helper: check if predictions are locked for a round
+export function isPredictionLocked(round: Round): boolean {
+  const today = new Date().toISOString().split('T')[0];
+  return today >= getLockDate(round);
 }

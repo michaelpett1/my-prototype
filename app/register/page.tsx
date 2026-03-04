@@ -17,9 +17,13 @@ export default function RegisterPage() {
 
   // Start lights animation state
   const [showStartLights, setShowStartLights] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   const handleStartLightsComplete = useCallback(() => {
+    // Don't hide the start lights — instead show a redirecting state
+    // so the registration form doesn't flash
+    setRedirecting(true);
     setShowStartLights(false);
     if (pendingRedirect) {
       router.push(pendingRedirect);
@@ -74,6 +78,16 @@ export default function RegisterPage() {
       {/* Start lights ceremony on successful sign-up */}
       {showStartLights && <StartLights onComplete={handleStartLightsComplete} />}
 
+      {redirecting ? (
+        <div className="min-h-screen bg-gradient-main flex items-center justify-center">
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <F1Logo width={80} />
+            </div>
+            <p className="text-[--color-text-secondary] animate-pulse">Loading...</p>
+          </div>
+        </div>
+      ) : (
       <div className="min-h-screen bg-gradient-main flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           {/* Logo / Title */}
@@ -164,6 +178,7 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }

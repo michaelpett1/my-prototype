@@ -23,6 +23,7 @@ function LoginForm() {
 
   // Start lights animation state
   const [showStartLights, setShowStartLights] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
   // Show intro on first visit (session-based)
@@ -41,6 +42,7 @@ function LoginForm() {
   }, []);
 
   const handleStartLightsComplete = useCallback(() => {
+    setRedirecting(true);
     setShowStartLights(false);
     if (pendingRedirect) {
       router.push(pendingRedirect);
@@ -78,6 +80,16 @@ function LoginForm() {
       {/* Start lights ceremony on successful sign-in */}
       {showStartLights && <StartLights onComplete={handleStartLightsComplete} />}
 
+      {redirecting ? (
+        <div className="min-h-screen bg-gradient-main flex items-center justify-center">
+          <div className="text-center">
+            <div className="flex justify-center mb-4">
+              <F1Logo width={80} />
+            </div>
+            <p className="text-[--color-text-secondary] animate-pulse">Loading...</p>
+          </div>
+        </div>
+      ) : (
       <div className={`min-h-screen bg-gradient-main flex items-center justify-center p-4 transition-opacity duration-500 ${
         introComplete ? 'opacity-100' : 'opacity-0'
       }`}>
@@ -150,6 +162,7 @@ function LoginForm() {
           </div>
         </div>
       </div>
+      )}
     </>
   );
 }
