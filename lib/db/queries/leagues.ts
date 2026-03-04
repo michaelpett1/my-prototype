@@ -45,20 +45,29 @@ export async function createLeague(name: string, userId: number): Promise<League
     throw new Error('Failed to generate unique join code');
   }
 
-  const { data: league } = await supabase
+  const { data: league, error: leagueError } = await supabase
     .from('leagues')
     .insert({ name, join_code: joinCode, created_by: userId })
     .select()
     .single();
 
+  if (leagueError) {
+    console.error('createLeague insert error:', leagueError);
+    throw new Error(`Failed to create league: ${leagueError.message}`);
+  }
+
   if (!league) {
-    throw new Error('Failed to create league');
+    throw new Error('Failed to create league: no data returned');
   }
 
   // Auto-add creator as member
-  await supabase
+  const { error: memberError } = await supabase
     .from('league_members')
     .insert({ league_id: league.id, user_id: userId });
+
+  if (memberError) {
+    console.error('createLeague add member error:', memberError);
+  }
 
   return league as League;
 }

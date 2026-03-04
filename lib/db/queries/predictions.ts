@@ -15,7 +15,7 @@ export async function getQualifyingPrediction(userId: number, roundId: number) {
 
 export async function upsertQualifyingPrediction(userId: number, roundId: number, p1: number, p2: number, p3: number) {
   const supabase = getSupabase();
-  await supabase
+  const { error } = await supabase
     .from('qualifying_predictions')
     .upsert(
       {
@@ -28,6 +28,10 @@ export async function upsertQualifyingPrediction(userId: number, roundId: number
       },
       { onConflict: 'user_id,round_id' }
     );
+  if (error) {
+    console.error('upsertQualifyingPrediction error:', error);
+    throw new Error(`Failed to save qualifying prediction: ${error.message}`);
+  }
 }
 
 // Race predictions
@@ -52,7 +56,7 @@ export async function upsertRacePrediction(
   positions: number[], numFinishers: number
 ) {
   const supabase = getSupabase();
-  await supabase
+  const { error } = await supabase
     .from('race_predictions')
     .upsert(
       {
@@ -73,6 +77,10 @@ export async function upsertRacePrediction(
       },
       { onConflict: 'user_id,round_id' }
     );
+  if (error) {
+    console.error('upsertRacePrediction error:', error);
+    throw new Error(`Failed to save race prediction: ${error.message}`);
+  }
 }
 
 // Sprint predictions
@@ -90,7 +98,7 @@ export async function getSprintPrediction(userId: number, roundId: number) {
 
 export async function upsertSprintPrediction(userId: number, roundId: number, positions: number[]) {
   const supabase = getSupabase();
-  await supabase
+  const { error } = await supabase
     .from('sprint_predictions')
     .upsert(
       {
@@ -105,6 +113,10 @@ export async function upsertSprintPrediction(userId: number, roundId: number, po
       },
       { onConflict: 'user_id,round_id' }
     );
+  if (error) {
+    console.error('upsertSprintPrediction error:', error);
+    throw new Error(`Failed to save sprint prediction: ${error.message}`);
+  }
 }
 
 // Teammate predictions
@@ -121,7 +133,7 @@ export async function getTeammatePredictions(userId: number) {
 export async function upsertTeammatePredictions(userId: number, picks: { teamId: number; driverId: number }[]) {
   const supabase = getSupabase();
   for (const pick of picks) {
-    await supabase
+    const { error } = await supabase
       .from('teammate_predictions')
       .upsert(
         {
@@ -131,6 +143,10 @@ export async function upsertTeammatePredictions(userId: number, picks: { teamId:
         },
         { onConflict: 'user_id,team_id' }
       );
+    if (error) {
+      console.error('upsertTeammatePrediction error:', error);
+      throw new Error(`Failed to save teammate prediction: ${error.message}`);
+    }
   }
 }
 
@@ -166,7 +182,7 @@ export async function upsertSeasonPrediction(
   driversChampionId: number, constructorsChampionId: number
 ) {
   const supabase = getSupabase();
-  await supabase
+  const { error } = await supabase
     .from('season_predictions')
     .upsert(
       {
@@ -177,4 +193,8 @@ export async function upsertSeasonPrediction(
       },
       { onConflict: 'user_id,window_number' }
     );
+  if (error) {
+    console.error('upsertSeasonPrediction error:', error);
+    throw new Error(`Failed to save season prediction: ${error.message}`);
+  }
 }

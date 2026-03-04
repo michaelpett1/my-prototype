@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { ROUNDS, DRIVERS } from '@/lib/f1-data';
+import { ROUNDS, DRIVERS, getLockDate } from '@/lib/f1-data';
 import {
   upsertQualifyingPrediction,
   upsertRacePrediction,
@@ -23,10 +23,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid round' }, { status: 400 });
   }
 
-  // Check if round is locked (qualifying/race has started)
+  // Check if round is locked (sprint qualifying for sprint weekends, qualifying for normal)
   const now = new Date();
-  const qualDate = new Date(round.qualifyingDate + 'T00:00:00Z');
-  if (now >= qualDate) {
+  const lockDateStr = getLockDate(round);
+  const lockDate = new Date(lockDateStr + 'T00:00:00Z');
+  if (now >= lockDate) {
     return NextResponse.json({ error: 'Predictions are locked for this round' }, { status: 403 });
   }
 
@@ -77,7 +78,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Prediction save error:', error);
-    return NextResponse.json({ error: 'Failed to save predictions' }, { status: 500 });
+    const errMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Prediction save error:', errMsg, error);
+    return NextResponse.json({ error: `Failed to save predictions: ${errMsg}` }, { status: 500 });
   }
 }

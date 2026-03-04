@@ -26,21 +26,29 @@ export async function POST(request: Request) {
     const supabase = getSupabase();
 
     // Check if email already exists
-    const { data: existingEmail } = await supabase
+    const { data: existingEmail, error: emailCheckErr } = await supabase
       .from('users')
       .select('id')
-      .eq('email', email)
+      .eq('email', email.toLowerCase())
       .maybeSingle();
+    if (emailCheckErr) {
+      console.error('Email check error:', emailCheckErr);
+      return NextResponse.json({ error: `Registration failed: ${emailCheckErr.message}` }, { status: 500 });
+    }
     if (existingEmail) {
       return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
     }
 
     // Check if username already exists
-    const { data: existingUsername } = await supabase
+    const { data: existingUsername, error: usernameCheckErr } = await supabase
       .from('users')
       .select('id')
       .eq('username', username)
       .maybeSingle();
+    if (usernameCheckErr) {
+      console.error('Username check error:', usernameCheckErr);
+      return NextResponse.json({ error: `Registration failed: ${usernameCheckErr.message}` }, { status: 500 });
+    }
     if (existingUsername) {
       return NextResponse.json({ error: 'Username already taken' }, { status: 409 });
     }
@@ -54,8 +62,8 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+      console.error('Supabase insert error:', JSON.stringify(error, null, 2));
+      return NextResponse.json({ error: `Registration failed: ${error.message}` }, { status: 500 });
     }
 
     return NextResponse.json({

@@ -47,7 +47,12 @@ export async function POST(request: NextRequest) {
     validPicks.push({ teamId, driverId });
   }
 
-  await upsertTeammatePredictions(userId, validPicks);
-
-  return NextResponse.json({ success: true });
+  try {
+    await upsertTeammatePredictions(userId, validPicks);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Teammate prediction save error:', errMsg, error);
+    return NextResponse.json({ error: `Failed to save teammate predictions: ${errMsg}` }, { status: 500 });
+  }
 }

@@ -67,7 +67,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid driver or team' }, { status: 400 });
   }
 
-  await upsertSeasonPrediction(userId, currentWindow, driversChampionId, constructorsChampionId);
-
-  return NextResponse.json({ success: true });
+  try {
+    await upsertSeasonPrediction(userId, currentWindow, driversChampionId, constructorsChampionId);
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Season prediction save error:', errMsg, error);
+    return NextResponse.json({ error: `Failed to save season prediction: ${errMsg}` }, { status: 500 });
+  }
 }

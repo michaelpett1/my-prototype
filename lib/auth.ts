@@ -14,17 +14,40 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const identifier = (credentials.email as string).trim();
+        const identifier = (credentials.email as string).trim().toLowerCase();
         const supabase = getSupabase();
 
-        // Accept either email or username
-        const { data: user } = await supabase
+        // Accept either email or username — try email first, then username
+        const { data: userByEmail, error: emailError } = await supabase
           .from('users')
           .select('id, username, email, password_hash')
-          .or(`email.eq.${identifier},username.eq.${identifier}`)
+          .eq('email', identifier)
           .maybeSingle();
 
-        if (!user) return null;
+        if (emailError) {
+          console.error('Auth email lookup error:', emailError);
+        }
+
+        let user = userByEmail;
+
+        if (!user) {
+          // Try username lookup
+          const { data: userByUsername, error: usernameError } = await supabase
+            .from('users')
+            .select('id, username, email, password_hash')
+            .eq('username', identifier)
+            .maybeSingle();
+
+          if (usernameError) {
+            console.error('Auth username lookup error:', usernameError);
+          }
+          user = userByUsername;
+        }
+
+        if (!user) {
+          console.log('Auth: no user found for identifier:', identifier);
+          return null;
+        }
 
         const passwordMatch = await bcrypt.compare(
           credentials.password as string,
