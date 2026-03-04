@@ -58,7 +58,7 @@ export default function HowToPlay({ variant }: HowToPlayProps) {
   }, [isOpen]);
 
   return (
-    <div className="relative">
+    <>
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(prev => !prev)}
@@ -74,20 +74,24 @@ export default function HowToPlay({ variant }: HowToPlayProps) {
 
       {isOpen && (
         <>
-          {/* Backdrop for mobile */}
-          <div className="fixed inset-0 z-40 sm:hidden" onClick={() => setIsOpen(false)} />
+          {/* Full-screen backdrop */}
+          <div
+            className="fixed inset-0 z-[998] bg-black/50 backdrop-blur-sm"
+            onClick={() => setIsOpen(false)}
+          />
 
+          {/* Modal panel */}
           <div
             ref={panelRef}
-            className="fixed sm:absolute right-4 sm:right-0 top-16 sm:top-full sm:mt-2 z-50 w-[calc(100vw-2rem)] sm:w-80 bg-[--color-bg-card] border border-[--color-border-bright] rounded-xl p-4 sm:p-5 shadow-2xl"
-            style={{ boxShadow: '0 0 40px rgba(0, 212, 255, 0.1), 0 20px 60px rgba(0,0,0,0.5)', maxHeight: '80vh', overflowY: 'auto' }}
+            className="fixed z-[999] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[calc(100vw-2rem)] sm:w-96 max-h-[80vh] overflow-y-auto bg-[--color-bg-card] border border-[--color-border-bright] rounded-xl p-5 sm:p-6"
+            style={{ boxShadow: '0 0 40px rgba(0, 212, 255, 0.15), 0 20px 60px rgba(0,0,0,0.6)' }}
           >
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <h4 className="text-sm font-bold text-[--color-accent-blue] uppercase tracking-wider">
                 {content.title}
               </h4>
-              <button onClick={() => setIsOpen(false)} className="text-[--color-text-muted] hover:text-[--color-text-primary] p-1">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              <button onClick={() => setIsOpen(false)} className="text-[--color-text-muted] hover:text-[--color-text-primary] p-1 -mr-1">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               </button>
             </div>
             <div className="space-y-3">
@@ -104,6 +108,6 @@ export default function HowToPlay({ variant }: HowToPlayProps) {
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }
