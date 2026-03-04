@@ -398,13 +398,6 @@
             template: `
             <section class="py-6">
                 <div class="max-w-[1140px] mx-auto px-6">
-                    <!-- Toggle for prototype demo -->
-                    <div class="flex justify-end mb-2">
-                        <button @click="isLoggedIn = !isLoggedIn" class="text-xs text-[#999] border border-[#ECECEF] rounded px-3 py-1 bg-white hover:bg-gray-50 cursor-pointer">
-                            Preview: {{ isLoggedIn ? 'Logged In' : 'Signed Out' }}
-                        </button>
-                    </div>
-
                     <!-- ═══ SIGNED OUT BANNER ═══ -->
                     <div v-if="!isLoggedIn" class="relative rounded-[20px] overflow-hidden h-[272px] max-md:h-[320px]">
                         <!-- Background -->
