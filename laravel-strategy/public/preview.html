@@ -37,6 +37,7 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
 
         .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 
     <!-- Tailwind Config for GDC tokens -->
@@ -253,15 +254,24 @@
         const CategoryCards = {
             props: { categories: { type: Array, required: true } },
             template: `
-            <div class="grid grid-cols-3 gap-4 max-md:grid-cols-3 max-[480px]:grid-cols-3 max-[480px]:gap-2">
-                <a v-for="card in categories" :key="card.id" :href="'#' + card.id"
-                   class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
-                    <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" :style="{ backgroundImage: 'url(' + card.image + ')' }"></div>
-                    <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">
-                        {{ card.label }}
-                        <svg class="w-3.5 h-3.5 max-[480px]:w-3 max-[480px]:h-3 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+            <div>
+                <div class="grid grid-cols-3 gap-4 max-md:grid-cols-3 max-[480px]:grid-cols-3 max-[480px]:gap-2">
+                    <a v-for="card in categories" :key="card.id" :href="'#' + card.id"
+                       class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
+                        <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" :style="{ backgroundImage: 'url(' + card.image + ')' }"></div>
+                        <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">
+                            {{ card.label }}
+                            <svg class="w-3.5 h-3.5 max-[480px]:hidden text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                        </div>
+                    </a>
+                </div>
+                <!-- Search bar -->
+                <div class="relative mt-6">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     </div>
-                </a>
+                    <input type="text" placeholder="Search strategy guides..." class="w-full h-12 pl-12 pr-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-base text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" />
+                </div>
             </div>`,
         };
 
@@ -276,7 +286,12 @@
                     currentVideo: { ...this.mainVideo },
                     isPlaying: false,
                     activeIndex: null,
+                    scrollThumbWidth: 33,
+                    scrollThumbLeft: 0,
                 };
+            },
+            mounted() {
+                this.$nextTick(() => this.updateScrollbar());
             },
             methods: {
                 playMainVideo() {
@@ -290,6 +305,15 @@
                         this.currentVideo = { ...video };
                         this.$nextTick(() => { this.isPlaying = true; });
                     });
+                },
+                updateScrollbar() {
+                    const el = this.$refs.videoSidebar;
+                    if (!el) return;
+                    const ratio = el.clientHeight / el.scrollHeight;
+                    this.scrollThumbWidth = Math.max(20, ratio * 100);
+                    const scrollRange = el.scrollHeight - el.clientHeight;
+                    const scrollPos = scrollRange > 0 ? el.scrollTop / scrollRange : 0;
+                    this.scrollThumbLeft = scrollPos * (100 - this.scrollThumbWidth);
                 },
             },
             template: `
@@ -314,7 +338,7 @@
                     </div>
                     <!-- Desktop: vertical scroll list; Mobile: horizontal scroll -->
                     <div class="relative">
-                        <div ref="videoSidebar" class="flex flex-col gap-2 max-h-[420px] overflow-y-auto hide-scrollbar max-lg:flex-row max-lg:max-h-none max-lg:overflow-y-visible max-lg:overflow-x-auto max-lg:gap-3 max-lg:pb-3">
+                        <div ref="videoSidebar" @scroll="updateScrollbar" class="flex flex-col gap-2 max-h-[420px] overflow-y-auto hide-scrollbar max-lg:flex-row max-lg:max-h-none max-lg:overflow-y-visible max-lg:overflow-x-auto max-lg:gap-3 max-lg:pb-3">
                             <a v-for="(video, index) in sidebarVideos" :key="video.videoId" href="#"
                                class="flex gap-2 p-2 rounded-md cursor-pointer transition-colors duration-200 no-underline text-inherit hover:bg-gray-50 hover:no-underline max-lg:min-w-[260px] max-lg:shrink-0"
                                :class="{ 'bg-blue-50 outline outline-2 outline-[#0157FF] -outline-offset-2': activeIndex === index }"
@@ -333,12 +357,15 @@
                         </div>
                         <!-- Mobile scroll indicator -->
                         <div class="hidden max-lg:flex items-center justify-center gap-2 mt-2 text-[#999]">
-                            <svg class="w-4 h-4 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
                             <span class="text-xs font-medium">Swipe for more videos</span>
                             <svg class="w-4 h-4 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
                         </div>
-                        <!-- Desktop: bottom fade gradient to indicate more content -->
-                        <div class="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none max-lg:hidden"></div>
+                        <!-- Desktop: scrollbar indicator under video thumbnails -->
+                        <div class="mt-2 max-lg:hidden">
+                            <div class="h-[3px] bg-[#ECECEF] rounded-full overflow-hidden relative">
+                                <div class="h-full bg-[#999] rounded-full absolute left-0 transition-all duration-150" :style="{ width: scrollThumbWidth + '%', left: scrollThumbLeft + '%' }"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>`,
@@ -362,21 +389,42 @@
             <div class="py-8 scroll-mt-24" :class="{ 'border-t border-[#ECECEF]': !first }">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-[23px] font-bold leading-8 text-black">{{ title }}</h2>
-                    <div class="flex gap-2">
-                        <button class="w-8 h-8 border border-[#ECECEF] rounded-full bg-white cursor-pointer flex items-center justify-center transition-all duration-200 text-[#999] hover:border-[#0157FF] hover:text-[#0157FF]" aria-label="Previous" @click="scroll(-1)">
-                            <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-                        </button>
-                        <button class="w-8 h-8 border border-[#ECECEF] rounded-full bg-white cursor-pointer flex items-center justify-center transition-all duration-200 text-[#999] hover:border-[#0157FF] hover:text-[#0157FF]" aria-label="Next" @click="scroll(1)">
-                            <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
-                        </button>
-                    </div>
                 </div>
-                <div ref="carousel" class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1 hide-scrollbar">
-                    <a v-for="article in articles" :key="article.url" :href="article.url"
-                       class="min-w-[220px] flex-1 snap-start cursor-pointer no-underline text-inherit hover:no-underline group">
-                        <div class="w-full h-40 rounded-lg overflow-hidden mb-2 bg-cover bg-center" :style="{ backgroundImage: 'url(' + article.image + ')' }"></div>
-                        <div class="text-sm font-semibold leading-5 text-black transition-colors duration-200 group-hover:text-[#0157FF]">{{ article.title }}</div>
-                    </a>
+                <div class="relative">
+                    <div ref="carousel" class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1 hide-scrollbar">
+                        <a v-for="(article, idx) in articles" :key="article.url" :href="article.url"
+                           class="min-w-[260px] w-[260px] shrink-0 snap-start cursor-pointer no-underline text-inherit hover:no-underline group relative">
+                            <div class="bg-white rounded-[10px] border border-[#ECEDEF] overflow-hidden h-full flex flex-col transition-shadow duration-200 group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)]">
+                                <!-- Image -->
+                                <div class="relative h-[160px] overflow-hidden">
+                                    <div class="w-full h-full bg-cover bg-center" :style="{ backgroundImage: 'url(' + article.image + ')' }"></div>
+                                </div>
+                                <!-- Content -->
+                                <div class="p-3 flex flex-col gap-2 flex-1">
+                                    <!-- Author row -->
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-[28px] h-[28px] rounded-full bg-[#ECECEF] shrink-0"></div>
+                                            <span class="text-[13px] font-normal text-[#0157FF]">Gambling.com</span>
+                                        </div>
+                                        <span class="text-[13px] text-black">6 min read</span>
+                                    </div>
+                                    <!-- Title -->
+                                    <h3 class="text-[16px] font-semibold leading-[22px] text-black transition-colors duration-200 group-hover:text-[#0157FF] line-clamp-2 m-0">{{ article.title }}</h3>
+                                    <!-- Footer meta -->
+                                    <div class="flex items-center gap-1.5 text-[12px] text-[#999] mt-auto pt-1">
+                                        <span>3 hours ago</span>
+                                        <span class="w-1 h-1 rounded-full bg-[#999]"></span>
+                                        <span>United Kingdom</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <!-- Arrow on right edge, vertically centered -->
+                    <button class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 w-9 h-9 border border-[#ECECEF] rounded-full bg-white cursor-pointer flex items-center justify-center transition-all duration-200 text-[#999] hover:border-[#0157FF] hover:text-[#0157FF] shadow-sm" aria-label="Next" @click="scroll(1)">
+                        <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+                    </button>
                 </div>
             </div>`,
         };
