@@ -1,22 +1,28 @@
 <script setup lang="ts">
 import { useRoadmapStore } from '~/stores/roadmap'
 import { useCapacity } from '~/composables/useCapacity'
-import { mockJiraItems, mockAuditItems } from '~/lib/mock-data'
+import { useScan } from '~/composables/useScan'
+import { useVelocity } from '~/composables/useVelocity'
+import { mockProjects } from '~/lib/mock-data'
 
 useHead({ title: 'Roadmap Planner' })
 
 const store = useRoadmapStore()
 const { masterCapacity, totalLoad, totalCapacity } = useCapacity()
+const { status: scanStatus, progress: scanProgress, runScan } = useScan()
+const { fetchVelocity } = useVelocity()
 
 const showInbox = ref(true)
-const inboxTab = ref<'jira' | 'audit'>('jira')
-const showAuditUploader = ref(false)
+const inboxTab = ref<'all' | 'low-confidence' | 'manual'>('all')
 
 // Load mock data only if store is empty
 onMounted(() => {
   if (store.items.length === 0) {
-    store.addItems([...mockJiraItems, ...mockAuditItems])
+    store.addItems([...mockProjects])
   }
+
+  // Fetch velocity data on mount
+  fetchVelocity()
 })
 
 function handleMasterCapacity(event: Event) {
@@ -26,6 +32,10 @@ function handleMasterCapacity(event: Event) {
 
 function toggleInbox() {
   showInbox.value = !showInbox.value
+}
+
+function handleScan() {
+  runScan()
 }
 </script>
 
@@ -46,6 +56,13 @@ function toggleInbox() {
 
         <!-- Mode toggle -->
         <ModeToggle />
+
+        <!-- Scan button -->
+        <ScanButton
+          :status="scanStatus"
+          :project-count="scanProgress.projects"
+          @scan="handleScan"
+        />
 
         <!-- Filters -->
         <div class="flex-1 min-w-0">
@@ -75,12 +92,6 @@ function toggleInbox() {
           >
             {{ showInbox ? 'Hide' : 'Show' }} Inbox
           </button>
-          <button
-            class="text-xs font-medium text-text-secondary hover:text-text-primary px-3 py-1.5 rounded-md hover:bg-surface-raised transition-colors"
-            @click="showAuditUploader = !showAuditUploader"
-          >
-            📄 Load Audit
-          </button>
         </div>
       </div>
     </header>
@@ -95,9 +106,8 @@ function toggleInbox() {
         >
           <InboxSidebar
             :active-tab="inboxTab"
-            :show-audit-uploader="showAuditUploader"
             @update:active-tab="inboxTab = $event"
-            @toggle-audit-uploader="showAuditUploader = !showAuditUploader"
+            @scan="handleScan"
           />
         </div>
       </Transition>
@@ -110,19 +120,13 @@ function toggleInbox() {
         </template>
         <EmptyState
           v-else
-          @connect-jira="store.addItems([...mockJiraItems])"
-          @upload-audit="showAuditUploader = true"
+          @scan="handleScan"
+          @add-manual="store.addItems([...mockProjects])"
         />
       </div>
     </div>
 
     <!-- Triage dialog -->
     <TriageDialog v-if="store.triageState.currentItem" />
-
-    <!-- Audit uploader overlay -->
-    <AuditUploader
-      v-if="showAuditUploader"
-      @close="showAuditUploader = false"
-    />
   </div>
 </template>

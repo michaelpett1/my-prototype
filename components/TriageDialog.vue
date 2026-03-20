@@ -9,12 +9,31 @@ const store = useRoadmapStore()
 const { quarter, currentWeekIdx } = useQuarter()
 const triage = computed(() => store.triageState)
 
+const STEPS = ['lane', 'duration', 'timing', 'notes'] as const
+
+const durationOptions = [
+  { weeks: 1, label: '1 week' },
+  { weeks: 2, label: '2 weeks' },
+  { weeks: 3, label: '3 weeks' },
+  { weeks: 4, label: '4 weeks' },
+  { weeks: 5, label: '5+ weeks' },
+]
+
 function goToLane() {
   store.setTriageStep('lane')
 }
 
+function goToDuration() {
+  store.setTriageStep('duration')
+}
+
 function selectLane(lane: LaneName) {
   store.setTriageLane(lane)
+  store.setTriageStep('duration')
+}
+
+function selectDuration(weeks: number) {
+  store.setTriageDuration(weeks)
   store.setTriageStep('timing')
 }
 
@@ -42,6 +61,17 @@ function cancel() {
 function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') cancel()
 }
+
+/** Compute a visual preview showing which weeks the item would span from the selected start week. */
+const spanPreview = computed(() => {
+  const dur = triage.value.selectedDuration ?? triage.value.currentItem?.durationWeeks ?? 1
+  const start = triage.value.selectedWeek
+  if (start == null) return null
+  return {
+    startWeekIdx: start,
+    endWeekIdx: start + dur - 1,
+  }
+})
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
@@ -82,9 +112,6 @@ onUnmounted(() => {
                 </h2>
                 <div class="text-xs text-text-tertiary font-mono mt-1">
                   {{ triage.currentItem.key }}
-                  <span v-if="triage.currentItem.source === 'audit'" class="ml-2 px-1.5 py-0.5 bg-audit-border text-audit font-bold rounded text-[9px] uppercase">
-                    Audit · {{ triage.currentItem.auditPriority }}
-                  </span>
                 </div>
               </div>
               <button
@@ -98,13 +125,13 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- Step indicator -->
+            <!-- Step indicator (4 steps) -->
             <div class="flex gap-1.5 mt-3">
               <div
-                v-for="(s, idx) in ['lane', 'timing', 'notes']"
+                v-for="(s, idx) in STEPS"
                 :key="s"
                 class="h-1 flex-1 rounded-full transition-colors duration-300"
-                :class="['lane', 'timing', 'notes'].indexOf(triage.step ?? '') >= idx ? 'bg-accent' : 'bg-border'"
+                :class="STEPS.indexOf(triage.step as typeof STEPS[number]) >= idx ? 'bg-accent' : 'bg-border'"
               />
             </div>
           </div>
@@ -131,12 +158,37 @@ onUnmounted(() => {
               </div>
             </div>
 
-            <!-- Step 2: Week selection -->
+            <!-- Step 2: Duration selection -->
+            <div v-else-if="triage.step === 'duration'">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-text-secondary">How long will this take?</h3>
+                <button class="text-xs text-accent hover:text-accent-hover font-medium" @click="goToLane">
+                  &larr; Back
+                </button>
+              </div>
+
+              <div class="grid grid-cols-5 gap-2">
+                <button
+                  v-for="opt in durationOptions"
+                  :key="opt.weeks"
+                  class="flex flex-col items-center gap-1.5 px-3 py-4 rounded-xl border-2 transition-all duration-200 hover:scale-[1.02]"
+                  :class="triage.selectedDuration === opt.weeks
+                    ? 'border-accent bg-accent/5 shadow-sm'
+                    : 'border-border-subtle hover:border-border'"
+                  @click="selectDuration(opt.weeks)"
+                >
+                  <span class="text-lg font-bold text-text-primary">{{ opt.weeks }}{{ opt.weeks >= 5 ? '+' : '' }}</span>
+                  <span class="text-[10px] font-medium text-text-tertiary">{{ opt.weeks === 1 ? 'week' : 'weeks' }}</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 3: Week selection (timing) -->
             <div v-else-if="triage.step === 'timing'">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-text-secondary">When should this ship?</h3>
-                <button class="text-xs text-accent hover:text-accent-hover font-medium" @click="goToLane">
-                  ← Back
+                <button class="text-xs text-accent hover:text-accent-hover font-medium" @click="goToDuration">
+                  &larr; Back
                 </button>
               </div>
 
@@ -163,7 +215,7 @@ onUnmounted(() => {
                 </button>
               </div>
 
-              <!-- Week picker -->
+              <!-- Week picker with span preview -->
               <div class="text-xs font-medium text-text-tertiary mb-2">Or pick a specific week:</div>
               <div class="grid grid-cols-7 gap-1">
                 <button
@@ -172,24 +224,33 @@ onUnmounted(() => {
                   class="flex flex-col items-center py-2 px-1 rounded-lg border text-xs transition-all duration-200"
                   :class="{
                     'border-accent bg-accent text-white': triage.selectedWeek === week.num,
-                    'border-border-subtle hover:border-border hover:bg-surface-raised': triage.selectedWeek !== week.num && week.capacity > 0,
+                    'border-accent/30 bg-accent/10 text-accent': spanPreview && triage.selectedWeek !== week.num && week.num > (spanPreview.startWeekIdx) && week.num <= spanPreview.endWeekIdx,
+                    'border-border-subtle hover:border-border hover:bg-surface-raised': (!spanPreview || (week.num < (spanPreview.startWeekIdx) || week.num > spanPreview.endWeekIdx)) && triage.selectedWeek !== week.num && week.capacity > 0,
                     'border-danger-light bg-danger-light text-text-tertiary cursor-not-allowed': week.capacity === 0,
                   }"
                   :disabled="week.capacity === 0"
                   @click="week.capacity > 0 && selectWeek(week.num)"
                 >
                   <span class="font-semibold">{{ week.label }}</span>
-                  <span class="text-[9px] mt-0.5 opacity-70">{{ store.weekLoad(week.num) }}/{{ week.capacity }}</span>
+                  <span class="text-[9px] mt-0.5 opacity-70">{{ store.weekLoad(week.num).toFixed(1) }}/{{ week.capacity }}</span>
                 </button>
+              </div>
+
+              <!-- Span preview legend -->
+              <div v-if="spanPreview" class="flex items-center gap-2 mt-3 text-[10px] text-text-tertiary">
+                <div class="w-3 h-2 rounded-sm bg-accent" />
+                <span>Start</span>
+                <div class="w-3 h-2 rounded-sm bg-accent/10 border border-accent/30" />
+                <span>Span ({{ triage.selectedDuration ?? triage.currentItem?.durationWeeks ?? 1 }}w)</span>
               </div>
             </div>
 
-            <!-- Step 3: Notes -->
+            <!-- Step 4: Notes -->
             <div v-else-if="triage.step === 'notes'">
               <div class="flex items-center justify-between mb-4">
                 <h3 class="text-sm font-semibold text-text-secondary">Any context to add?</h3>
                 <button class="text-xs text-accent hover:text-accent-hover font-medium" @click="store.setTriageStep('timing')">
-                  ← Back
+                  &larr; Back
                 </button>
               </div>
 
@@ -201,7 +262,11 @@ onUnmounted(() => {
                     :style="{ backgroundColor: triage.selectedLane ? laneColor(triage.selectedLane) : '#6B7280' }"
                   />
                   <span class="text-xs font-medium text-text-primary">{{ triage.selectedLane }}</span>
-                  <span class="text-xs text-text-tertiary">·</span>
+                  <span class="text-xs text-text-tertiary">&middot;</span>
+                  <span class="text-xs text-text-secondary">
+                    {{ triage.selectedDuration ?? triage.currentItem?.durationWeeks ?? 1 }}w
+                  </span>
+                  <span class="text-xs text-text-tertiary">&middot;</span>
                   <span class="text-xs text-text-secondary">
                     {{ quarter.weeks[triage.selectedWeek ?? 0]?.label }} ({{ quarter.weeks[triage.selectedWeek ?? 0]?.dateLabel }})
                   </span>

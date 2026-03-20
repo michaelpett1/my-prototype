@@ -1,4 +1,4 @@
-import type { LaneName } from '~/types'
+import type { LaneName, ConfidenceLevel, ItemSource } from '~/types'
 
 export const LANE_COLORS: Record<LaneName, string> = {
   'New Product Features': '#0157FF',
@@ -42,4 +42,39 @@ export function priorityColor(priority: string): string {
 
 export function statusColor(status: string): string {
   return STATUS_COLORS[status] ?? '#9CA3AF'
+}
+
+// ── Confidence colors ──────────────────────────────────────────────
+
+export const CONFIDENCE_COLORS: Record<ConfidenceLevel, string> = {
+  high: '#10B981',
+  medium: '#F59E0B',
+  low: '#EF4444',
+}
+
+export const CONFIDENCE_BG_COLORS: Record<ConfidenceLevel, string> = {
+  high: '#ECFDF5',
+  medium: '#FFFBEB',
+  low: '#FEF2F2',
+}
+
+export function confidenceColor(level: ConfidenceLevel): string {
+  return CONFIDENCE_COLORS[level] ?? '#9CA3AF'
+}
+
+export function confidenceBgColor(level: ConfidenceLevel): string {
+  return CONFIDENCE_BG_COLORS[level] ?? '#F4F5F7'
+}
+
+// ── Source colors ──────────────────────────────────────────────────
+
+export const SOURCE_COLORS: Record<ItemSource, string> = {
+  slack: '#4A154B',
+  confluence: '#0052CC',
+  jira: '#0052CC',
+  manual: '#6B7280',
+}
+
+export function sourceColor(type: ItemSource): string {
+  return SOURCE_COLORS[type] ?? '#6B7280'
 }

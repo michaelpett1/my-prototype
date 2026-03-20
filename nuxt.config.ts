@@ -27,6 +27,9 @@ export default defineNuxtConfig({
     jiraEmail: process.env.JIRA_EMAIL || '',
     jiraApiToken: process.env.JIRA_API_TOKEN || '',
     jiraProjectKey: process.env.JIRA_PROJECT_KEY || 'GDCU',
+    slackBotToken: process.env.SLACK_BOT_TOKEN || '',
+    confluenceBaseUrl: process.env.CONFLUENCE_BASE_URL || '',
+    jiraBoardId: process.env.JIRA_BOARD_ID || '',
   },
 
   app: {

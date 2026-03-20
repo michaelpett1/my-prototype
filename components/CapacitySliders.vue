@@ -36,7 +36,8 @@ function handleWeekCapacity(weekIdx: number, event: Event) {
         <input
           type="range"
           min="0"
-          max="6"
+          max="10"
+          step="0.5"
           :value="week.capacity"
           class="w-12 h-1 appearance-none rounded-full cursor-pointer"
           :class="week.capacity === 0 ? 'accent-danger' : 'accent-accent'"
@@ -44,14 +45,19 @@ function handleWeekCapacity(weekIdx: number, event: Event) {
           @input="handleWeekCapacity(week.num, $event)"
         >
         <div
-          class="text-[10px] font-semibold mt-1 transition-colors duration-200"
+          class="text-[10px] font-semibold mt-1 transition-colors duration-200 whitespace-nowrap"
           :class="{
             'text-danger': week.capacity === 0,
             'text-warning': store.isOverCapacity(week.num),
             'text-text-tertiary': !store.isOverCapacity(week.num) && week.capacity > 0,
           }"
         >
-          {{ week.capacity === 0 ? '🚫' : `${store.weekLoad(week.num)}/${week.capacity}` }}
+          <template v-if="week.capacity === 0">
+            &oslash;
+          </template>
+          <template v-else>
+            {{ store.weekLoad(week.num).toFixed(1) }} / {{ week.capacity }} pts
+          </template>
         </div>
       </div>
     </div>
