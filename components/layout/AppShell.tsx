@@ -1,0 +1,21 @@
+'use client';
+import { Sidebar } from './Sidebar';
+import { Topbar } from './Topbar';
+
+interface AppShellProps {
+  children: React.ReactNode;
+}
+
+export function AppShell({ children }: AppShellProps) {
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-50">
+      <Sidebar />
+      <div className="flex flex-col flex-1 min-w-0">
+        <Topbar />
+        <main className="flex-1 overflow-auto">
+          {children}
+        </main>
+      </div>
+    </div>
+  );
+}
