@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, Maximize2 } from 'lucide-react';
+import { Plus, Maximize2, Minimize2 } from 'lucide-react';
 import { RoadmapCard } from '@/components/roadmap/RoadmapCard';
 import { ItemDetailPanel } from '@/components/timelines/ItemDetailPanel';
 import { Button } from '@/components/ui/Button';
@@ -9,91 +9,77 @@ import type { TimelineItem } from '@/lib/types';
 import { SWIMLANE_THEMES } from '@/lib/utils/colorUtils';
 import { clsx } from '@/lib/utils/clsx';
 
-// Quarters based on today
 function getCurrentQuarters(): string[] {
   const today = new Date();
   const year = today.getFullYear();
   const q = Math.ceil((today.getMonth() + 1) / 3);
-  const quarters: string[] = [];
-  for (let i = 0; i < 4; i++) {
+  return Array.from({ length: 4 }, (_, i) => {
     const qi = ((q - 1 + i) % 4) + 1;
     const yr = year + Math.floor((q - 1 + i) / 4);
-    quarters.push(`${yr} Q${qi}`);
-  }
-  return quarters;
+    return `${yr} Q${qi}`;
+  });
 }
 
 function getItemQuarter(item: TimelineItem): string {
   const d = new Date(item.startDate);
-  const year = d.getFullYear();
-  const q = Math.ceil((d.getMonth() + 1) / 3);
-  return `${year} Q${q}`;
+  return `${d.getFullYear()} Q${Math.ceil((d.getMonth() + 1) / 3)}`;
 }
 
 function getItemTheme(item: TimelineItem): string {
-  // Assign theme by tags
-  for (const theme of SWIMLANE_THEMES) {
-    if (item.tags.includes(theme.label.toLowerCase())) return theme.label;
-  }
-  // Fallback by project type
-  const tagMap: Record<string, string> = {
-    growth: 'Growth',
-    mobile: 'Mobile',
-    platform: 'Platform',
-    data: 'Retention',
-    ux: 'Conversion',
-    design: 'Conversion',
-    engineering: 'Platform',
+  const map: Record<string, string> = {
+    growth: 'Growth', mobile: 'Mobile', platform: 'Platform',
+    data: 'Retention', ux: 'Conversion', design: 'Conversion', engineering: 'Platform',
   };
   for (const tag of item.tags) {
-    if (tagMap[tag]) return tagMap[tag];
+    if (map[tag]) return map[tag];
   }
   return SWIMLANE_THEMES[0].label;
 }
 
 export default function RoadmapPage() {
-  const { items, selectedItemId, selectItem, updateItem } = useProjectsStore();
+  const { items, selectedItemId, selectItem } = useProjectsStore();
   const [presentMode, setPresentMode] = useState(false);
   const [filterTheme, setFilterTheme] = useState<string | null>(null);
 
   const quarters = getCurrentQuarters();
-  const selectedItem = selectedItemId ? items.find((i) => i.id === selectedItemId) ?? null : null;
-
-  // Only show top-level items (projects + milestones)
-  const roadmapItems = items.filter((i) => i.type === 'project' || i.type === 'milestone');
-
-  const handleDrop = (e: React.DragEvent, theme: string, quarter: string) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('text/plain');
-    if (!id) return;
-    // We don't actually change dates here, just move visually
-    // In a real app this would recalculate dates
-  };
+  const selectedItem = selectedItemId ? items.find(i => i.id === selectedItemId) ?? null : null;
+  const roadmapItems = items.filter(i => i.type === 'project' || i.type === 'milestone');
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData('text/plain', id);
   };
 
   return (
-    <div className={clsx('flex flex-col h-full', presentMode && 'bg-slate-900')}>
+    <div
+      className="flex flex-col h-full"
+      style={{ background: presentMode ? '#0F172A' : '#FAFAF9' }}
+    >
       {/* Toolbar */}
       {!presentMode && (
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-slate-200 bg-white shrink-0">
-          <h1 className="text-sm font-semibold text-slate-800">Visual Roadmap</h1>
-          <div className="h-4 w-px bg-slate-200" />
+        <div
+          className="flex items-center gap-3 px-4 py-2 shrink-0 flex-wrap"
+          style={{ backgroundColor: '#FFFFFF', borderBottom: '1px solid rgba(0,0,0,0.07)', minHeight: 44 }}
+        >
+          <span className="text-[13px] font-semibold" style={{ color: '#1C1917' }}>Visual Roadmap</span>
+          <div className="w-px h-4" style={{ background: 'rgba(0,0,0,0.08)' }} />
 
-          {/* Theme filter */}
-          <div className="flex items-center gap-1">
-            {[null, ...SWIMLANE_THEMES.map((t) => t.label)].map((theme) => (
+          {/* Theme filter chips */}
+          <div className="flex items-center gap-0.5">
+            {[null, ...SWIMLANE_THEMES.map(t => t.label)].map(theme => (
               <button
                 key={theme ?? 'all'}
                 onClick={() => setFilterTheme(theme)}
-                className={clsx(
-                  'px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
-                  filterTheme === theme
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-500 hover:bg-slate-100'
-                )}
+                className="px-2.5 py-1.5 rounded-[4px] text-[12px] font-medium transition-all duration-150"
+                style={filterTheme === theme
+                  ? { background: '#2563EB', color: '#FFFFFF' }
+                  : { color: '#6B7280' }
+                }
+                onMouseEnter={e => {
+                  if (filterTheme !== theme) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.04)';
+                }}
+                onMouseLeave={e => {
+                  if (filterTheme !== theme) (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                }}
               >
                 {theme ?? 'All'}
               </button>
@@ -103,125 +89,110 @@ export default function RoadmapPage() {
           <div className="flex-1" />
 
           <Button variant="ghost" size="sm" onClick={() => setPresentMode(true)}>
-            <Maximize2 size={14} />
-            Present
+            <Maximize2 size={13} /> Present
           </Button>
           <Button variant="primary" size="sm">
-            <Plus size={14} />
-            Add Item
+            <Plus size={13} /> Add Item
           </Button>
         </div>
       )}
 
-      {/* Present mode overlay */}
+      {/* Present mode header */}
       {presentMode && (
-        <div className="flex items-center justify-between px-6 py-3 shrink-0">
-          <h1 className="text-lg font-semibold text-white">Product Roadmap</h1>
+        <div className="flex items-center justify-between px-8 py-4 shrink-0">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#475569', letterSpacing: '0.1em' }}>
+              Product Roadmap
+            </p>
+            <h1 className="text-[20px] font-semibold mt-0.5" style={{ color: '#F1F5F9', letterSpacing: '-0.01em' }}>
+              {new Date().getFullYear()} — {quarters[quarters.length - 1]}
+            </h1>
+          </div>
           <button
             onClick={() => setPresentMode(false)}
-            className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded border border-slate-600 transition-colors"
+            className="flex items-center gap-1.5 text-[12px] rounded-[5px] transition-all duration-150"
+            style={{ padding: '6px 12px', color: '#64748B', border: '1px solid #1E293B' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = '#94A3B8'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = '#64748B'; }}
           >
-            Exit Presentation
+            <Minimize2 size={13} /> Exit
           </button>
         </div>
       )}
 
-      {/* Swimlane grid */}
-      <div className="flex-1 overflow-auto">
-        <div
-          className={clsx(
-            'min-w-[900px]',
-            presentMode ? 'p-6' : 'p-4'
-          )}
-        >
-          {/* Column headers (quarters) */}
-          <div className="flex">
-            <div className="w-36 shrink-0" />
-            <div className="flex-1 grid gap-px" style={{ gridTemplateColumns: `repeat(${quarters.length}, 1fr)` }}>
-              {quarters.map((q) => (
-                <div
-                  key={q}
-                  className={clsx(
-                    'text-center text-xs font-semibold py-2.5 rounded-t-lg',
-                    presentMode
-                      ? 'text-white bg-slate-800'
-                      : 'text-slate-600 bg-slate-100 border border-b-0 border-slate-200'
-                  )}
-                >
-                  {q}
-                </div>
-              ))}
-            </div>
+      {/* Grid */}
+      <div className="flex-1 overflow-auto p-4">
+        <div className="min-w-[800px]">
+          {/* Quarter headers */}
+          <div className="flex mb-1" style={{ paddingLeft: 140 }}>
+            {quarters.map(q => (
+              <div
+                key={q}
+                className="flex-1 text-center text-[11px] font-semibold rounded-[4px] mx-0.5 py-2"
+                style={presentMode
+                  ? { background: 'rgba(255,255,255,0.06)', color: '#94A3B8', letterSpacing: '0.04em' }
+                  : { background: 'rgba(0,0,0,0.04)', color: '#9CA3AF', letterSpacing: '0.04em' }
+                }
+              >
+                {q}
+              </div>
+            ))}
           </div>
 
           {/* Swimlane rows */}
           {SWIMLANE_THEMES
-            .filter((t) => !filterTheme || t.label === filterTheme)
-            .map((theme) => {
-              const themeItems = roadmapItems.filter((i) => getItemTheme(i) === theme.label);
+            .filter(t => !filterTheme || t.label === filterTheme)
+            .map(theme => {
+              const themeItems = roadmapItems.filter(i => getItemTheme(i) === theme.label);
               if (themeItems.length === 0 && filterTheme !== theme.label) return null;
 
               return (
                 <div key={theme.label} className="flex mb-1">
                   {/* Row label */}
-                  <div
-                    className={clsx(
-                      'w-36 shrink-0 flex items-start pt-3 pr-3',
-                      presentMode ? '' : ''
-                    )}
-                  >
+                  <div className="shrink-0 flex items-start pt-3 pr-3" style={{ width: 140 }}>
                     <div className="flex items-center gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: theme.color }} />
-                      <span className={clsx(
-                        'text-xs font-semibold',
-                        presentMode ? 'text-slate-300' : 'text-slate-600'
-                      )}>
+                      <div className="w-[8px] h-[8px] rounded-full" style={{ background: theme.color }} />
+                      <span
+                        className="text-[11px] font-semibold"
+                        style={{ color: presentMode ? '#64748B' : '#9CA3AF', letterSpacing: '0.02em' }}
+                      >
                         {theme.label}
                       </span>
                     </div>
                   </div>
 
                   {/* Quarter cells */}
-                  <div
-                    className="flex-1 grid gap-px"
-                    style={{ gridTemplateColumns: `repeat(${quarters.length}, 1fr)` }}
-                  >
-                    {quarters.map((q) => {
-                      const cellItems = themeItems.filter((i) => getItemQuarter(i) === q);
-                      return (
-                        <div
-                          key={q}
-                          className={clsx(
-                            'min-h-[80px] p-2 rounded space-y-1.5 border',
-                            presentMode
-                              ? 'bg-slate-800 border-slate-700'
-                              : 'bg-white border-slate-200 hover:border-slate-300'
-                          )}
-                          onDragOver={(e) => e.preventDefault()}
-                          onDrop={(e) => handleDrop(e, theme.label, q)}
-                        >
-                          {cellItems.map((item) => (
-                            <RoadmapCard
-                              key={item.id}
-                              item={item}
-                              onClick={() => selectItem(item.id)}
-                              onDragStart={handleDragStart}
-                            />
-                          ))}
-                        </div>
-                      );
-                    })}
-                  </div>
+                  {quarters.map(q => {
+                    const cellItems = themeItems.filter(i => getItemQuarter(i) === q);
+                    return (
+                      <div
+                        key={q}
+                        className="flex-1 mx-0.5 p-2 rounded-[5px] space-y-1.5 min-h-[80px]"
+                        style={presentMode
+                          ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }
+                          : { background: '#FFFFFF', border: '1px solid rgba(0,0,0,0.07)' }
+                        }
+                        onDragOver={e => e.preventDefault()}
+                        onDrop={e => e.preventDefault()}
+                      >
+                        {cellItems.map(item => (
+                          <RoadmapCard
+                            key={item.id}
+                            item={item}
+                            onClick={() => selectItem(item.id)}
+                            onDragStart={handleDragStart}
+                          />
+                        ))}
+                      </div>
+                    );
+                  })}
                 </div>
               );
             })}
         </div>
       </div>
 
-      {/* Detail panel */}
-      {!presentMode && (
-        <ItemDetailPanel item={selectedItem} onClose={() => selectItem(null)} />
-      )}
+      {!presentMode && <ItemDetailPanel item={selectedItem} onClose={() => selectItem(null)} />}
     </div>
   );
 }

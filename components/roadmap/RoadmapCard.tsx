@@ -10,35 +10,40 @@ interface RoadmapCardProps {
   onDragStart: (e: React.DragEvent, id: string) => void;
 }
 
-const TYPE_EMOJI: Record<string, string> = {
-  project: '📋',
-  milestone: '🏁',
-  task: '✓',
-};
+const TYPE_ICON: Record<string, string> = { project: '●', milestone: '◆', task: '▸' };
 
 export function RoadmapCard({ item, onClick, onDragStart }: RoadmapCardProps) {
-  const barColor = GANTT_BAR_COLORS[item.status];
+  const color = GANTT_BAR_COLORS[item.status];
 
   return (
     <div
-      className="bg-white border border-slate-200 rounded-lg p-2.5 cursor-pointer hover:border-slate-300 hover:shadow-sm transition-all group select-none"
+      className="bg-white rounded-[5px] cursor-pointer select-none transition-all duration-150 ease-out"
+      style={{
+        border: '1px solid rgba(0,0,0,0.07)',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        padding: '8px 10px',
+        /* Left edge colour bar — the status signal */
+        borderLeft: `3px solid ${color}`,
+      }}
       draggable
-      onDragStart={(e) => onDragStart(e, item.id)}
+      onDragStart={e => onDragStart(e, item.id)}
       onClick={onClick}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 3px 8px rgba(0,0,0,0.08)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)';
+        (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
+      }}
     >
-      {/* Status color bar on left edge via border-l */}
-      <div className="flex gap-2">
-        <div className="w-1 rounded-full shrink-0 self-stretch" style={{ backgroundColor: barColor }} />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1.5 mb-1">
-            <span className="text-xs">{TYPE_EMOJI[item.type]}</span>
-            <p className="text-xs font-medium text-slate-800 truncate">{item.title}</p>
-          </div>
-          <div className="flex items-center justify-between">
-            <StatusBadge status={item.status} size="sm" />
-            <Avatar ownerId={item.ownerId} size="xs" />
-          </div>
-        </div>
+      <div className="flex items-start gap-1.5 mb-1.5">
+        <span className="text-[10px] mt-[1px] shrink-0" style={{ color: '#D1D5DB' }}>{TYPE_ICON[item.type]}</span>
+        <p className="text-[12px] font-semibold leading-snug line-clamp-2" style={{ color: '#1C1917' }}>{item.title}</p>
+      </div>
+      <div className="flex items-center justify-between">
+        <StatusBadge status={item.status} size="sm" />
+        <Avatar ownerId={item.ownerId} size="xs" />
       </div>
     </div>
   );

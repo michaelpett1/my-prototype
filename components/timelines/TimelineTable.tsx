@@ -4,67 +4,81 @@ import { StatusBadge, PriorityBadge } from '@/components/ui/Badge';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Avatar } from '@/components/ui/Avatar';
 import { formatDate } from '@/lib/utils/dateUtils';
-import { useProjectsStore } from '@/lib/store/projectsStore';
 
 interface TimelineTableProps {
   items: TimelineItem[];
   onSelectItem: (id: string) => void;
 }
 
+/* Design decision: table rows use alternating bg so subtle you almost can't see it.
+   Inline actions reveal on hover via CSS — don't clutter the default view. */
 export function TimelineTable({ items, onSelectItem }: TimelineTableProps) {
-  const updateItem = useProjectsStore((s) => s.updateItem);
-
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[900px] text-sm">
-        <thead>
-          <tr className="border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wide">
-            <th className="text-left py-2.5 px-4 font-medium">Name</th>
-            <th className="text-left py-2.5 px-4 font-medium">Owner</th>
-            <th className="text-left py-2.5 px-4 font-medium">Status</th>
-            <th className="text-left py-2.5 px-4 font-medium">Priority</th>
-            <th className="text-left py-2.5 px-4 font-medium">Start</th>
-            <th className="text-left py-2.5 px-4 font-medium">End</th>
-            <th className="text-left py-2.5 px-4 font-medium w-36">Progress</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {items.map((item) => (
-            <tr
-              key={item.id}
-              className="hover:bg-slate-50 cursor-pointer transition-colors group"
-              onClick={() => onSelectItem(item.id)}
+    <table className="w-full min-w-[860px] text-[13px]" style={{ backgroundColor: '#FFFFFF' }}>
+      <thead>
+        <tr style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}>
+          {['Name', 'Owner', 'Status', 'Priority', 'Start', 'End', 'Progress'].map(col => (
+            <th
+              key={col}
+              className="text-left py-2.5 font-semibold uppercase tracking-widest select-none"
+              style={{
+                fontSize: '10px',
+                color: '#9CA3AF',
+                letterSpacing: '0.07em',
+                padding: col === 'Name' ? '10px 16px' : '10px 12px',
+              }}
             >
-              <td className="py-2.5 px-4">
-                <div className="flex items-center gap-2">
-                  {item.parentId && <div className="w-3 shrink-0" />}
-                  <div
-                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                      { not_started: 'bg-slate-400', in_progress: 'bg-blue-500', at_risk: 'bg-amber-500', complete: 'bg-emerald-500' }[item.status]
-                    }`}
-                  />
-                  <span className={`${!item.parentId ? 'font-medium text-slate-800' : 'text-slate-600'} group-hover:text-blue-600 transition-colors truncate max-w-[200px]`}>
-                    {item.title}
-                  </span>
-                </div>
-              </td>
-              <td className="py-2.5 px-4">
-                <Avatar ownerId={item.ownerId} size="xs" />
-              </td>
-              <td className="py-2.5 px-4"><StatusBadge status={item.status} size="sm" /></td>
-              <td className="py-2.5 px-4"><PriorityBadge priority={item.priority} /></td>
-              <td className="py-2.5 px-4 text-slate-600 whitespace-nowrap">{formatDate(item.startDate, 'MMM d')}</td>
-              <td className="py-2.5 px-4 text-slate-600 whitespace-nowrap">{formatDate(item.endDate, 'MMM d')}</td>
-              <td className="py-2.5 px-4" onClick={(e) => e.stopPropagation()}>
-                <div className="flex items-center gap-2">
-                  <ProgressBar value={item.progress} height="xs" className="w-20" />
-                  <span className="text-xs text-slate-500 tabular-nums w-8">{item.progress}%</span>
-                </div>
-              </td>
-            </tr>
+              {col}
+            </th>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </tr>
+      </thead>
+      <tbody>
+        {items.map((item, i) => (
+          <tr
+            key={item.id}
+            className="group transition-colors duration-100 cursor-pointer"
+            style={{ borderBottom: '1px solid rgba(0,0,0,0.045)' }}
+            onClick={() => onSelectItem(item.id)}
+            onMouseEnter={e => { (e.currentTarget as HTMLTableRowElement).style.background = '#FAFAF9'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLTableRowElement).style.background = 'transparent'; }}
+          >
+            {/* Name */}
+            <td className="py-2.5 px-4">
+              <div className="flex items-center gap-2">
+                {item.parentId && <div className="w-3 shrink-0" />}
+                <div
+                  className="w-[5px] h-[5px] rounded-full shrink-0"
+                  style={{ background: { not_started: '#9CA3AF', in_progress: '#2563EB', at_risk: '#D97706', complete: '#16A34A' }[item.status] }}
+                />
+                <span
+                  className="truncate max-w-[220px] transition-colors duration-100 group-hover:text-[#2563EB]"
+                  style={{ fontWeight: item.parentId ? 400 : 600, color: '#1C1917' }}
+                >
+                  {item.title}
+                </span>
+              </div>
+            </td>
+            <td className="py-2.5 px-3"><Avatar ownerId={item.ownerId} size="xs" /></td>
+            <td className="py-2.5 px-3"><StatusBadge status={item.status} size="sm" /></td>
+            <td className="py-2.5 px-3"><PriorityBadge priority={item.priority} /></td>
+            <td className="py-2.5 px-3 font-mono text-[12px]" style={{ color: '#6B7280', whiteSpace: 'nowrap' }}>
+              {formatDate(item.startDate, 'MMM d')}
+            </td>
+            <td className="py-2.5 px-3 font-mono text-[12px]" style={{ color: '#6B7280', whiteSpace: 'nowrap' }}>
+              {formatDate(item.endDate, 'MMM d')}
+            </td>
+            <td className="py-2.5 px-3" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center gap-2">
+                <ProgressBar value={item.progress} height="xs" className="w-20" />
+                <span className="text-[11px] font-mono tabular-nums" style={{ color: '#9CA3AF' }}>
+                  {item.progress}%
+                </span>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Plus, LayoutGrid, List, Columns, AlignLeft } from 'lucide-react';
+import { Plus, AlignLeft, List, Columns } from 'lucide-react';
 import { GanttChart } from '@/components/timelines/GanttChart';
 import { TimelineTable } from '@/components/timelines/TimelineTable';
 import { TimelineBoard } from '@/components/timelines/TimelineBoard';
@@ -10,87 +10,123 @@ import { useProjectsStore } from '@/lib/store/projectsStore';
 import type { TimelineViewMode, GanttScale } from '@/lib/types';
 import { clsx } from '@/lib/utils/clsx';
 
-const VIEW_OPTIONS: Array<{ mode: TimelineViewMode; label: string; icon: React.ElementType }> = [
-  { mode: 'gantt', label: 'Gantt', icon: AlignLeft },
-  { mode: 'table', label: 'Table', icon: List },
-  { mode: 'board', label: 'Board', icon: Columns },
+const VIEW_OPTS: Array<{ mode: TimelineViewMode; label: string; icon: React.ElementType }> = [
+  { mode: 'gantt',  label: 'Gantt',  icon: AlignLeft },
+  { mode: 'table',  label: 'Table',  icon: List },
+  { mode: 'board',  label: 'Board',  icon: Columns },
 ];
 
-const SCALE_OPTIONS: Array<{ scale: GanttScale; label: string }> = [
-  { scale: 'week', label: 'Week' },
-  { scale: 'month', label: 'Month' },
+const SCALE_OPTS: Array<{ scale: GanttScale; label: string }> = [
+  { scale: 'week',    label: 'Week' },
+  { scale: 'month',   label: 'Month' },
   { scale: 'quarter', label: 'Quarter' },
 ];
 
+/* ── Segmented control — shared between view + scale toggles ──── */
+function SegmentedControl<T extends string>({
+  options,
+  value,
+  onChange,
+  renderLabel,
+}: {
+  options: T[];
+  value: T;
+  onChange: (v: T) => void;
+  renderLabel: (v: T) => React.ReactNode;
+}) {
+  return (
+    <div
+      className="flex items-center rounded-[5px] p-[3px] gap-[2px]"
+      style={{ background: 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,0,0,0.06)' }}
+    >
+      {options.map((opt) => (
+        <button
+          key={opt}
+          onClick={() => onChange(opt)}
+          className={clsx(
+            'flex items-center gap-1.5 rounded-[3px] text-[12px] font-medium transition-all duration-150 ease-out px-2.5 py-1',
+            value === opt
+              ? 'bg-white shadow-[0_1px_2px_rgba(0,0,0,0.08)] text-[#1C1917]'
+              : 'text-[#6B7280] hover:text-[#374151]'
+          )}
+        >
+          {renderLabel(opt)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function TimelinesPage() {
   const {
-    items,
-    viewMode,
-    ganttScale,
-    selectedItemId,
-    setViewMode,
-    setGanttScale,
-    selectItem,
-    filterStatus,
-    filterOwnerId,
-    setFilterStatus,
+    items, viewMode, ganttScale, selectedItemId,
+    setViewMode, setGanttScale, selectItem,
+    filterStatus, setFilterStatus,
   } = useProjectsStore();
 
-  const selectedItem = selectedItemId ? items.find((i) => i.id === selectedItemId) ?? null : null;
+  const selectedItem = selectedItemId ? items.find(i => i.id === selectedItemId) ?? null : null;
 
-  // Apply filters
-  const filtered = items.filter((item) => {
+  const filtered = items.filter(item => {
     if (filterStatus && item.status !== filterStatus) return false;
-    if (filterOwnerId && item.ownerId !== filterOwnerId) return false;
     return true;
   });
+
+  // Icons for view toggle
+  const VIEW_ICONS: Record<TimelineViewMode, React.ElementType> = {
+    gantt: AlignLeft, table: List, board: Columns,
+  };
 
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-4 py-2.5 border-b border-slate-200 bg-white shrink-0">
+      <div
+        className="flex items-center gap-3 px-4 py-2 shrink-0 flex-wrap"
+        style={{
+          backgroundColor: '#FFFFFF',
+          borderBottom: '1px solid rgba(0,0,0,0.07)',
+          minHeight: '44px',
+        }}
+      >
         {/* View toggle */}
-        <div className="flex items-center bg-slate-100 rounded p-0.5 gap-0.5">
-          {VIEW_OPTIONS.map(({ mode, label, icon: Icon }) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={clsx(
-                'flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
-                viewMode === mode ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-              )}
-            >
-              <Icon size={13} />
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          options={['gantt', 'table', 'board'] as TimelineViewMode[]}
+          value={viewMode}
+          onChange={setViewMode}
+          renderLabel={(v) => {
+            const Icon = VIEW_ICONS[v];
+            return (
+              <>
+                <Icon size={12} />
+                {v.charAt(0).toUpperCase() + v.slice(1)}
+              </>
+            );
+          }}
+        />
 
-        {/* Scale toggle (Gantt only) */}
+        {/* Scale toggle — only visible in Gantt mode */}
         {viewMode === 'gantt' && (
-          <div className="flex items-center bg-slate-100 rounded p-0.5 gap-0.5">
-            {SCALE_OPTIONS.map(({ scale, label }) => (
-              <button
-                key={scale}
-                onClick={() => setGanttScale(scale)}
-                className={clsx(
-                  'px-2.5 py-1.5 rounded text-xs font-medium transition-colors',
-                  ganttScale === scale ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'
-                )}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <SegmentedControl
+            options={['week', 'month', 'quarter'] as GanttScale[]}
+            value={ganttScale}
+            onChange={setGanttScale}
+            renderLabel={(v) => v.charAt(0).toUpperCase() + v.slice(1)}
+          />
         )}
 
-        {/* Filter by status */}
+        {/* Status filter */}
         <select
           value={filterStatus ?? ''}
-          onChange={(e) => setFilterStatus(e.target.value || null)}
-          className="text-xs border border-slate-200 rounded px-2 py-1.5 text-slate-600 bg-white"
+          onChange={e => setFilterStatus(e.target.value || null)}
+          className="text-[12px] rounded-[5px] transition-all duration-150 ease-out"
+          style={{
+            padding: '5px 8px',
+            border: '1px solid rgba(0,0,0,0.10)',
+            color: '#374151',
+            background: '#FFFFFF',
+            boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+          }}
         >
-          <option value="">All Statuses</option>
+          <option value="">All statuses</option>
           <option value="not_started">Not Started</option>
           <option value="in_progress">In Progress</option>
           <option value="at_risk">At Risk</option>
@@ -100,31 +136,17 @@ export default function TimelinesPage() {
         <div className="flex-1" />
 
         <Button variant="primary" size="sm">
-          <Plus size={14} />
-          New Project
+          <Plus size={13} /> New Project
         </Button>
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
-        {viewMode === 'gantt' && (
-          <div className="h-full overflow-auto">
-            <GanttChart items={filtered} scale={ganttScale} onSelectItem={selectItem} />
-          </div>
-        )}
-        {viewMode === 'table' && (
-          <div className="h-full overflow-auto">
-            <TimelineTable items={filtered} onSelectItem={selectItem} />
-          </div>
-        )}
-        {viewMode === 'board' && (
-          <div className="h-full overflow-auto">
-            <TimelineBoard items={filtered} onSelectItem={selectItem} />
-          </div>
-        )}
+        {viewMode === 'gantt'  && <div className="h-full overflow-auto"><GanttChart items={filtered} scale={ganttScale} onSelectItem={selectItem} /></div>}
+        {viewMode === 'table'  && <div className="h-full overflow-auto"><TimelineTable items={filtered} onSelectItem={selectItem} /></div>}
+        {viewMode === 'board'  && <div className="h-full overflow-auto"><TimelineBoard items={filtered} onSelectItem={selectItem} /></div>}
       </div>
 
-      {/* Detail panel */}
       <ItemDetailPanel item={selectedItem} onClose={() => selectItem(null)} />
     </div>
   );

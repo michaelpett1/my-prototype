@@ -11,7 +11,7 @@ interface SidePanelProps {
   width?: string;
 }
 
-export function SidePanel({ open, onClose, title, children, width = 'w-96' }: SidePanelProps) {
+export function SidePanel({ open, onClose, title, children, width = '420px' }: SidePanelProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     if (open) document.addEventListener('keydown', handler);
@@ -20,24 +20,55 @@ export function SidePanel({ open, onClose, title, children, width = 'w-96' }: Si
 
   return (
     <>
-      {open && <div className="fixed inset-0 z-20 bg-black/20" onClick={onClose} />}
+      {/* Scrim — subtle, not dark-modal heavy */}
+      <div
+        className="fixed inset-0 z-20 transition-opacity duration-150 ease-out"
+        style={{
+          background: 'rgba(0,0,0,0.16)',
+          opacity: open ? 1 : 0,
+          pointerEvents: open ? 'auto' : 'none',
+        }}
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      {/* Panel */}
       <aside
-        className={clsx(
-          'fixed right-0 top-0 h-full bg-white border-l border-slate-200 shadow-xl z-30 flex flex-col transition-panel',
+        className="fixed right-0 top-0 h-full flex flex-col z-30"
+        style={{
           width,
-          open ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'
-        )}
+          backgroundColor: '#FFFFFF',
+          borderLeft: '1px solid rgba(0,0,0,0.07)',
+          boxShadow: '0 0 0 1px rgba(0,0,0,0.05), -12px 0 40px rgba(0,0,0,0.08)',
+          transform: open ? 'translateX(0)' : 'translateX(100%)',
+          opacity: open ? 1 : 0,
+          transition: open
+            ? 'transform 220ms cubic-bezier(0.16, 1, 0.3, 1), opacity 150ms ease-out'
+            : 'transform 180ms ease-in, opacity 120ms ease-in',
+          pointerEvents: open ? 'auto' : 'none',
+        }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
       >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 shrink-0">
-          <h2 className="text-sm font-semibold text-slate-800 truncate">{title}</h2>
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-4 py-3 shrink-0"
+          style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+        >
+          <h2 className="text-[13px] font-semibold truncate" style={{ color: '#1C1917' }}>{title}</h2>
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
-            aria-label="Close panel"
+            className="rounded-[4px] transition-all duration-150 ease-out flex items-center justify-center"
+            style={{ width: 24, height: 24, color: '#9CA3AF' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = '#374151'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#9CA3AF'; }}
+            aria-label="Close"
           >
-            <X size={16} />
+            <X size={14} />
           </button>
         </div>
+
         <div className="flex-1 overflow-y-auto">{children}</div>
       </aside>
     </>

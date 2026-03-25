@@ -6,29 +6,40 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
 }
 
-const VARIANT_CLASSES = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 border-transparent',
-  secondary: 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:border-slate-300',
-  ghost: 'bg-transparent text-slate-600 border-transparent hover:bg-slate-100 hover:text-slate-800',
-  danger: 'bg-red-600 text-white hover:bg-red-700 border-transparent',
-};
-
-const SIZE_CLASSES = {
-  sm: 'px-2.5 py-1.5 text-xs gap-1.5',
-  md: 'px-3 py-2 text-sm gap-2',
-  lg: 'px-4 py-2.5 text-sm gap-2',
-};
+/* Design decision: all buttons use border-radius 5px. Consistent across the app.
+   Primary = accent blue, used only for the ONE main action per view.
+   Secondary = white + border, for supporting actions.
+   Ghost = no border, very low visual weight, for tertiary actions.
+*/
 
 export function Button({ variant = 'secondary', size = 'md', className, children, ...props }: ButtonProps) {
+  const base = 'inline-flex items-center justify-center font-semibold rounded-[5px] transition-all duration-150 ease-out disabled:opacity-40 disabled:cursor-not-allowed select-none';
+
+  const variants = {
+    primary:   'text-white bg-[#2563EB] hover:bg-[#1D4ED8] border border-transparent shadow-[0_1px_2px_rgba(0,0,0,0.10)]',
+    secondary: 'text-[#374151] bg-white border hover:bg-[#FAFAF9] hover:border-[rgba(0,0,0,0.14)] shadow-[0_1px_2px_rgba(0,0,0,0.05)]',
+    ghost:     'text-[#6B7280] bg-transparent border border-transparent hover:bg-[rgba(0,0,0,0.04)] hover:text-[#374151]',
+    danger:    'text-white bg-[#DC2626] hover:bg-[#B91C1C] border border-transparent shadow-[0_1px_2px_rgba(0,0,0,0.10)]',
+  };
+
+  const sizes = {
+    sm: 'px-2.5 py-1.5 text-[12px] gap-1.5',
+    md: 'px-3 py-[7px] text-[13px] gap-2',
+    lg: 'px-4 py-2 text-[13px] gap-2',
+  };
+
+  // Design decision: secondary border as rgba instead of named colour
+  const borderColors = {
+    primary:   '',
+    secondary: 'border-[rgba(0,0,0,0.10)]',
+    ghost:     '',
+    danger:    '',
+  };
+
   return (
     <button
       {...props}
-      className={clsx(
-        'inline-flex items-center justify-center font-medium rounded border transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
-        VARIANT_CLASSES[variant],
-        SIZE_CLASSES[size],
-        className
-      )}
+      className={clsx(base, variants[variant], sizes[size], borderColors[variant], className)}
     >
       {children}
     </button>

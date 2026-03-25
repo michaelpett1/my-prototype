@@ -1,19 +1,24 @@
 'use client';
 import { useRef } from 'react';
-import { format, parseISO, differenceInDays, addDays, eachMonthOfInterval, startOfMonth, eachWeekOfInterval, startOfWeek } from 'date-fns';
+import {
+  format, parseISO, differenceInDays, addDays,
+  eachMonthOfInterval, startOfMonth, eachWeekOfInterval,
+} from 'date-fns';
 import type { TimelineItem, GanttScale } from '@/lib/types';
 import { GANTT_BAR_COLORS } from '@/lib/utils/colorUtils';
 import { Avatar } from '@/components/ui/Avatar';
-import { StatusBadge } from '@/components/ui/Badge';
-import { clsx } from '@/lib/utils/clsx';
 
-const LEFT_COL_WIDTH = 280;
-const ROW_HEIGHT = 36;
-const HEADER_HEIGHT = 40;
-const PIXELS_PER_DAY: Record<GanttScale, number> = {
-  week: 30,
-  month: 8,
-  quarter: 4,
+const LEFT_COL  = 260;
+const ROW_H     = 34;
+const HEADER_H  = 38;
+const PPD: Record<GanttScale, number> = { week: 28, month: 7, quarter: 3.5 };
+
+/* Status dot colour — inline to avoid clsx object pattern issues */
+const STATUS_DOT: Record<string, string> = {
+  not_started: '#9CA3AF',
+  in_progress: '#2563EB',
+  at_risk:     '#D97706',
+  complete:    '#16A34A',
 };
 
 interface GanttChartProps {
@@ -23,98 +28,95 @@ interface GanttChartProps {
 }
 
 export function GanttChart({ items, scale, onSelectItem }: GanttChartProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const today = new Date();
-  const ppd = PIXELS_PER_DAY[scale];
+  const ppd = PPD[scale];
 
-  // Compute date range from items
-  const allDates = items.flatMap((i) => [parseISO(i.startDate), parseISO(i.endDate)]);
-  const minDate = allDates.reduce((a, b) => a < b ? a : b, addDays(today, -14));
-  const maxDate = allDates.reduce((a, b) => a > b ? a : b, addDays(today, 90));
-  const rangeStart = addDays(startOfMonth(minDate), -7);
-  const rangeEnd = addDays(maxDate, 30);
+  // Compute range from data ± padding
+  const allDates = items.flatMap(i => [parseISO(i.startDate), parseISO(i.endDate)]);
+  const minDate  = allDates.reduce((a, b) => a < b ? a : b, addDays(today, -14));
+  const maxDate  = allDates.reduce((a, b) => a > b ? a : b, addDays(today, 90));
+  const rangeStart = addDays(startOfMonth(minDate), -3);
+  const rangeEnd   = addDays(maxDate, 21);
 
-  const totalDays = differenceInDays(rangeEnd, rangeStart);
+  const totalDays  = differenceInDays(rangeEnd, rangeStart);
   const totalWidth = totalDays * ppd;
-  const todayOffset = differenceInDays(today, rangeStart) * ppd;
+  const todayOff   = differenceInDays(today, rangeStart) * ppd;
 
-  // Build column headers
+  // Column headers
   const headers: Array<{ label: string; offset: number; width: number }> = [];
   if (scale === 'week') {
     const weeks = eachWeekOfInterval({ start: rangeStart, end: rangeEnd }, { weekStartsOn: 1 });
-    weeks.forEach((w) => {
-      const off = differenceInDays(w, rangeStart) * ppd;
-      headers.push({ label: format(w, 'MMM d'), offset: off, width: 7 * ppd });
+    weeks.forEach(w => {
+      headers.push({ label: format(w, 'MMM d'), offset: differenceInDays(w, rangeStart) * ppd, width: 7 * ppd });
     });
   } else {
     const months = eachMonthOfInterval({ start: rangeStart, end: rangeEnd });
-    months.forEach((m) => {
-      const off = differenceInDays(m, rangeStart) * ppd;
-      const nextMonth = addDays(m, 32);
-      const nextStart = startOfMonth(nextMonth);
-      const width = differenceInDays(nextStart, m) * ppd;
-      headers.push({ label: format(m, scale === 'quarter' ? 'MMM yyyy' : 'MMM yyyy'), offset: off, width });
+    months.forEach(m => {
+      const next = startOfMonth(addDays(m, 32));
+      const width = differenceInDays(next, m) * ppd;
+      headers.push({ label: format(m, 'MMM yyyy'), offset: differenceInDays(m, rangeStart) * ppd, width });
     });
   }
 
-  // Build flat rows (projects first, then children indented)
-  const roots = items.filter((i) => !i.parentId);
-  const rows: Array<{ item: TimelineItem; depth: number; expanded: boolean }> = [];
-  const addRows = (items: TimelineItem[], depth: number) => {
-    items.forEach((item) => {
-      rows.push({ item, depth, expanded: true });
-      const children = items.filter((c) => c.parentId === item.id);
-      // Not filtering by parentId from local items — use global items
-    });
-  };
-
-  // Flatten: projects then their children
-  const allFlat: Array<{ item: TimelineItem; depth: number }> = [];
-  roots.forEach((root) => {
-    allFlat.push({ item: root, depth: 0 });
-    const children = items.filter((i) => i.parentId === root.id);
-    children.forEach((child) => allFlat.push({ item: child, depth: 1 }));
+  // Flat row list: project then its children
+  const roots = items.filter(i => !i.parentId);
+  const rows: Array<{ item: TimelineItem; depth: number }> = [];
+  roots.forEach(root => {
+    rows.push({ item: root, depth: 0 });
+    items.filter(i => i.parentId === root.id).forEach(child => rows.push({ item: child, depth: 1 }));
   });
 
-  function itemLeft(item: TimelineItem) {
-    return differenceInDays(parseISO(item.startDate), rangeStart) * ppd;
-  }
-  function itemWidth(item: TimelineItem) {
-    const days = Math.max(1, differenceInDays(parseISO(item.endDate), parseISO(item.startDate)));
-    return days * ppd;
-  }
+  const itemLeft  = (item: TimelineItem) => differenceInDays(parseISO(item.startDate), rangeStart) * ppd;
+  const itemWidth = (item: TimelineItem) => Math.max(1, differenceInDays(parseISO(item.endDate), parseISO(item.startDate))) * ppd;
 
   return (
-    <div className="flex overflow-hidden" style={{ height: `${HEADER_HEIGHT + allFlat.length * ROW_HEIGHT + 2}px` }}>
-      {/* Left sticky column */}
+    <div
+      className="flex overflow-hidden"
+      style={{ height: HEADER_H + rows.length * ROW_H + 1, backgroundColor: '#FFFFFF' }}
+    >
+      {/* ── Left sticky name column ─────────────────────────────── */}
       <div
-        className="shrink-0 border-r border-slate-200 bg-white z-10"
-        style={{ width: LEFT_COL_WIDTH }}
+        className="shrink-0 z-10 flex flex-col"
+        style={{ width: LEFT_COL, backgroundColor: '#FFFFFF', borderRight: '1px solid rgba(0,0,0,0.07)' }}
       >
-        {/* Header */}
+        {/* Header cell */}
         <div
-          className="border-b border-slate-200 flex items-center px-3"
-          style={{ height: HEADER_HEIGHT }}
+          className="flex items-center px-3 shrink-0"
+          style={{ height: HEADER_H, borderBottom: '1px solid rgba(0,0,0,0.07)' }}
         >
-          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Project / Task</span>
+          <span className="text-[11px] font-semibold uppercase tracking-widest" style={{ color: '#9CA3AF', letterSpacing: '0.07em' }}>
+            Project / Task
+          </span>
         </div>
+
         {/* Rows */}
-        {allFlat.map(({ item, depth }) => (
+        {rows.map(({ item, depth }) => (
           <div
             key={item.id}
-            className="flex items-center gap-2 border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors"
-            style={{ height: ROW_HEIGHT, paddingLeft: 12 + depth * 16, paddingRight: 8 }}
+            className="flex items-center gap-2 transition-colors duration-100 cursor-pointer group"
+            style={{
+              height: ROW_H,
+              paddingLeft: 12 + depth * 14,
+              paddingRight: 8,
+              borderBottom: '1px solid rgba(0,0,0,0.04)',
+            }}
             onClick={() => onSelectItem(item.id)}
+            onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = '#FAFAF9'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'transparent'; }}
           >
+            {/* Status dot */}
             <div
-              className={clsx('w-2 h-2 rounded-full shrink-0', {
-                'not_started': 'bg-slate-400',
-                'in_progress': 'bg-blue-500',
-                'at_risk': 'bg-amber-500',
-                'complete': 'bg-emerald-500',
-              }[item.status])}
+              className="w-[6px] h-[6px] rounded-full shrink-0"
+              style={{ background: STATUS_DOT[item.status] }}
             />
-            <span className={clsx('text-sm truncate flex-1', depth === 0 ? 'font-medium text-slate-800' : 'text-slate-600')}>
+            {/* Name */}
+            <span
+              className="text-[13px] truncate flex-1 transition-colors duration-100"
+              style={{
+                fontWeight: depth === 0 ? 600 : 400,
+                color: depth === 0 ? '#1C1917' : '#6B7280',
+              }}
+            >
               {item.title}
             </span>
             <Avatar ownerId={item.ownerId} size="xs" />
@@ -122,101 +124,125 @@ export function GanttChart({ items, scale, onSelectItem }: GanttChartProps) {
         ))}
       </div>
 
-      {/* Scrollable chart area */}
-      <div ref={containerRef} className="flex-1 overflow-x-auto scroll-x relative">
-        <div style={{ width: totalWidth, position: 'relative' }}>
-          {/* Header */}
+      {/* ── Scrollable Gantt area ──────────────────────────────── */}
+      <div className="flex-1 overflow-x-auto" style={{ overflowY: 'hidden' }}>
+        <div style={{ width: totalWidth, position: 'relative', minHeight: HEADER_H + rows.length * ROW_H }}>
+
+          {/* Column header row */}
           <div
-            className="flex border-b border-slate-200 bg-white sticky top-0 z-10"
-            style={{ height: HEADER_HEIGHT }}
+            className="flex sticky top-0 z-10"
+            style={{ height: HEADER_H, backgroundColor: '#FFFFFF', borderBottom: '1px solid rgba(0,0,0,0.07)' }}
           >
             {headers.map((h, i) => (
               <div
                 key={i}
-                className="shrink-0 border-r border-slate-100 flex items-center px-2"
-                style={{ width: h.width }}
+                className="absolute flex items-center px-2"
+                style={{
+                  left: h.offset,
+                  width: h.width,
+                  height: HEADER_H,
+                  borderRight: '1px solid rgba(0,0,0,0.05)',
+                }}
               >
-                <span className="text-xs text-slate-500 font-medium truncate">{h.label}</span>
+                <span className="text-[11px] font-medium truncate" style={{ color: '#9CA3AF' }}>{h.label}</span>
               </div>
             ))}
           </div>
 
-          {/* Grid + bars */}
-          <div style={{ position: 'relative' }}>
-            {/* Column grid lines */}
-            {headers.map((h, i) => (
-              <div
-                key={i}
-                className="absolute top-0 bottom-0 border-r border-slate-100"
-                style={{ left: h.offset, width: h.width }}
-              />
-            ))}
-
-            {/* Today line */}
+          {/* Grid lines */}
+          {headers.map((h, i) => (
             <div
-              className="absolute top-0 bottom-0 w-px bg-red-400 z-10"
-              style={{ left: todayOffset }}
+              key={i}
+              className="absolute top-0 bottom-0"
+              style={{ left: h.offset + h.width - 1, width: 1, background: 'rgba(0,0,0,0.04)' }}
+            />
+          ))}
+
+          {/* Today marker */}
+          <div
+            className="absolute top-0 bottom-0 z-10"
+            style={{ left: todayOff, width: 1, background: '#DC2626', opacity: 0.5 }}
+          >
+            <span
+              className="absolute text-[10px] font-semibold font-mono whitespace-nowrap"
+              style={{ top: HEADER_H + 4, left: 4, color: '#DC2626' }}
             >
-              <div className="absolute -top-0 -left-3 text-xs text-red-400 font-medium whitespace-nowrap">Today</div>
-            </div>
-
-            {/* Rows */}
-            {allFlat.map(({ item, depth }, rowIndex) => {
-              const left = itemLeft(item);
-              const width = itemWidth(item);
-              const color = GANTT_BAR_COLORS[item.status];
-              const isMilestone = item.type === 'milestone';
-
-              return (
-                <div
-                  key={item.id}
-                  className="border-b border-slate-100 hover:bg-slate-50/50 relative"
-                  style={{ height: ROW_HEIGHT }}
-                >
-                  {isMilestone ? (
-                    // Diamond milestone
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rotate-45 cursor-pointer hover:scale-110 transition-transform z-10"
-                      style={{ left: left - 6, backgroundColor: color }}
-                      onClick={() => onSelectItem(item.id)}
-                      title={item.title}
-                    />
-                  ) : (
-                    <div
-                      className="gantt-bar absolute rounded cursor-pointer z-10 flex items-center px-2 group"
-                      style={{
-                        left,
-                        width: Math.max(width, 4),
-                        top: 6,
-                        bottom: 6,
-                        backgroundColor: color,
-                        opacity: 0.9,
-                      }}
-                      onClick={() => onSelectItem(item.id)}
-                    >
-                      {width > 60 && (
-                        <span className="text-white text-xs font-medium truncate">{item.title}</span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Progress overlay */}
-                  {!isMilestone && item.progress > 0 && (
-                    <div
-                      className="absolute rounded z-10 pointer-events-none"
-                      style={{
-                        left,
-                        width: Math.max((width * item.progress) / 100, 2),
-                        top: 6,
-                        bottom: 6,
-                        backgroundColor: 'rgba(255,255,255,0.3)',
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
+              today
+            </span>
           </div>
+
+          {/* Bars */}
+          {rows.map(({ item, depth }, rowIdx) => {
+            const left   = itemLeft(item);
+            const width  = itemWidth(item);
+            const color  = GANTT_BAR_COLORS[item.status];
+            const isMile = item.type === 'milestone';
+
+            return (
+              <div
+                key={item.id}
+                className="absolute w-full"
+                style={{
+                  top: HEADER_H + rowIdx * ROW_H,
+                  height: ROW_H,
+                  borderBottom: '1px solid rgba(0,0,0,0.04)',
+                }}
+              >
+                {isMile ? (
+                  /* Diamond milestone marker */
+                  <div
+                    className="absolute gantt-bar"
+                    style={{
+                      left: left - 5,
+                      top: '50%',
+                      transform: 'translateY(-50%) rotate(45deg)',
+                      width: 10,
+                      height: 10,
+                      background: color,
+                      borderRadius: 2,
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => onSelectItem(item.id)}
+                    title={item.title}
+                  />
+                ) : (
+                  <div
+                    className="absolute gantt-bar rounded-[3px] cursor-pointer flex items-center overflow-hidden"
+                    style={{
+                      left,
+                      width: Math.max(width, 3),
+                      top: 5,
+                      bottom: 5,
+                      background: color,
+                      /* Progress overlay as a lighter stripe */
+                    }}
+                    onClick={() => onSelectItem(item.id)}
+                  >
+                    {/* Progress fill — slightly lighter overlay */}
+                    {item.progress > 0 && (
+                      <div
+                        className="absolute left-0 top-0 bottom-0"
+                        style={{
+                          width: `${item.progress}%`,
+                          background: 'rgba(255,255,255,0.22)',
+                          borderRadius: '3px 0 0 3px',
+                        }}
+                      />
+                    )}
+                    {/* Label — only when bar is wide enough */}
+                    {width > 72 && (
+                      <span
+                        className="relative z-10 px-2 text-white text-[11px] font-semibold truncate"
+                        style={{ textShadow: '0 1px 2px rgba(0,0,0,0.2)' }}
+                      >
+                        {item.title}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
