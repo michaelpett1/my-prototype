@@ -1,20 +1,16 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
-import { AppShell } from '@/components/layout/AppShell';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Northstar — Product Management',
-  description: 'Bespoke product management tool for modern teams.',
+  description: 'AI-powered product management. Northstar scans JIRA, Confluence, and Slack to keep your roadmap in sync.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        <AppShell>{children}</AppShell>
+      <body className="antialiased" style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"' }}>
+        {children}
       </body>
     </html>
   );

@@ -37,9 +37,9 @@ export function SidePanel({ open, onClose, title, children, width = '420px' }: S
         className="fixed right-0 top-0 h-full flex flex-col z-30"
         style={{
           width,
-          backgroundColor: '#FFFFFF',
-          borderLeft: '1px solid rgba(0,0,0,0.07)',
-          boxShadow: '0 0 0 1px rgba(0,0,0,0.05), -12px 0 40px rgba(0,0,0,0.08)',
+          backgroundColor: 'var(--bg-primary)',
+          borderLeft: '1px solid var(--border)',
+          boxShadow: '0 0 0 1px var(--border-light), -12px 0 40px rgba(0,0,0,0.08)',
           transform: open ? 'translateX(0)' : 'translateX(100%)',
           opacity: open ? 1 : 0,
           transition: open
@@ -54,15 +54,15 @@ export function SidePanel({ open, onClose, title, children, width = '420px' }: S
         {/* Header */}
         <div
           className="flex items-center justify-between px-4 py-3 shrink-0"
-          style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
-          <h2 className="text-[13px] font-semibold truncate" style={{ color: '#1C1917' }}>{title}</h2>
+          <h2 className="text-[13px] font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{title}</h2>
           <button
             onClick={onClose}
             className="rounded-[4px] transition-all duration-150 ease-out flex items-center justify-center"
-            style={{ width: 24, height: 24, color: '#9CA3AF' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = '#374151'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = '#9CA3AF'; }}
+            style={{ width: 24, height: 24, color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--border-row)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-muted)'; }}
             aria-label="Close"
           >
             <X size={14} />

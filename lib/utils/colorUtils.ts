@@ -52,8 +52,16 @@ export function calcKRProgress(startValue: number, currentValue: number, targetV
   return Math.min(100, Math.max(0, ((currentValue - startValue) / (targetValue - startValue)) * 100));
 }
 
-export function calcObjectiveProgress(keyResults: Array<{ startValue: number; currentValue: number; targetValue: number }>): number {
+export function calcObjectiveProgress(keyResults: Array<{ startValue: number; currentValue: number; targetValue: number; weight?: number }>): number {
   if (keyResults.length === 0) return 0;
+  const totalWeight = keyResults.reduce((sum, kr) => sum + (kr.weight || 0), 0);
+  if (totalWeight > 0) {
+    const weighted = keyResults.reduce((sum, kr) => {
+      const w = kr.weight || 0;
+      return sum + calcKRProgress(kr.startValue, kr.currentValue, kr.targetValue) * w;
+    }, 0);
+    return Math.round(weighted / totalWeight);
+  }
   const total = keyResults.reduce((sum, kr) => sum + calcKRProgress(kr.startValue, kr.currentValue, kr.targetValue), 0);
   return Math.round(total / keyResults.length);
 }

@@ -25,7 +25,7 @@ export function ProgressBar({ value, color, height = 'sm', showLabel = false, cl
     <div className={clsx('flex items-center gap-2', className)}>
       <div
         className="flex-1 rounded-full overflow-hidden"
-        style={{ height: h, background: 'rgba(0,0,0,0.06)' }}
+        style={{ height: h, background: 'var(--border-row)' }}
       >
         <div
           className="h-full rounded-full transition-all duration-300 ease-out"
@@ -35,7 +35,7 @@ export function ProgressBar({ value, color, height = 'sm', showLabel = false, cl
       {showLabel && (
         <span
           className="tabular-nums shrink-0"
-          style={{ fontSize: '12px', color: '#9CA3AF', fontFamily: 'ui-monospace, monospace', width: '32px', textAlign: 'right' }}
+          style={{ fontSize: '12px', color: 'var(--text-muted)', fontFamily: 'ui-monospace, monospace', width: '32px', textAlign: 'right' }}
         >
           {pct}%
         </span>
@@ -63,7 +63,7 @@ export function DonutProgress({ value, size = 48, strokeWidth = 4, color = '#256
       <circle
         cx={size / 2} cy={size / 2} r={r}
         fill="none"
-        stroke="rgba(0,0,0,0.07)"
+        stroke="var(--border)"
         strokeWidth={strokeWidth}
       />
       <circle

@@ -1,30 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 /* ─── Design tokens ──────────────────────────────────────────────── */
 @theme {
-  /* Warm neutral palette — the key departure from sterile blue-grey */
-  --color-canvas: #FAFAF9;
-  --color-canvas-subtle: #F5F4F2;
+  --color-canvas: #f4f6fb;
+  --color-canvas-subtle: #f4f6fb;
   --color-surface: #FFFFFF;
   --color-surface-raised: #FFFFFF;
 
-  /* Borders as rgba, not slate-XXX. Thin and deliberate. */
   --color-border: rgba(0,0,0,0.07);
   --color-border-strong: rgba(0,0,0,0.13);
 
-  /* Text hierarchy — warm darks, not pure #000 */
   --color-text-primary: #1C1917;
   --color-text-secondary: #6B7280;
   --color-text-muted: #9CA3AF;
   --color-text-inverse: #FAFAF9;
 
-  /* One accent, used surgically */
-  --color-accent: #2563EB;
-  --color-accent-hover: #1D4ED8;
-  --color-accent-subtle: #EFF6FF;
-  --color-accent-text: #1D4ED8;
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-subtle: #eef2ff;
+  --color-accent-text: #4338ca;
 
-  /* Semantic */
   --color-success: #16A34A;
   --color-success-subtle: #F0FDF4;
   --color-warning: #D97706;
@@ -32,24 +28,171 @@
   --color-danger: #DC2626;
   --color-danger-subtle: #FEF2F2;
 
-  /* Sidebar stays dark navy — contrast with the warm canvas */
   --color-sidebar: #111827;
   --color-sidebar-hover: #1F2937;
   --color-sidebar-active: #1E40AF;
   --color-sidebar-border: rgba(255,255,255,0.06);
 
-  /* Shadows — very soft, warm-tinted */
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.04);
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.04);
   --shadow-panel: 0 0 0 1px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.10);
 
-  /* Border radius system — consistent per element type */
-  --radius-xs: 3px;  /* chips, badges */
-  --radius-sm: 5px;  /* buttons, inputs */
-  --radius-md: 7px;  /* cards, panels */
-  --radius-lg: 11px; /* modals, popovers */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 11px;
+}
+
+/* ─── CSS custom properties for inline style usage ───────────────── */
+/* These are the variables used in style={{ color: 'var(--...)' }} */
+:root {
+  /* App accent (set via JS) */
+  --app-accent: #4f46e5;
+  --app-accent-hover: #4338ca;
+  --app-accent-subtle: #eef2ff;
+
+  /* Text */
+  --text-primary: #1C1917;
+  --text-secondary: #374151;
+  --text-tertiary: #6B7280;
+  --text-muted: #9CA3AF;
+  --text-disabled: #D1D5DB;
+  --text-inverse: #FFFFFF;
+
+  /* Surfaces */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #f4f6fb;
+  --bg-tertiary: #F5F5F4;
+  --bg-hover: #FAFAF9;
+  --bg-subtle: rgba(0,0,0,0.04);
+  --bg-overlay: rgba(0,0,0,0.5);
+
+  /* Borders */
+  --border: rgba(0,0,0,0.07);
+  --border-light: rgba(0,0,0,0.05);
+  --border-medium: rgba(0,0,0,0.10);
+  --border-strong: rgba(0,0,0,0.12);
+  --border-row: rgba(0,0,0,0.06);
+
+  /* Shadows */
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.04);
+
+  /* Semantic status */
+  --success: #16A34A;
+  --success-light: #22C55E;
+  --success-bg: #F0FDF4;
+  --success-border: rgba(22,163,74,0.15);
+  --success-text: #15803D;
+  --success-text-dark: #166534;
+
+  --warning: #D97706;
+  --warning-bg: #FFFBEB;
+  --warning-border: rgba(217,119,6,0.15);
+  --warning-text: #92400E;
+  --warning-text-dark: #78350F;
+
+  --danger: #DC2626;
+  --danger-bg: #FEF2F2;
+  --danger-border: rgba(220,38,38,0.15);
+  --danger-text: #991B1B;
+  --danger-text-dark: #7F1D1D;
+
+  --info: #2563EB;
+  --info-bg: #EFF6FF;
+  --info-text: #1E40AF;
+
+  --purple: #7C3AED;
+  --purple-bg: #EDE9FE;
+  --purple-text: #6D28D9;
+
+  /* Sidebar */
+  --sidebar-bg: #111827;
+  --sidebar-hover: #1F2937;
+  --sidebar-text: #9CA3AF;
+  --sidebar-text-active: #F9FAFB;
+
+  /* Modal */
+  --modal-bg: #FFFFFF;
+
+  /* Input */
+  --input-bg: #FFFFFF;
+  --input-border: rgba(0,0,0,0.12);
+
+  /* Misc */
+  --badge-bg: rgba(0,0,0,0.05);
+  --skeleton-from: #F5F4F2;
+  --skeleton-via: #EDECE9;
+}
+
+/* ─── Dark mode variable overrides ───────────────────────────────── */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Text */
+  --text-primary: #e6edf3;
+  --text-secondary: #c9d1d9;
+  --text-tertiary: #8b949e;
+  --text-muted: #6e7681;
+  --text-disabled: #484f58;
+  --text-inverse: #0d1117;
+
+  /* Surfaces */
+  --bg-primary: #161b22;
+  --bg-secondary: #0d1117;
+  --bg-tertiary: #1c2129;
+  --bg-hover: #1c2129;
+  --bg-subtle: rgba(255,255,255,0.04);
+  --bg-overlay: rgba(0,0,0,0.7);
+
+  /* Borders */
+  --border: rgba(255,255,255,0.08);
+  --border-light: rgba(255,255,255,0.05);
+  --border-medium: rgba(255,255,255,0.10);
+  --border-strong: rgba(255,255,255,0.14);
+  --border-row: rgba(255,255,255,0.06);
+
+  /* Shadows */
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
+
+  /* Semantic - slightly adjusted for dark backgrounds */
+  --success-bg: rgba(22,163,74,0.12);
+  --success-border: rgba(22,163,74,0.25);
+  --success-text: #3fb950;
+  --success-text-dark: #56d364;
+
+  --warning-bg: rgba(217,119,6,0.12);
+  --warning-border: rgba(217,119,6,0.25);
+  --warning-text: #d29922;
+  --warning-text-dark: #e3b341;
+
+  --danger-bg: rgba(220,38,38,0.12);
+  --danger-border: rgba(220,38,38,0.25);
+  --danger-text: #f85149;
+  --danger-text-dark: #ffa198;
+
+  --info-bg: rgba(37,99,235,0.12);
+  --info-text: #58a6ff;
+
+  --purple-bg: rgba(124,58,237,0.12);
+  --purple-text: #bc8cff;
+
+  /* Sidebar stays dark */
+  --sidebar-bg: #010409;
+  --sidebar-hover: #161b22;
+
+  /* Modal */
+  --modal-bg: #161b22;
+
+  /* Input */
+  --input-bg: #0d1117;
+  --input-border: rgba(255,255,255,0.14);
+
+  /* Misc */
+  --badge-bg: rgba(255,255,255,0.06);
+  --skeleton-from: #161b22;
+  --skeleton-via: #1c2129;
 }
 
 /* ─── Base reset ─────────────────────────────────────────────────── */
@@ -58,38 +201,102 @@
 html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 body {
-  background-color: var(--color-canvas);
-  color: var(--color-text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
   font-size: 14px;
   line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
 }
 
-/* ─── Typography ─────────────────────────────────────────────────── */
-/* Only two weights: 400 and 600. The gap does the hierarchy work. */
+/* ─── Dark mode global overrides ─────────────────────────────────── */
+/* These catch elements that use classes instead of inline vars */
+[data-theme="dark"] .surface {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border) !important;
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .surface-raised {
+  background-color: var(--bg-tertiary) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] .dm-canvas {
+  background-color: var(--bg-secondary) !important;
+}
+[data-theme="dark"] .dm-text {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .dm-text-muted {
+  color: var(--text-tertiary) !important;
+}
+[data-theme="dark"] .dm-border {
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] header.topbar {
+  background-color: rgba(22,27,34,0.85) !important;
+  border-bottom-color: var(--border) !important;
+}
+[data-theme="dark"] header.topbar span,
+[data-theme="dark"] header.topbar button {
+  color: var(--text-tertiary);
+}
+[data-theme="dark"] header.topbar .breadcrumb-active {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] .toolbar {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] .card {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border) !important;
+}
+[data-theme="dark"] .card * {
+  border-color: var(--border-light) !important;
+}
+[data-theme="dark"] .card h1,
+[data-theme="dark"] .card h2,
+[data-theme="dark"] .card h3,
+[data-theme="dark"] .card p.dm-heading {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: var(--input-bg) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--input-border) !important;
+}
+[data-theme="dark"] .settings-nav {
+  background-color: var(--bg-primary) !important;
+  border-color: var(--border) !important;
+}
 
-/* Monospace for data, IDs, timestamps, progress values */
+/* Dark mode scrollbars */
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
+
+/* ─── Typography ─────────────────────────────────────────────────── */
 .mono { font-family: 'GeistMono', 'JetBrains Mono', 'Fira Code', ui-monospace, monospace; }
 
-/* ─── Scrollbars — minimal and warm ─────────────────────────────── */
+/* ─── Scrollbars ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.20); }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.08); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.15); }
 
-/* ─── Focus rings — intentional, not browser-default ────────────── */
+/* ─── Focus rings ────────────────────────────────────────────────── */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--app-accent);
   outline-offset: 2px;
   border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
 }
 
 /* ─── Transitions ────────────────────────────────────────────────── */
-/* 150ms for color/opacity, 200ms for transforms */
 .transition-color-fast { transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out, opacity 150ms ease-out; }
 .transition-transform-fast { transition: transform 200ms ease-out; }
 
-/* ─── Gantt specifics ────────────────────────────────────────────── */
+/* ─── Gantt ──────────────────────────────────────────────────────── */
 .gantt-bar {
   cursor: grab;
   transition: filter 120ms ease-out, opacity 120ms ease-out;
@@ -109,14 +316,96 @@ body {
   transition: transform 180ms ease-in, opacity 120ms ease-in;
 }
 
+/* ─── Modal animation ────────────────────────────────────────────── */
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.97) translateY(4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ─── Toast animation ────────────────────────────────────────────── */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* ─── Skeleton loader ────────────────────────────────────────────── */
 @keyframes skeleton-shimmer {
   from { background-position: -200% 0; }
   to   { background-position:  200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #F5F4F2 25%, #EDECE9 50%, #F5F4F2 75%);
+  background: linear-gradient(90deg, var(--skeleton-from) 25%, var(--skeleton-via) 50%, var(--skeleton-from) 75%);
   background-size: 200% 100%;
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
   border-radius: 4px;
+}
+
+/* ─── Accent-aware button ────────────────────────────────────────── */
+.btn-accent {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+  box-shadow: 0 2px 8px rgba(79,70,229,0.3);
+  transition: all 150ms ease-out;
+}
+.btn-accent:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #6d28d9 100%) !important;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.4);
+  transform: translateY(-1px);
+}
+
+/* ─── Sidebar active state uses accent ───────────────────────────── */
+.sidebar-active {
+  background: linear-gradient(135deg, rgba(79,70,229,0.15) 0%, rgba(124,58,237,0.1) 100%) !important;
+  box-shadow: inset 3px 0 0 0 #7c3aed, inset 0 0 0 1px rgba(124,58,237,0.15) !important;
+}
+
+/* ─── Page entrance animation ───────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeUp {
+  animation: fadeUp 0.3s ease-out both;
+}
+
+/* ─── Card hover lift ───────────────────────────────────────────── */
+.card-hover {
+  transition: transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease-out;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  border-color: rgba(79,70,229,0.15);
+}
+
+/* ─── Frosted glass ─────────────────────────────────────────────── */
+.glass {
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+/* ─── Ambient background ────────────────────────────────────────── */
+.ambient-bg {
+  position: relative;
+}
+.ambient-bg::before {
+  content: '';
+  position: fixed;
+  top: -20%;
+  right: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(79,70,229,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.ambient-bg::after {
+  content: '';
+  position: fixed;
+  bottom: -20%;
+  left: -10%;
+  width: 50%;
+  height: 50%;
+  background: radial-gradient(circle, rgba(6,182,212,0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }

@@ -19,8 +19,8 @@ export function RoadmapCard({ item, onClick, onDragStart }: RoadmapCardProps) {
     <div
       className="bg-white rounded-[5px] cursor-pointer select-none transition-all duration-150 ease-out"
       style={{
-        border: '1px solid rgba(0,0,0,0.07)',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        border: '1px solid var(--border)',
+        boxShadow: 'var(--card-shadow)',
         padding: '8px 10px',
         /* Left edge colour bar — the status signal */
         borderLeft: `3px solid ${color}`,
@@ -29,17 +29,17 @@ export function RoadmapCard({ item, onClick, onDragStart }: RoadmapCardProps) {
       onDragStart={e => onDragStart(e, item.id)}
       onClick={onClick}
       onMouseEnter={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 3px 8px rgba(0,0,0,0.08)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 3px 8px var(--border-medium)';
         (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 2px rgba(0,0,0,0.04)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--card-shadow)';
         (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
       }}
     >
       <div className="flex items-start gap-1.5 mb-1.5">
-        <span className="text-[10px] mt-[1px] shrink-0" style={{ color: '#D1D5DB' }}>{TYPE_ICON[item.type]}</span>
-        <p className="text-[12px] font-semibold leading-snug line-clamp-2" style={{ color: '#1C1917' }}>{item.title}</p>
+        <span className="text-[10px] mt-[1px] shrink-0" style={{ color: 'var(--text-disabled)' }}>{TYPE_ICON[item.type]}</span>
+        <p className="text-[12px] font-semibold leading-snug line-clamp-2" style={{ color: 'var(--text-primary)' }}>{item.title}</p>
       </div>
       <div className="flex items-center justify-between">
         <StatusBadge status={item.status} size="sm" />

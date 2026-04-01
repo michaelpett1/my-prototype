@@ -28,7 +28,7 @@ export function TimelineBoard({ items, onSelectItem }: TimelineBoardProps) {
   };
 
   return (
-    <div className="flex gap-3 h-full p-4 overflow-x-auto" style={{ backgroundColor: '#FAFAF9' }}>
+    <div className="flex gap-3 h-full p-4 overflow-x-auto" style={{ backgroundColor: 'var(--bg-secondary)' }}>
       {COLUMNS.map(({ status, label, accent }) => {
         const col = items.filter(i => i.status === status);
         return (
@@ -42,10 +42,10 @@ export function TimelineBoard({ items, onSelectItem }: TimelineBoardProps) {
             {/* Column header */}
             <div className="flex items-center gap-2 mb-2.5 px-0.5">
               <div className="w-[7px] h-[7px] rounded-full shrink-0" style={{ background: accent }} />
-              <span className="text-[12px] font-semibold" style={{ color: '#374151' }}>{label}</span>
+              <span className="text-[12px] font-semibold" style={{ color: 'var(--text-secondary)' }}>{label}</span>
               <span
                 className="ml-auto text-[11px] font-mono px-1.5 py-0.5 rounded-[3px]"
-                style={{ background: 'rgba(0,0,0,0.05)', color: '#9CA3AF' }}
+                style={{ background: 'var(--border-light)', color: 'var(--text-muted)' }}
               >
                 {col.length}
               </span>
@@ -58,26 +58,26 @@ export function TimelineBoard({ items, onSelectItem }: TimelineBoardProps) {
                   key={item.id}
                   className="bg-white rounded-[7px] p-3 cursor-pointer transition-all duration-150 ease-out"
                   style={{
-                    border: '1px solid rgba(0,0,0,0.07)',
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                    border: '1px solid var(--border)',
+                    boxShadow: 'var(--card-shadow)',
                   }}
                   draggable
                   onDragStart={e => e.dataTransfer.setData('text/plain', item.id)}
                   onClick={() => onSelectItem(item.id)}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 3px 8px rgba(0,0,0,0.08)';
-                    (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,0,0,0.12)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 3px 8px var(--border-medium)';
+                    (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border-strong)';
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(-1px)';
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLDivElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.04)';
-                    (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(0,0,0,0.07)';
+                    (e.currentTarget as HTMLDivElement).style.boxShadow = 'var(--card-shadow)';
+                    (e.currentTarget as HTMLDivElement).style.borderColor = 'var(--border)';
                     (e.currentTarget as HTMLDivElement).style.transform = 'translateY(0)';
                   }}
                 >
                   {/* Card header */}
                   <div className="flex items-start justify-between gap-2 mb-2.5">
-                    <p className="text-[13px] font-semibold line-clamp-2 leading-snug" style={{ color: '#1C1917' }}>
+                    <p className="text-[13px] font-semibold line-clamp-2 leading-snug" style={{ color: 'var(--text-primary)' }}>
                       {item.title}
                     </p>
                     <PriorityBadge priority={item.priority} />
@@ -89,7 +89,7 @@ export function TimelineBoard({ items, onSelectItem }: TimelineBoardProps) {
                   {/* Footer */}
                   <div className="flex items-center justify-between">
                     <Avatar ownerId={item.ownerId} size="xs" />
-                    <span className="text-[11px] font-mono" style={{ color: '#9CA3AF' }}>
+                    <span className="text-[11px] font-mono" style={{ color: 'var(--text-muted)' }}>
                       {formatDate(item.endDate, 'MMM d')}
                     </span>
                   </div>
@@ -101,8 +101,8 @@ export function TimelineBoard({ items, onSelectItem }: TimelineBoardProps) {
                   className="flex items-center justify-center rounded-[7px] text-[12px]"
                   style={{
                     height: 64,
-                    border: '1.5px dashed rgba(0,0,0,0.10)',
-                    color: '#9CA3AF',
+                    border: '1.5px dashed var(--border-medium)',
+                    color: 'var(--text-muted)',
                   }}
                 >
                   Drop here

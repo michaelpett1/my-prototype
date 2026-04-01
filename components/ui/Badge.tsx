@@ -8,10 +8,10 @@ import type { TimelineItemStatus, OKRStatus, Priority } from '@/lib/types';
 
 // ── Status badge ────────────────────────────────────────────────────
 const STATUS_CONFIG: Record<TimelineItemStatus, { dot: string; label: string; bg: string; text: string }> = {
-  not_started: { dot: '#9CA3AF', label: 'Not Started',  bg: 'rgba(0,0,0,0.04)',   text: '#6B7280' },
-  in_progress: { dot: '#2563EB', label: 'In Progress',  bg: '#EFF6FF',             text: '#1D4ED8' },
-  at_risk:     { dot: '#D97706', label: 'At Risk',      bg: '#FFFBEB',             text: '#92400E' },
-  complete:    { dot: '#16A34A', label: 'Complete',     bg: '#F0FDF4',             text: '#15803D' },
+  not_started: { dot: '#9CA3AF', label: 'Not Started',  bg: 'var(--bg-subtle)',    text: 'var(--text-tertiary)' },
+  in_progress: { dot: '#2563EB', label: 'In Progress',  bg: 'var(--info-bg)',      text: '#1D4ED8' },
+  at_risk:     { dot: '#D97706', label: 'At Risk',      bg: 'var(--warning-bg)',   text: 'var(--warning-text)' },
+  complete:    { dot: '#16A34A', label: 'Complete',     bg: 'var(--success-bg)',   text: 'var(--success-text)' },
 };
 
 interface StatusBadgeProps { status: TimelineItemStatus; size?: 'sm' | 'md'; }
@@ -36,9 +36,9 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 
 // ── OKR status badge ────────────────────────────────────────────────
 const OKR_CONFIG: Record<OKRStatus, { dot: string; label: string; bg: string; text: string }> = {
-  on_track: { dot: '#16A34A', label: 'On Track', bg: '#F0FDF4', text: '#15803D' },
-  at_risk:  { dot: '#D97706', label: 'At Risk',  bg: '#FFFBEB', text: '#92400E' },
-  off_track:{ dot: '#DC2626', label: 'Off Track',bg: '#FEF2F2', text: '#991B1B' },
+  on_track: { dot: '#16A34A', label: 'On Track', bg: 'var(--success-bg)', text: 'var(--success-text)' },
+  at_risk:  { dot: '#D97706', label: 'At Risk',  bg: 'var(--warning-bg)', text: 'var(--warning-text)' },
+  off_track:{ dot: '#DC2626', label: 'Off Track',bg: 'var(--danger-bg)', text: 'var(--danger-text)' },
 };
 
 interface OKRStatusBadgeProps { status: OKRStatus; size?: 'sm' | 'md'; }
@@ -66,7 +66,7 @@ const PRI_CONFIG: Record<Priority, { label: string; bg: string; text: string }> 
   p0: { label: 'P0', bg: '#FEF2F2', text: '#991B1B' },
   p1: { label: 'P1', bg: '#FFF7ED', text: '#9A3412' },
   p2: { label: 'P2', bg: '#FEFCE8', text: '#854D0E' },
-  p3: { label: 'P3', bg: 'rgba(0,0,0,0.04)', text: '#6B7280' },
+  p3: { label: 'P3', bg: 'var(--bg-subtle)', text: 'var(--text-tertiary)' },
 };
 
 interface PriorityBadgeProps { priority: Priority; }

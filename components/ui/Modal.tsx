@@ -31,7 +31,7 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
       {/* Scrim */}
       <div
         className="absolute inset-0"
-        style={{ background: 'rgba(0,0,0,0.30)' }}
+        style={{ background: 'var(--bg-overlay)' }}
         onClick={onClose}
       />
 
@@ -40,9 +40,9 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
         className="relative w-full flex flex-col"
         style={{
           maxWidth: maxW,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--bg-primary)',
           borderRadius: '11px',
-          boxShadow: '0 0 0 1px rgba(0,0,0,0.07), 0 20px 60px rgba(0,0,0,0.14)',
+          boxShadow: '0 0 0 1px var(--border), 0 20px 60px rgba(0,0,0,0.14)',
           animation: 'modal-in 180ms cubic-bezier(0.16, 1, 0.3, 1)',
         }}
       >
@@ -56,14 +56,14 @@ export function Modal({ open, onClose, title, children, size = 'md' }: ModalProp
         {/* Header */}
         <div
           className="flex items-center justify-between px-4 py-3"
-          style={{ borderBottom: '1px solid rgba(0,0,0,0.07)' }}
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
-          <h2 id="modal-title" className="text-[13px] font-semibold" style={{ color: '#1C1917' }}>{title}</h2>
+          <h2 id="modal-title" className="text-[13px] font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
           <button
             onClick={onClose}
             className="rounded-[4px] flex items-center justify-center transition-all duration-150"
-            style={{ width: 24, height: 24, color: '#9CA3AF' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,0,0,0.06)'; }}
+            style={{ width: 24, height: 24, color: 'var(--text-muted)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--border-row)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
             aria-label="Close"
           >
