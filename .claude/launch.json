@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "northstar",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "strategy-pages",
+      "runtimeExecutable": "/usr/bin/python3",
+      "runtimeArgs": ["-m", "http.server", "8080"],
+      "port": 8080,
+      "autoPort": true
+    }
+  ]
+}
