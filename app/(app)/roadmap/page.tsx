@@ -73,7 +73,7 @@ function TaskCard({
   onDragStart: (e: React.DragEvent, id: string) => void;
   onEdit: (task: RoadmapTask) => void;
   onDelete: (id: string) => void;
-  onClone: (task: RoadmapTask) => void;
+  onClone: (task: RoadmapTask, type: 'ux' | 'dev') => void;
 }) {
   const teamMembers = useSettingsStore(s => s.teamMembers);
   const color = typeColor(task.type);
@@ -125,12 +125,20 @@ function TaskCard({
           Edit
         </button>
         <button
-          onClick={e => { e.stopPropagation(); onClone(task); }}
+          onClick={e => { e.stopPropagation(); onClone(task, 'ux'); }}
           style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid var(--border-medium)', background: 'var(--bg-primary)', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
-          title={`Clone ${task.type === 'dev' ? 'DEV' : 'UX'} task`}
+          title="Clone as UX task"
         >
           <Copy size={9} />
-          Clone
+          Clone UX
+        </button>
+        <button
+          onClick={e => { e.stopPropagation(); onClone(task, 'dev'); }}
+          style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid var(--border-medium)', background: 'var(--bg-primary)', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
+          title="Clone as Dev task"
+        >
+          <Copy size={9} />
+          Clone Dev
         </button>
         <button
           onClick={e => { e.stopPropagation(); onDelete(task.id); }}
@@ -256,7 +264,7 @@ function SprintDropZone({
   onOpenAddModal: (sprintNumber: number, type?: 'ux' | 'dev') => void;
   onEditTask: (task: RoadmapTask) => void;
   onDeleteTask: (id: string) => void;
-  onCloneTask: (task: RoadmapTask) => void;
+  onCloneTask: (task: RoadmapTask, type: 'ux' | 'dev') => void;
   onCapacityChange: (sprintNumber: number, type: 'dev' | 'ux', value: number) => void;
 }) {
   const [dragOver, setDragOver] = useState(false);
@@ -1222,13 +1230,13 @@ export default function RoadmapPage() {
     setModalOpen(true);
   }
 
-  function handleCloneTask(task: RoadmapTask) {
+  function handleCloneTask(task: RoadmapTask, type: 'ux' | 'dev') {
     const { addTask } = useRoadmapStore.getState();
     const cloned: RoadmapTask = {
       ...task,
       id: Math.random().toString(36).slice(2, 9),
-      type: task.type,
-      title: `Copy of ${task.title}`,
+      type,
+      title: task.title,
       createdAt: new Date().toISOString(),
       timelineItemId: undefined,
     };
