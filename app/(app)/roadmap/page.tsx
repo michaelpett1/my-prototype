@@ -1,6 +1,6 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
-import { Plus, User, ChevronDown, ChevronUp, Flame, Copy, ArrowDownToLine, Check, AlertTriangle, Undo2 } from 'lucide-react';
+import { Plus, User, ChevronDown, ChevronUp, Flame, Copy, ArrowDownToLine, Check, AlertTriangle, Undo2, Pencil, Trash2 } from 'lucide-react';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { useRoadmapStore, generateSprints, getCurrentSprintNumber } from '@/lib/store/roadmapStore';
@@ -106,46 +106,56 @@ function TaskCard({
         (e.currentTarget as HTMLDivElement).style.transform = 'none';
       }}
     >
-      {/* Actions — edit/clone/delete on hover */}
+      {/* Actions — floating toolbar on hover */}
       <div
         className="opacity-0 group-hover:opacity-100 transition-opacity duration-150"
         style={{
           position: 'absolute',
-          top: 4,
-          right: 4,
+          top: -10,
+          right: 6,
           display: 'flex',
-          gap: 2,
+          gap: 1,
+          background: 'var(--bg-primary)',
+          borderRadius: 8,
+          padding: 2,
+          boxShadow: '0 2px 8px rgba(0,0,0,0.12), 0 0 0 1px var(--border)',
+          zIndex: 5,
         }}
       >
         <button
           onClick={e => { e.stopPropagation(); onEdit(task); }}
-          style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid var(--border-medium)', background: 'var(--bg-primary)', color: 'var(--text-tertiary)', cursor: 'pointer' }}
+          className="hover:bg-gray-100 dark:hover:bg-gray-800"
+          style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, border: 'none', background: 'transparent', color: 'var(--text-tertiary)', cursor: 'pointer', transition: 'color 150ms, background 150ms' }}
           title="Edit task"
         >
-          Edit
+          <Pencil size={12} />
         </button>
         <button
           onClick={e => { e.stopPropagation(); onClone(task, 'ux'); }}
-          style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid var(--border-medium)', background: 'var(--bg-primary)', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
+          className="hover:bg-blue-50 dark:hover:bg-blue-900/30"
+          style={{ height: 26, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 6, border: 'none', background: 'transparent', color: UX_COLOR, cursor: 'pointer', padding: '0 6px', fontSize: 10, fontWeight: 600, transition: 'background 150ms' }}
           title="Clone as UX task"
         >
-          <Copy size={9} />
-          Clone UX
+          <Copy size={10} />
+          UX
         </button>
         <button
           onClick={e => { e.stopPropagation(); onClone(task, 'dev'); }}
-          style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid var(--border-medium)', background: 'var(--bg-primary)', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 2 }}
+          className="hover:bg-purple-50 dark:hover:bg-purple-900/30"
+          style={{ height: 26, display: 'flex', alignItems: 'center', gap: 3, borderRadius: 6, border: 'none', background: 'transparent', color: DEV_COLOR, cursor: 'pointer', padding: '0 6px', fontSize: 10, fontWeight: 600, transition: 'background 150ms' }}
           title="Clone as Dev task"
         >
-          <Copy size={9} />
-          Clone Dev
+          <Copy size={10} />
+          DEV
         </button>
+        <div style={{ width: 1, background: 'var(--border)', margin: '4px 1px' }} />
         <button
           onClick={e => { e.stopPropagation(); onDelete(task.id); }}
-          style={{ fontSize: 10, padding: '2px 5px', borderRadius: 3, border: '1px solid rgba(220,38,38,0.2)', background: 'var(--danger-bg)', color: '#DC2626', cursor: 'pointer' }}
+          className="hover:bg-red-50 dark:hover:bg-red-900/30"
+          style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 6, border: 'none', background: 'transparent', color: 'var(--text-disabled)', cursor: 'pointer', transition: 'color 150ms, background 150ms' }}
           title="Delete task"
         >
-          ×
+          <Trash2 size={12} />
         </button>
       </div>
 
