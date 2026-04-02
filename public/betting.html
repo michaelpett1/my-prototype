@@ -60,6 +60,13 @@
                 </div>
             </section>
 
+            <!-- Category Cards + Search -->
+            <section class="pb-6">
+                <div class="max-w-[1200px] mx-auto px-6">
+                    <category-cards :categories="pageData.categories" active-category="betting-strategy"></category-cards>
+                </div>
+            </section>
+
             <!-- Featured Article -->
             <section class="pb-8">
                 <div class="max-w-[1200px] mx-auto px-6">
@@ -119,6 +126,11 @@
         const { createApp } = Vue;
 
         const pageData = {
+            categories: [
+                { id: 'casino-strategy', label: 'Casino Strategy', image: 'https://objects.kaxmedia.com/auto/o/2038/46e216d6f6.jpeg', href: 'casino.html' },
+                { id: 'betting-strategy', label: 'Betting Strategy', image: 'https://objects.kaxmedia.com/genesis/football-strategy.webp', href: 'betting.html' },
+                { id: 'poker-strategy', label: 'Poker Strategy', image: 'https://objects.kaxmedia.com/genesis/how-to-play-stud-poker.webp', href: 'poker.html' },
+            ],
             allArticles: [
                 { title: 'How do Betting Odds Work?', url: 'https://www.gambling.com/strategy/betting/how-odds-work', image: 'https://objects.kaxmedia.com/genesis/betting-odds-strategy.webp', author: 'Shannon Lane', authorImg: 'https://objects.kaxmedia.com/auto/o/208729/f283797b46.webp', excerpt: 'A complete guide to understanding decimal, fractional and American odds formats. Learn how to calculate payouts and find value bets.', readTime: '6 min read', timeAgo: '1 hour ago', region: 'UK', featured: true },
                 { title: 'Best Football Betting Strategies', url: 'https://www.gambling.com/strategy/betting/football', image: 'https://objects.kaxmedia.com/genesis/football-strategy.webp', author: 'Shannon Lane', authorImg: 'https://objects.kaxmedia.com/auto/o/208729/f283797b46.webp', excerpt: 'Proven football betting strategies including over/under, both teams to score and Asian handicaps.', readTime: '5 min read', timeAgo: '3 hours ago', region: 'UK' },
@@ -220,12 +232,36 @@
 
         const SiteFooter = { data() { return { footerColumns: [{title:'Popular Pages',links:[{label:'Online Casinos',href:'https://www.gambling.com/online-casinos'},{label:'Online Betting',href:'https://www.gambling.com/online-betting'},{label:'Online Slots',href:'https://www.gambling.com/online-casinos/slots'},{label:'Poker Sites',href:'https://www.gambling.com/poker'},{label:'Reviews',href:'https://www.gambling.com/reviews'},{label:'Free Games',href:'https://www.gambling.com/free-games'}]},{title:'Quick Links',links:[{label:'Casino Bonuses',href:'https://www.gambling.com/online-casinos/bonuses'},{label:'Online Blackjack',href:'https://www.gambling.com/online-casinos/blackjack'},{label:'Guides',href:'https://www.gambling.com/guides'},{label:'News',href:'https://www.gambling.com/news'}]},{title:'Support',links:[{label:'About Us',href:'https://www.gambling.com/about-us'},{label:'Authors',href:'https://www.gambling.com/authors'},{label:'Contact Us',href:'https://www.gambling.com/contact'},{label:'Responsible Gambling',href:'https://www.gambling.com/responsible-gambling'}]}], socialLinks:[{href:'https://x.com/gamblingcom',icon:'https://objects.kaxmedia.com/auto/o/163105/6d2bef2635.svg',alt:'X',label:'X'},{href:'https://www.youtube.com/@GamblingComGroup',icon:'https://objects.kaxmedia.com/auto/o/207713/dd9365d09a.svg',alt:'YouTube',label:'YouTube'},{href:'https://www.facebook.com/gamblingcom',icon:'https://objects.kaxmedia.com/auto/o/163103/abf741e7a2.svg',alt:'Facebook',label:'Facebook'}], badges:[{src:'https://objects.kaxmedia.com/auto/o/163122/a668aabbbd.svg',alt:'GAMB',height:40},{src:'https://objects.kaxmedia.com/auto/o/163119/d9f4d5eb90.svg',alt:'GamStop',height:48},{src:'https://objects.kaxmedia.com/auto/o/163118/df5e1b2ddd.svg',alt:'GamCare',height:51},{src:'https://objects.kaxmedia.com/auto/o/209377/e0932ff1ed.svg',alt:'GambleAware',height:21},{src:'https://objects.kaxmedia.com/auto/o/163106/6830429ae0.svg',alt:'18+',height:51}] }; }, template: `<footer class="bg-white text-black border-t border-[#d8d8d8]"><div class="py-[30px] border-b border-[#d8d8d8]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap"><div v-for="col in footerColumns" :key="col.title" class="w-1/3 px-4 max-lg:w-1/2 max-md:w-full max-md:pb-6"><h5 class="text-lg font-semibold text-black bg-[#f7f7f7] rounded-[10px] p-2.5 mb-4">{{ col.title }}</h5><ul class="flex flex-col gap-0"><li v-for="link in col.links" :key="link.href" class="pb-2.5"><a :href="link.href" class="text-[13px] font-normal text-[#0157FF] no-underline leading-5 hover:text-[#003EE6] hover:underline">{{ link.label }}</a></li></ul></div></div></div><div class="pt-[30px]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap items-start"><div class="flex flex-wrap gap-2.5 w-[28%] pr-4 max-lg:w-full max-lg:mb-6"><a v-for="social in socialLinks" :key="social.href" :href="social.href" class="inline-flex items-center justify-center w-8 h-8 no-underline transition-opacity duration-200 rounded overflow-hidden hover:opacity-70 hover:no-underline" :aria-label="social.label"><img :src="social.icon" :alt="social.alt" width="32" height="32" class="w-8 h-8 block"></a></div><div class="flex-1 text-base font-normal text-[#999] leading-6"><p class="mb-3">DISCLAIMER: Online Wagering is illegal in some Jurisdictions. It is your responsibility to check your local regulations before playing online.</p><p class="mb-3">&copy; 2011-2026 GDC Media Limited. All Rights Reserved.</p><p>Gambling can be addictive. Please play Responsibly.</p></div></div></div><div class="py-5 pb-[30px]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap justify-center items-center gap-6"><img v-for="badge in badges" :key="badge.src" :src="badge.src" :alt="badge.alt" class="w-auto" :style="{ height: badge.height + 'px' }"></div></div></footer>` };
 
+        /* ── Category Cards ── */
+        const CategoryCards = {
+            props: { categories: { type: Array, required: true }, activeCategory: { type: String, default: null } },
+            template: `
+            <div>
+                <div class="grid grid-cols-3 gap-4 max-[480px]:gap-2">
+                    <a v-for="card in categories" :key="card.id" :href="card.href || ('#' + card.id)"
+                       :class="['no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline', card.id === activeCategory ? 'ring-2 ring-[#0157FF] shadow-[0_4px_16px_rgba(1,87,255,0.15)]' : '']">
+                        <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" :style="{ backgroundImage: 'url(' + card.image + ')' }"></div>
+                        <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">
+                            {{ card.label }}
+                        </div>
+                    </a>
+                </div>
+                <div class="relative mt-6">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <svg class="w-5 h-5 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </div>
+                    <input type="text" placeholder="Search strategy guides..." class="w-full h-12 pl-12 pr-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-base text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" />
+                </div>
+            </div>`,
+        };
+
         const app = createApp({ data() { return { pageData }; } });
         app.component('site-header', SiteHeader);
         app.component('site-footer', SiteFooter);
         app.component('featured-card', FeaturedCard);
         app.component('article-card', ArticleCard);
         app.component('rewards-banner', RewardsBanner);
+        app.component('category-cards', CategoryCards);
         app.mount('#app');
     </script>
 </body>
