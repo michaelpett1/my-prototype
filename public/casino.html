@@ -564,13 +564,6 @@
             },
             template: `
             <div class="bg-[#F5F7FB] rounded-2xl overflow-hidden">
-                <!-- ACE Header Bar -->
-                <div class="flex items-center gap-3 px-5 py-3 bg-white border-b border-[#ECECEF]">
-                    <img src="https://www.gambling.com/assets/gambling-com-logo-gdc-ba8ed6c9c.svg" alt="Gambling.com" class="h-5" onerror="this.style.display='none'">
-                    <span class="text-[#0157FF] font-bold text-[15px] tracking-wide">ACE</span>
-                    <span class="text-[#999] text-[12px]">Powered by Gambling.com</span>
-                </div>
-
                 <!-- Welcome State -->
                 <div v-if="showWelcome" class="px-6 pt-10 pb-6 text-center">
                     <h3 class="text-[22px] font-bold text-black mb-1">{{ getGreeting() }}</h3>
@@ -595,20 +588,8 @@
                     <!-- Divider -->
                     <div class="max-w-[560px] mx-auto my-6 border-t border-[#E8E8ED]"></div>
 
-                    <!-- Powered by badge -->
-                    <div class="flex justify-center mb-6">
-                        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#D8DAE0] bg-white">
-                            <span class="text-[11px] font-semibold text-[#666] tracking-wider uppercase">Powered by</span>
-                            <img src="https://www.gambling.com/assets/gambling-com-logo-gdc-ba8ed6c9c.svg" alt="Gambling.com" class="h-4" onerror="this.textContent='Gambling.com'">
-                        </div>
-                    </div>
-
-                    <!-- Try asking -->
+                    <!-- Suggestions -->
                     <div class="max-w-[560px] mx-auto">
-                        <div class="flex items-center gap-1.5 mb-3 justify-center">
-                            <svg class="w-4 h-4 text-[#0157FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
-                            <span class="text-[13px] font-medium text-[#666]">Try asking</span>
-                        </div>
                         <div class="flex flex-col gap-2">
                             <button v-for="chip in getSuggestionChips()" :key="chip" @click="submitQuery(chip)" class="w-full text-left px-4 py-3 bg-white rounded-lg border border-[#E8E8ED] text-[14px] text-black hover:border-[#0157FF] hover:bg-[#F5F7FF] transition-all duration-200 cursor-pointer">{{ chip }}</button>
                         </div>
