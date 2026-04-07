@@ -400,12 +400,6 @@
                         </div>
                     </a>
                 </div>
-                <div class="relative mt-6">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </div>
-                    <input type="text" placeholder="Search strategy guides..." class="w-full h-12 pl-12 pr-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-base text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" />
-                </div>
             </div>`,
         };
 
@@ -508,18 +502,18 @@
                     query: '',
                     messages: [],
                     isTyping: false,
-                    isExpanded: false,
+                    isExpanded: true,
                 };
+            },
+            mounted() {
+                this.messages.push({
+                    role: 'assistant',
+                    text: 'Hi! I\'m your ' + this.category + ' strategy assistant. Ask me anything about our ' + this.category.toLowerCase() + ' strategy guides and I\'ll find the most relevant articles for you.',
+                });
             },
             methods: {
                 toggleExpand() {
                     this.isExpanded = !this.isExpanded;
-                    if (this.isExpanded && this.messages.length === 0) {
-                        this.messages.push({
-                            role: 'assistant',
-                            text: 'Hi! I\'m your ' + this.category + ' strategy assistant. Ask me anything about our ' + this.category.toLowerCase() + ' strategy guides and I\'ll find the most relevant articles for you.',
-                        });
-                    }
                 },
                 async submitQuery() {
                     const q = this.query.trim();

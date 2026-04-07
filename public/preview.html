@@ -86,6 +86,13 @@
                 </div>
             </section>
 
+            <!-- Strategy AI Assistant -->
+            <section class="pb-2">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <strategy-assistant :articles="pageData.allArticles" category="Gambling"></strategy-assistant>
+                </div>
+            </section>
+
             <!-- Featured Videos -->
             <section class="py-8 border-t border-[#ECECEF] scroll-mt-16">
                 <div class="max-w-[1140px] mx-auto px-6">
@@ -99,7 +106,7 @@
             <!-- Casino Strategy -->
             <section id="casino-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
-                    <article-carousel title="Casino Strategy" :articles="pageData.casinoStrategy" :first="true"></article-carousel>
+                    <article-carousel title="Casino Strategy" :articles="pageData.casinoStrategy" :first="true" see-all-url="casino.html"></article-carousel>
                 </div>
             </section>
 
@@ -113,14 +120,14 @@
             <!-- Betting Strategy -->
             <section id="betting-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
-                    <article-carousel title="Betting Strategy" :articles="pageData.bettingStrategy"></article-carousel>
+                    <article-carousel title="Betting Strategy" :articles="pageData.bettingStrategy" see-all-url="betting.html"></article-carousel>
                 </div>
             </section>
 
             <!-- Poker Strategy -->
             <section id="poker-strategy" class="scroll-mt-24">
                 <div class="max-w-[1140px] mx-auto px-6">
-                    <article-carousel title="Poker Strategy" :articles="pageData.pokerStrategy"></article-carousel>
+                    <article-carousel title="Poker Strategy" :articles="pageData.pokerStrategy" see-all-url="poker.html"></article-carousel>
                 </div>
             </section>
         </main>
@@ -197,7 +204,15 @@
                 { title: 'Poker Math: Calculating Pot Odds For Beginners', url: 'https://www.gambling.com/strategy/online-poker/poker-math-calculating-texas-hold-em-poker-pot-odds-for-beginners', image: 'https://objects.kaxmedia.com/genesis/math-calculation.jpg', author: 'Jonathan Raab', authorImg: 'https://objects.kaxmedia.com/auto/o/158539/cb52832ec9.png' },
                 { title: 'The Benefits of Effective Poker Bankroll Management', url: 'https://www.gambling.com/strategy/online-poker/the-benefits-of-effective-poker-bankroll-management', image: 'https://objects.kaxmedia.com/genesis/poker-bankroll-management.jpg', author: 'Jonathan Raab', authorImg: 'https://objects.kaxmedia.com/auto/o/158539/cb52832ec9.png' },
             ],
+            allArticles: [],
         };
+        pageData.allArticles = [...pageData.casinoStrategy, ...pageData.casinoGuides, ...pageData.bettingStrategy, ...pageData.pokerStrategy].map(a => ({
+            ...a,
+            excerpt: a.excerpt || a.title,
+            readTime: a.readTime || '5 min read',
+            timeAgo: a.timeAgo || '1 week ago',
+            region: a.region || 'UK',
+        }));
 
         /* ═══════════════════════════════════════════════
            VUE COMPONENTS
@@ -263,13 +278,6 @@
                             {{ card.label }}
                         </div>
                     </a>
-                </div>
-                <!-- Search bar -->
-                <div class="relative mt-6">
-                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-[#999]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                    </div>
-                    <input type="text" placeholder="Search strategy guides..." class="w-full h-12 pl-12 pr-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-base text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" />
                 </div>
             </div>`,
         };
@@ -370,6 +378,7 @@
                 title: { type: String, required: true },
                 articles: { type: Array, required: true },
                 first: { type: Boolean, default: false },
+                seeAllUrl: { type: String, default: '' },
             },
             data() {
                 return { showLeftArrow: false, showRightArrow: true };
@@ -394,6 +403,7 @@
             <div class="py-8 scroll-mt-24" :class="{ 'border-t border-[#ECECEF]': !first }">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-[23px] font-bold leading-8 text-black">{{ title }}</h2>
+                    <a v-if="seeAllUrl" :href="seeAllUrl" class="text-[14px] font-semibold text-[#0157FF] no-underline hover:underline whitespace-nowrap">See All</a>
                 </div>
                 <div class="relative">
                     <div ref="carousel" @scroll="checkArrows" class="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1 hide-scrollbar">
@@ -671,6 +681,125 @@
             </footer>`,
         };
 
+        /* ── Strategy AI Assistant ── */
+        const StrategyAssistant = {
+            props: {
+                articles: { type: Array, required: true },
+                category: { type: String, default: 'Strategy' },
+            },
+            data() {
+                return {
+                    query: '',
+                    messages: [],
+                    isTyping: false,
+                    isExpanded: true,
+                };
+            },
+            mounted() {
+                this.messages.push({
+                    role: 'assistant',
+                    text: 'Hi! I\'m your ' + this.category + ' strategy assistant. Ask me anything about our strategy guides and I\'ll find the most relevant articles for you.',
+                });
+            },
+            methods: {
+                toggleExpand() {
+                    this.isExpanded = !this.isExpanded;
+                },
+                async submitQuery() {
+                    const q = this.query.trim();
+                    if (!q || this.isTyping) return;
+                    this.messages.push({ role: 'user', text: q });
+                    this.query = '';
+                    this.isTyping = true;
+                    await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
+                    const matches = this.findRelevantArticles(q);
+                    let response;
+                    if (matches.length > 0) {
+                        const articleList = matches.slice(0, 3).map(a =>
+                            '<a href="' + a.url + '" class="text-[#0157FF] font-semibold hover:underline">' + a.title + '</a> — ' + a.excerpt
+                        ).join('<br><br>');
+                        response = 'Based on our strategy guides, here\'s what I found:<br><br>' + articleList;
+                    } else {
+                        response = 'I couldn\'t find a specific guide matching that query. Try asking about topics like ' + this.getSuggestions() + '.';
+                    }
+                    this.messages.push({ role: 'assistant', text: response });
+                    this.isTyping = false;
+                    this.$nextTick(() => {
+                        const container = this.$refs.chatMessages;
+                        if (container) container.scrollTop = container.scrollHeight;
+                    });
+                },
+                findRelevantArticles(query) {
+                    const q = query.toLowerCase();
+                    const words = q.split(/\s+/).filter(w => w.length > 2);
+                    const scored = this.articles.map(article => {
+                        const text = (article.title + ' ' + (article.excerpt || '')).toLowerCase();
+                        let score = 0;
+                        words.forEach(word => {
+                            if (text.includes(word)) score += 1;
+                            if (article.title.toLowerCase().includes(word)) score += 2;
+                        });
+                        if (text.includes(q)) score += 5;
+                        return { ...article, score };
+                    });
+                    return scored.filter(a => a.score > 0).sort((a, b) => b.score - a.score);
+                },
+                getSuggestions() {
+                    const titles = this.articles.slice(0, 4).map(a => {
+                        const short = a.title.split(':')[0].trim();
+                        return '<strong>' + short + '</strong>';
+                    });
+                    return titles.join(', ');
+                },
+            },
+            template: `
+            <div class="border border-[#ECECEF] rounded-xl overflow-hidden bg-white transition-all duration-300" :class="isExpanded ? 'shadow-[0_4px_24px_rgba(1,87,255,0.1)]' : ''">
+                <button @click="toggleExpand" class="w-full flex items-center gap-3 px-5 py-3.5 bg-white hover:bg-[#F9F9FB] transition-colors duration-200 cursor-pointer border-none text-left">
+                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0">
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-[15px] font-semibold text-black leading-tight">Ask our {{ category }} Strategy AI</div>
+                        <div class="text-[13px] text-[#999] leading-tight mt-0.5">Get instant answers from our expert strategy guides</div>
+                    </div>
+                    <svg class="w-5 h-5 text-[#999] transition-transform duration-200 shrink-0" :class="isExpanded ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div v-if="isExpanded" class="border-t border-[#ECECEF]">
+                    <div ref="chatMessages" class="px-5 py-4 max-h-[320px] overflow-y-auto hide-scrollbar flex flex-col gap-3">
+                        <div v-for="(msg, i) in messages" :key="i" class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
+                            <div v-if="msg.role === 'assistant'" class="flex gap-2.5 max-w-[85%]">
+                                <div class="w-7 h-7 rounded-md bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0 mt-0.5">
+                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                </div>
+                                <div class="bg-[#F4F6FA] rounded-xl rounded-tl-sm px-4 py-3 text-[14px] leading-[22px] text-black" v-html="msg.text"></div>
+                            </div>
+                            <div v-else class="bg-[#0157FF] text-white rounded-xl rounded-tr-sm px-4 py-3 text-[14px] leading-[22px] max-w-[75%]">{{ msg.text }}</div>
+                        </div>
+                        <div v-if="isTyping" class="flex gap-2.5">
+                            <div class="w-7 h-7 rounded-md bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0 mt-0.5">
+                                <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </div>
+                            <div class="bg-[#F4F6FA] rounded-xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
+                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-5 pb-4">
+                        <form @submit.prevent="submitQuery" class="flex gap-2">
+                            <input v-model="query" type="text" :placeholder="'Ask about ' + category.toLowerCase() + ' strategy...'" class="flex-1 h-11 px-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-[14px] text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" :disabled="isTyping" />
+                            <button type="submit" :disabled="!query.trim() || isTyping" class="h-11 px-5 rounded-lg bg-[#0157FF] text-white text-[14px] font-semibold border-none cursor-pointer transition-all duration-200 hover:bg-[#003EE6] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                                Ask
+                            </button>
+                        </form>
+                        <p class="text-[11px] text-[#999] mt-2 text-center">Answers sourced exclusively from our {{ category.toLowerCase() }} strategy guides</p>
+                    </div>
+                </div>
+            </div>`,
+        };
+
         /* ═══════════════════════════════════════════════
            CREATE AND MOUNT VUE APP
            ═══════════════════════════════════════════════ */
@@ -685,6 +814,7 @@
         app.component('category-cards', CategoryCards);
         app.component('featured-video-player', FeaturedVideoPlayer);
         app.component('article-carousel', ArticleCarousel);
+        app.component('strategy-assistant', StrategyAssistant);
         app.component('rewards-banner', RewardsBanner);
 
         app.mount('#app');
