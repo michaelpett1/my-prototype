@@ -380,22 +380,14 @@
                     query: '',
                     messages: [],
                     isTyping: false,
-                    isExpanded: true,
+                    showWelcome: true,
                 };
             },
-            mounted() {
-                this.messages.push({
-                    role: 'assistant',
-                    text: 'Hi! I\'m your ' + this.category + ' strategy assistant. Ask me anything about our ' + this.category.toLowerCase() + ' strategy guides and I\'ll find the most relevant articles for you.',
-                });
-            },
             methods: {
-                toggleExpand() {
-                    this.isExpanded = !this.isExpanded;
-                },
-                async submitQuery() {
-                    const q = this.query.trim();
+                async submitQuery(text) {
+                    const q = (text || this.query).trim();
                     if (!q || this.isTyping) return;
+                    this.showWelcome = false;
                     this.messages.push({ role: 'user', text: q });
                     this.query = '';
                     this.isTyping = true;
@@ -403,14 +395,17 @@
                     const matches = this.findRelevantArticles(q);
                     let response;
                     if (matches.length > 0) {
-                        const articleList = matches.slice(0, 3).map(a =>
-                            '<a href="' + a.url + '" class="text-[#0157FF] font-semibold hover:underline">' + a.title + '</a> — ' + a.excerpt
-                        ).join('<br><br>');
-                        response = 'Based on our ' + this.category.toLowerCase() + ' strategy guides, here\'s what I found:<br><br>' + articleList;
+                        response = {
+                            text: 'Here are the most relevant ' + this.category.toLowerCase() + ' strategy guides I found for you:',
+                            articles: matches.slice(0, 3),
+                        };
                     } else {
-                        response = 'I couldn\'t find a specific guide matching that query in our ' + this.category.toLowerCase() + ' strategy collection. Try asking about topics like ' + this.getSuggestions() + '.';
+                        response = {
+                            text: 'I couldn\'t find a specific guide matching that query in our ' + this.category.toLowerCase() + ' strategy collection. Try asking about different topics.',
+                            articles: [],
+                        };
                     }
-                    this.messages.push({ role: 'assistant', text: response });
+                    this.messages.push({ role: 'assistant', ...response });
                     this.isTyping = false;
                     this.$nextTick(() => {
                         const container = this.$refs.chatMessages;
@@ -432,63 +427,127 @@
                     });
                     return scored.filter(a => a.score > 0).sort((a, b) => b.score - a.score);
                 },
-                getSuggestions() {
-                    const titles = this.articles.slice(0, 4).map(a => {
-                        const short = a.title.split(':')[0].trim();
-                        return '<strong>' + short + '</strong>';
+                getGreeting() {
+                    const h = new Date().getHours();
+                    if (h < 12) return 'Good morning';
+                    if (h < 18) return 'Good afternoon';
+                    return 'Good evening';
+                },
+                getSuggestionChips() {
+                    return this.articles.slice(0, 3).map(a => {
+                        const short = a.title.split(':')[0].split('–')[0].trim();
+                        return short.length > 35 ? short.substring(0, 32) + '...' : short;
                     });
-                    return titles.join(', ');
                 },
             },
             template: `
-            <div class="border border-[#ECECEF] rounded-xl overflow-hidden bg-white transition-all duration-300" :class="isExpanded ? 'shadow-[0_4px_24px_rgba(1,87,255,0.1)]' : ''">
-                <!-- Collapsed bar -->
-                <button @click="toggleExpand" class="w-full flex items-center gap-3 px-5 py-3.5 bg-white hover:bg-[#F9F9FB] transition-colors duration-200 cursor-pointer border-none text-left">
-                    <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    </div>
-                    <div class="flex-1">
-                        <div class="text-[15px] font-semibold text-black leading-tight">Ask our {{ category }} Strategy AI</div>
-                        <div class="text-[13px] text-[#999] leading-tight mt-0.5">Get instant answers from our expert strategy guides</div>
-                    </div>
-                    <svg class="w-5 h-5 text-[#999] transition-transform duration-200 shrink-0" :class="isExpanded ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
+            <div class="bg-[#F5F7FB] rounded-2xl overflow-hidden">
+                <!-- ACE Header Bar -->
+                <div class="flex items-center gap-3 px-5 py-3 bg-white border-b border-[#ECECEF]">
+                    <img src="https://www.gambling.com/assets/gambling-com-logo-gdc-ba8ed6c9c.svg" alt="Gambling.com" class="h-5" onerror="this.style.display='none'">
+                    <span class="text-[#0157FF] font-bold text-[15px] tracking-wide">ACE</span>
+                    <span class="text-[#999] text-[12px]">Powered by Gambling.com</span>
+                </div>
 
-                <!-- Expanded chat -->
-                <div v-if="isExpanded" class="border-t border-[#ECECEF]">
-                    <!-- Messages -->
-                    <div ref="chatMessages" class="px-5 py-4 max-h-[320px] overflow-y-auto hide-scrollbar flex flex-col gap-3">
-                        <div v-for="(msg, i) in messages" :key="i" class="flex" :class="msg.role === 'user' ? 'justify-end' : 'justify-start'">
-                            <div v-if="msg.role === 'assistant'" class="flex gap-2.5 max-w-[85%]">
-                                <div class="w-7 h-7 rounded-md bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0 mt-0.5">
-                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                                </div>
-                                <div class="bg-[#F4F6FA] rounded-xl rounded-tl-sm px-4 py-3 text-[14px] leading-[22px] text-black" v-html="msg.text"></div>
-                            </div>
-                            <div v-else class="bg-[#0157FF] text-white rounded-xl rounded-tr-sm px-4 py-3 text-[14px] leading-[22px] max-w-[75%]">{{ msg.text }}</div>
-                        </div>
-                        <div v-if="isTyping" class="flex gap-2.5">
-                            <div class="w-7 h-7 rounded-md bg-gradient-to-br from-[#0157FF] to-[#003EE6] flex items-center justify-center shrink-0 mt-0.5">
-                                <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            </div>
-                            <div class="bg-[#F4F6FA] rounded-xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
-                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
-                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
-                                <span class="w-2 h-2 bg-[#999] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
-                            </div>
-                        </div>
-                    </div>
+                <!-- Welcome State -->
+                <div v-if="showWelcome" class="px-6 pt-10 pb-6 text-center">
+                    <h3 class="text-[22px] font-bold text-black mb-1">{{ getGreeting() }}</h3>
+                    <p class="text-[15px] text-[#666] mb-8">What can I help you understand today?</p>
 
                     <!-- Input -->
-                    <div class="px-5 pb-4">
-                        <form @submit.prevent="submitQuery" class="flex gap-2">
-                            <input v-model="query" type="text" :placeholder="'Ask about ' + category.toLowerCase() + ' strategy...'" class="flex-1 h-11 px-4 rounded-lg border border-[#ECECEF] bg-[#F9F9FB] text-[14px] text-black placeholder-[#999] outline-none transition-colors duration-200 focus:border-[#0157FF] focus:bg-white focus:shadow-[0_0_0_3px_rgba(1,87,255,0.1)]" :disabled="isTyping" />
-                            <button type="submit" :disabled="!query.trim() || isTyping" class="h-11 px-5 rounded-lg bg-[#0157FF] text-white text-[14px] font-semibold border-none cursor-pointer transition-all duration-200 hover:bg-[#003EE6] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 shrink-0">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                                Ask
-                            </button>
+                    <div class="max-w-[560px] mx-auto">
+                        <form @submit.prevent="submitQuery()" class="relative">
+                            <input v-model="query" type="text" placeholder="What are you looking for today?" class="w-full h-[52px] pl-5 pr-24 rounded-xl border border-[#D8DAE0] bg-white text-[15px] text-black placeholder-[#999] outline-none transition-all duration-200 focus:border-[#0157FF] focus:shadow-[0_0_0_3px_rgba(1,87,255,0.08)]" />
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-[#999] hover:text-[#666] transition-colors border-none bg-transparent cursor-default">
+                                    <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                                </button>
+                                <button type="submit" :disabled="!query.trim()" class="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer transition-all duration-200" :class="query.trim() ? 'bg-[#0157FF] text-white hover:bg-[#003EE6]' : 'bg-[#E8E8ED] text-[#999]'">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                                </button>
+                            </div>
                         </form>
-                        <p class="text-[11px] text-[#999] mt-2 text-center">Answers sourced exclusively from our {{ category.toLowerCase() }} strategy guides</p>
+                        <p class="text-[12px] text-[#999] mt-2">Press Enter to send, Shift+Enter for new line</p>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="max-w-[560px] mx-auto my-6 border-t border-[#E8E8ED]"></div>
+
+                    <!-- Powered by badge -->
+                    <div class="flex justify-center mb-6">
+                        <div class="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#D8DAE0] bg-white">
+                            <span class="text-[11px] font-semibold text-[#666] tracking-wider uppercase">Powered by</span>
+                            <img src="https://www.gambling.com/assets/gambling-com-logo-gdc-ba8ed6c9c.svg" alt="Gambling.com" class="h-4" onerror="this.textContent='Gambling.com'">
+                        </div>
+                    </div>
+
+                    <!-- Try asking -->
+                    <div class="max-w-[560px] mx-auto">
+                        <div class="flex items-center gap-1.5 mb-3 justify-center">
+                            <svg class="w-4 h-4 text-[#0157FF]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                            <span class="text-[13px] font-medium text-[#666]">Try asking</span>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <button v-for="chip in getSuggestionChips()" :key="chip" @click="submitQuery(chip)" class="w-full text-left px-4 py-3 bg-white rounded-lg border border-[#E8E8ED] text-[14px] text-black hover:border-[#0157FF] hover:bg-[#F5F7FF] transition-all duration-200 cursor-pointer">{{ chip }}</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat State -->
+                <div v-else class="flex flex-col" style="height: 480px;">
+                    <!-- Messages -->
+                    <div ref="chatMessages" class="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-4">
+                        <div v-for="(msg, i) in messages" :key="i">
+                            <!-- User message -->
+                            <div v-if="msg.role === 'user'" class="flex justify-end items-end gap-2 mb-1">
+                                <div class="bg-[#1B2838] text-white rounded-full px-5 py-2.5 text-[14px] max-w-[75%]">{{ msg.text }}</div>
+                                <div class="w-7 h-7 rounded-full bg-[#0157FF] flex items-center justify-center shrink-0">
+                                    <svg class="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                </div>
+                            </div>
+                            <!-- Assistant message -->
+                            <div v-else>
+                                <p class="text-[14px] text-[#333] leading-relaxed mb-3">{{ msg.text }}</p>
+                                <div v-if="msg.articles && msg.articles.length" class="flex flex-col gap-3">
+                                    <a v-for="article in msg.articles" :key="article.title" :href="article.url || '#'" class="block bg-white rounded-xl border border-[#E8E8ED] p-4 hover:border-[#0157FF] hover:shadow-sm transition-all duration-200 no-underline">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1">
+                                                <h4 class="text-[14px] font-semibold text-black mb-1 leading-snug">{{ article.title }}</h4>
+                                                <p class="text-[13px] text-[#666] leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
+                                            </div>
+                                            <span class="text-[11px] font-medium text-white bg-[#22C55E] px-2 py-0.5 rounded-full shrink-0 mt-0.5">Guide</span>
+                                        </div>
+                                        <div class="flex items-center gap-3 mt-2 text-[12px] text-[#999]">
+                                            <span>{{ article.author }}</span>
+                                            <span>{{ article.readTime }}</span>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Typing indicator -->
+                        <div v-if="isTyping" class="text-[14px] text-[#999]">
+                            <span class="inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 bg-[#999] rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                                <span class="w-1.5 h-1.5 bg-[#999] rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                                <span class="w-1.5 h-1.5 bg-[#999] rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bottom input -->
+                    <div class="px-5 py-3 border-t border-[#E8E8ED] bg-white">
+                        <form @submit.prevent="submitQuery()" class="relative">
+                            <input v-model="query" type="text" placeholder="Ask a follow-up question..." class="w-full h-[48px] pl-5 pr-24 rounded-xl border border-[#D8DAE0] bg-white text-[14px] text-black placeholder-[#999] outline-none transition-all duration-200 focus:border-[#0157FF] focus:shadow-[0_0_0_3px_rgba(1,87,255,0.08)]" :disabled="isTyping" />
+                            <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                                <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-[#999] hover:text-[#666] transition-colors border-none bg-transparent cursor-default">
+                                    <svg class="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                                </button>
+                                <button type="submit" :disabled="!query.trim() || isTyping" class="w-8 h-8 rounded-full flex items-center justify-center border-none cursor-pointer transition-all duration-200" :class="query.trim() ? 'bg-[#0157FF] text-white hover:bg-[#003EE6]' : 'bg-[#E8E8ED] text-[#999]'">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>`,
