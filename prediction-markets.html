@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How Prediction Markets Work | Gambling.com</title>
+    <meta name="description" content="Learn how prediction markets work — from market creation to resolution. Understand share pricing, implied probability, and how to trade on real-world outcomes.">
+    <meta property="og:title" content="How Prediction Markets Work | Gambling.com">
+    <meta property="og:description" content="Understand the three-stage lifecycle of every prediction market.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://www.gambling.com/assets/og-prediction-markets.jpg">
+    <link rel="canonical" href="https://www.gambling.com/guides/prediction-markets">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <style type="text/tailwindcss">
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 400; line-height: 26px; color: #000; background: #fff; }
+        a { color: #0157FF; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        a:hover { color: #003EE6; text-decoration: underline; }
+        a:focus-visible { outline: 2px solid #0157FF; outline-offset: 2px; }
+        img { display: block; max-width: 100%; }
+        ol, ul { list-style: none; }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { 'gdc-blue': '#0157FF', 'gdc-blue-hover': '#003EE6', 'gdc-red': '#FF0000', 'gdc-red-hover': '#E50000', 'gdc-grey': '#ECECEF', 'gdc-black': '#000000', 'gdc-white': '#FFFFFF', 'gdc-deep-grey': '#999999', 'gdc-deep-blue-navy': '#050A30', 'gdc-light-blue': '#E6F1FC', 'gdc-gold': '#E1A730', 'gdc-gold-hover': '#B4841E', 'gdc-green': '#39B54A', 'gdc-green-hover': '#2D9238' }, fontFamily: { gdc: ['Red Hat Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'] } } },
+        };
+    </script>
+</head>
+<body>
+    <div id="app">
+        <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[200] focus:bg-gdc-blue focus:text-white focus:px-4 focus:py-2 focus:rounded-md focus:text-sm focus:font-semibold focus:no-underline">Skip to content</a>
+        <site-header></site-header>
+        <main id="main-content">
+            <!-- Breadcrumb -->
+            <div class="border-b border-gdc-grey">
+                <div class="max-w-[1200px] mx-auto px-6 py-3">
+                    <nav class="flex items-center gap-2 text-sm text-gdc-deep-grey" aria-label="Breadcrumb">
+                        <a href="https://www.gambling.com" class="text-gdc-deep-grey font-normal hover:text-gdc-blue">Gambling.com</a>
+                        <span aria-hidden="true">&#187;</span>
+                        <a href="preview.html" class="text-gdc-deep-grey font-normal hover:text-gdc-blue">Strategy</a>
+                        <span aria-hidden="true">&#187;</span>
+                        <span class="text-black font-semibold">Prediction Markets</span>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Page Header -->
+            <section class="py-8">
+                <div class="max-w-[1200px] mx-auto px-6 text-center">
+                    <h1 class="text-[29px] max-sm:text-[23px] max-sm:leading-[32px] font-semibold leading-[40px] mb-3">How Prediction Markets Work</h1>
+                    <p class="text-base text-gdc-deep-grey max-w-[520px] mx-auto">Every market follows the same three-stage lifecycle</p>
+
+                    <!-- Stage pills -->
+                    <ol class="flex items-center justify-center gap-3 max-sm:gap-2 mt-6 flex-wrap list-none" role="list">
+                        <li class="flex items-center gap-3 max-sm:gap-2">
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-gdc-blue text-white text-sm font-semibold">Creation</span>
+                            <svg class="w-4 h-4 text-gdc-deep-grey shrink-0 max-sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+                        </li>
+                        <li class="flex items-center gap-3 max-sm:gap-2">
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-gdc-blue text-white text-sm font-semibold">Movement</span>
+                            <svg class="w-4 h-4 text-gdc-deep-grey shrink-0 max-sm:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg>
+                        </li>
+                        <li>
+                            <span class="inline-flex items-center px-4 py-1.5 rounded-full bg-gdc-blue text-white text-sm font-semibold">Resolution</span>
+                        </li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Three-Stage Cards -->
+            <section class="pb-12">
+                <div class="max-w-[1200px] mx-auto px-6">
+                    <div class="grid grid-cols-3 gap-6 max-lg:grid-cols-2 max-sm:grid-cols-1">
+
+                        <!-- Stage 1: Market Creation -->
+                        <div class="bg-white rounded-lg border border-gdc-grey p-6 flex flex-col">
+                            <span class="text-xs font-semibold tracking-wider text-gdc-blue uppercase">Stage 1</span>
+                            <span class="text-[48px] font-normal leading-none text-gdc-black mt-2 tracking-tight" aria-hidden="true">01</span>
+                            <div class="h-[2px] w-full bg-gdc-blue rounded-full mt-3 mb-4"></div>
+                            <h3 class="text-[20px] font-semibold leading-6 text-gdc-black mb-3">Market Creation</h3>
+                            <p class="text-base text-gdc-deep-grey leading-relaxed mb-5">A question is posed with a specific, verifiable outcome and a deadline. The two possible outcomes — Yes and No — each gets its own share.</p>
+                            <div class="mt-auto border-l-[3px] border-gdc-blue bg-gdc-light-blue rounded-r-md px-4 py-3">
+                                <p class="text-sm text-gdc-black leading-relaxed">"Will the Federal Reserve cut interest rates before June 30?"</p>
+                            </div>
+                        </div>
+
+                        <!-- Stage 2: Market Movement -->
+                        <div class="bg-white rounded-lg border border-gdc-grey p-6 flex flex-col">
+                            <span class="text-xs font-semibold tracking-wider text-gdc-blue uppercase">Stage 2</span>
+                            <span class="text-[48px] font-normal leading-none text-gdc-black mt-2 tracking-tight" aria-hidden="true">02</span>
+                            <div class="h-[2px] w-full bg-gdc-blue rounded-full mt-3 mb-4"></div>
+                            <h3 class="text-[20px] font-semibold leading-6 text-gdc-black mb-3">Market Movement</h3>
+                            <p class="text-base text-gdc-deep-grey leading-relaxed mb-5">Each share is priced between $0 and $1, reflecting the market's implied probability. Buy shares in whatever outcome you believe will occur. Prices fluctuate, and you can sell your position at any time before the deadline.</p>
+                            <div class="mt-auto border-l-[3px] border-gdc-blue bg-gdc-light-blue rounded-r-md px-4 py-3">
+                                <p class="text-sm text-gdc-black leading-relaxed">A "Yes" share trading at $0.65 means the market believes there's a ~65% chance the outcome happens.</p>
+                            </div>
+                        </div>
+
+                        <!-- Stage 3: Market Resolution -->
+                        <div class="bg-white rounded-lg border border-gdc-grey p-6 flex flex-col">
+                            <span class="text-xs font-semibold tracking-wider text-gdc-blue uppercase">Stage 3</span>
+                            <span class="text-[48px] font-normal leading-none text-gdc-black mt-2 tracking-tight" aria-hidden="true">03</span>
+                            <div class="h-[2px] w-full bg-gdc-blue rounded-full mt-3 mb-4"></div>
+                            <h3 class="text-[20px] font-semibold leading-6 text-gdc-black mb-3">Market Resolution</h3>
+                            <p class="text-base text-gdc-deep-grey leading-relaxed mb-5">The market settles when the event deadline passes. Transactions are processed automatically.</p>
+                            <div class="mt-auto border-l-[3px] border-gdc-blue bg-gdc-light-blue rounded-r-md px-4 py-3">
+                                <p class="text-sm text-gdc-black leading-relaxed">Winning shares pay out $1 each. Losing shares pay out $0.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Explore More Strategies -->
+            <section class="py-12 border-t border-gdc-grey">
+                <div class="max-w-[1200px] mx-auto px-6">
+                    <h2 class="text-[26px] font-semibold leading-[32px] mb-6">Explore More Strategies</h2>
+                    <div class="grid grid-cols-3 gap-4 max-[480px]:gap-2">
+                        <a href="preview.html" class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
+                            <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" style="background-image: url('https://objects.kaxmedia.com/auto/o/106986/df49168be0.png')"></div>
+                            <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">Strategy Home</div>
+                        </a>
+                        <a href="betting.html" class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
+                            <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" style="background-image: url('https://objects.kaxmedia.com/genesis/betting-odds-strategy.webp')"></div>
+                            <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">Betting Strategy</div>
+                        </a>
+                        <a href="casino.html" class="no-underline text-inherit rounded-lg overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(0,0,0,0.1)] hover:no-underline">
+                            <div class="w-full h-[120px] max-md:h-[80px] max-[480px]:h-[70px] rounded-lg bg-cover bg-center" style="background-image: url('https://objects.kaxmedia.com/auto/o/2038/46e216d6f6.jpeg')"></div>
+                            <div class="flex items-center justify-center gap-1 text-sm max-[480px]:text-xs font-semibold text-black py-2 max-[480px]:py-1 text-center">Casino Strategy</div>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <rewards-banner></rewards-banner>
+        <site-footer></site-footer>
+    </div>
+
+    <script>
+        const { createApp } = Vue;
+
+        /* ── SiteHeader ── */
+        const SiteHeader = {
+            template: `
+            <header class="bg-white shadow-[0px_1px_5px_-2px_#4e4e4e] sticky top-0 z-[100]">
+                <div class="max-w-[1200px] mx-auto px-6 flex items-center justify-between h-14">
+                    <a href="https://www.gambling.com" class="flex items-center shrink-0 no-underline" aria-label="Gambling.com home"><img src="https://objects.kaxmedia.com/auto/o/105557/8fbf0fa9e7.svg" alt="gambling.com" width="124" height="42" class="h-[42px] w-auto"></a>
+                    <nav class="hidden lg:flex items-center gap-0" aria-label="Primary navigation">
+                        <a v-for="item in navItems" :key="item.href" :href="item.href" class="text-base font-medium text-black no-underline pl-4 whitespace-nowrap leading-[56px] h-14 flex items-center transition-colors duration-200 hover:text-[#0157FF] hover:no-underline">{{ item.label }}</a>
+                    </nav>
+                    <div class="flex items-center gap-3">
+                        <a href="https://www.gambling.com/sign-up" class="inline-flex items-center gap-1.5 text-base font-medium text-black no-underline whitespace-nowrap cursor-pointer hover:underline" aria-label="Sign up"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="shrink-0"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.2282 20.7349C22.5503 18.5466 24 15.4426 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 15.4426 1.44967 18.5466 3.77185 20.7349C5.92015 22.7593 8.81518 24 12 24C15.1848 24 18.0799 22.7593 20.2282 20.7349ZM4.794 19.1536C6.48568 17.0434 9.08505 15.6923 12 15.6923C14.9149 15.6923 17.5143 17.0434 19.206 19.1536C17.3665 21.0065 14.8172 22.1538 12 22.1538C9.18277 22.1538 6.63351 21.0065 4.794 19.1536ZM16.6154 8.30769C16.6154 10.8567 14.549 12.9231 12 12.9231C9.45099 12.9231 7.38462 10.8567 7.38462 8.30769C7.38462 5.75869 9.45099 3.69231 12 3.69231C14.549 3.69231 16.6154 5.75869 16.6154 8.30769Z" fill="black"/></svg>Sign&nbsp;Up</a>
+                        <div class="inline-flex items-center cursor-pointer no-underline hover:opacity-70" aria-label="Select region" role="button" tabindex="0"><div class="w-[30px] h-[54px] shrink-0 bg-center bg-no-repeat" style="background-image: url('https://objects.kaxmedia.com/auto/o/263246/a8d6548e5d.svg'); background-size: 26px;"></div><div class="flex items-center gap-2 text-base font-medium text-black whitespace-nowrap">GX<svg xmlns="http://www.w3.org/2000/svg" width="17" height="10" viewBox="0 0 17 10" fill="none" class="shrink-0"><path d="M16 1L8.5 8.5L0.999999 1" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+                        <button class="bg-transparent border-none cursor-pointer p-0 text-black flex items-center" aria-label="Search"><img src="https://objects.kaxmedia.com/auto/o/139752/7900ca8f22.svg" alt="" width="20" height="25" class="w-5 h-[25px]"></button>
+                    </div>
+                </div>
+            </header>`,
+            data() { return { navItems: [{label:'Reviews',href:'https://www.gambling.com/reviews'},{label:'Casino',href:'https://www.gambling.com/online-casinos'},{label:'Betting',href:'https://www.gambling.com/online-betting'},{label:'Free Games',href:'https://www.gambling.com/free-games'},{label:'Guides',href:'https://www.gambling.com/guides'},{label:'News',href:'https://www.gambling.com/news'},{label:'Inside Gambling.com',href:'https://www.gambling.com/inside'}]}; },
+        };
+
+        const RewardsBanner = { data() { return { isLoggedIn: false }; }, template: `<section class="py-6"><div class="max-w-[1200px] mx-auto px-6"><div v-if="!isLoggedIn" class="relative rounded-[20px] overflow-hidden h-[272px] max-md:h-[320px]"><img src="assets/rewards-bg-dark.png" alt="" class="absolute inset-0 w-full h-full object-cover"><img src="assets/cosmo-mascot.png" alt="" class="absolute right-[15%] max-md:right-[2%] top-[-20px] h-[304px] max-md:h-[240px] w-auto pointer-events-none"><img src="assets/chip-large.png" alt="" class="absolute right-[5%] max-md:right-[-2%] top-[60px] max-md:top-[40px] w-[100px] max-md:w-[70px] h-auto pointer-events-none"><img src="assets/chip-small.png" alt="" class="absolute left-[38%] max-md:left-[60%] top-[-10px] w-[70px] max-md:w-[50px] h-auto pointer-events-none" style="transform: rotate(-43deg);"><div class="relative z-10 flex flex-col items-start justify-center h-full pl-6 max-w-[550px] max-md:max-w-[220px] max-md:pt-4"><div class="flex items-center gap-2 mb-3"><img src="assets/gdc-logo-white.png" alt="gambling.com" class="h-[60px] max-md:h-[44px] w-auto"><span class="text-white text-[37px] max-md:text-[25px] font-normal" style="text-shadow: 0px 4px 24px black;">Rewards</span></div><p class="text-white text-[22px] max-md:text-[18px] font-semibold leading-8 max-md:leading-6 mb-4" style="text-shadow: 0px 4px 24px black;">Register with us, earn chips, get FREE stuff.</p><a href="https://www.gambling.com/rewards" class="bg-white border border-black text-black text-base font-semibold capitalize text-center py-3 px-16 max-md:px-10 rounded no-underline hover:no-underline hover:bg-gray-100 transition-colors">Register Now</a><p class="text-white text-sm mt-2" style="text-shadow: 0px 4px 24px black;">Already registered. <a href="https://www.gambling.com/login" class="text-white font-bold underline hover:text-white">Log in</a></p></div></div></div></section>` };
+
+        const SiteFooter = { data() { return { footerColumns: [{title:'Popular Pages',links:[{label:'Online Casinos',href:'https://www.gambling.com/online-casinos'},{label:'Online Betting',href:'https://www.gambling.com/online-betting'},{label:'Online Slots',href:'https://www.gambling.com/online-casinos/slots'},{label:'Poker Sites',href:'https://www.gambling.com/poker'},{label:'Reviews',href:'https://www.gambling.com/reviews'},{label:'Free Games',href:'https://www.gambling.com/free-games'}]},{title:'Quick Links',links:[{label:'Casino Bonuses',href:'https://www.gambling.com/online-casinos/bonuses'},{label:'Online Blackjack',href:'https://www.gambling.com/online-casinos/blackjack'},{label:'Guides',href:'https://www.gambling.com/guides'},{label:'News',href:'https://www.gambling.com/news'}]},{title:'Support',links:[{label:'About Us',href:'https://www.gambling.com/about-us'},{label:'Authors',href:'https://www.gambling.com/authors'},{label:'Contact Us',href:'https://www.gambling.com/contact'},{label:'Responsible Gambling',href:'https://www.gambling.com/responsible-gambling'}]}], socialLinks:[{href:'https://x.com/gamblingcom',icon:'https://objects.kaxmedia.com/auto/o/163105/6d2bef2635.svg',alt:'X',label:'X'},{href:'https://www.youtube.com/@GamblingComGroup',icon:'https://objects.kaxmedia.com/auto/o/207713/dd9365d09a.svg',alt:'YouTube',label:'YouTube'},{href:'https://www.facebook.com/gamblingcom',icon:'https://objects.kaxmedia.com/auto/o/163103/abf741e7a2.svg',alt:'Facebook',label:'Facebook'}], badges:[{src:'https://objects.kaxmedia.com/auto/o/163122/a668aabbbd.svg',alt:'GAMB',height:40},{src:'https://objects.kaxmedia.com/auto/o/163119/d9f4d5eb90.svg',alt:'GamStop',height:48},{src:'https://objects.kaxmedia.com/auto/o/163118/df5e1b2ddd.svg',alt:'GamCare',height:51},{src:'https://objects.kaxmedia.com/auto/o/209377/e0932ff1ed.svg',alt:'GambleAware',height:21},{src:'https://objects.kaxmedia.com/auto/o/163106/6830429ae0.svg',alt:'18+',height:51}] }; }, template: `<footer class="bg-white text-black border-t border-[#d8d8d8]"><div class="py-[30px] border-b border-[#d8d8d8]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap"><div v-for="col in footerColumns" :key="col.title" class="w-1/3 px-4 max-lg:w-1/2 max-md:w-full max-md:pb-6"><h5 class="text-lg font-semibold text-black bg-[#f7f7f7] rounded-[10px] p-2.5 mb-4">{{ col.title }}</h5><ul class="flex flex-col gap-0"><li v-for="link in col.links" :key="link.href" class="pb-2.5"><a :href="link.href" class="text-[13px] font-normal text-[#0157FF] no-underline leading-5 hover:text-[#003EE6] hover:underline">{{ link.label }}</a></li></ul></div></div></div><div class="pt-[30px]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap items-start"><div class="flex flex-wrap gap-2.5 w-[28%] pr-4 max-lg:w-full max-lg:mb-6"><a v-for="social in socialLinks" :key="social.href" :href="social.href" class="inline-flex items-center justify-center w-8 h-8 no-underline transition-opacity duration-200 rounded overflow-hidden hover:opacity-70 hover:no-underline" :aria-label="social.label"><img :src="social.icon" :alt="social.alt" width="32" height="32" class="w-8 h-8 block"></a></div><div class="flex-1 text-base font-normal text-[#999] leading-6"><p class="mb-3">DISCLAIMER: Online Wagering is illegal in some Jurisdictions. It is your responsibility to check your local regulations before playing online.</p><p class="mb-3">&copy; 2011-2026 GDC Media Limited. All Rights Reserved.</p><p>Gambling can be addictive. Please play Responsibly.</p></div></div></div><div class="py-5 pb-[30px]"><div class="max-w-[1200px] mx-auto px-6 flex flex-wrap justify-center items-center gap-6"><img v-for="badge in badges" :key="badge.src" :src="badge.src" :alt="badge.alt" class="w-auto" :style="{ height: badge.height + 'px' }"></div></div></footer>` };
+
+        const app = createApp({});
+        app.component('site-header', SiteHeader);
+        app.component('site-footer', SiteFooter);
+        app.component('rewards-banner', RewardsBanner);
+        app.mount('#app');
+    </script>
+</body>
+</html>
