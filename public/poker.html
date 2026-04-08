@@ -60,17 +60,17 @@
                 </div>
             </section>
 
-            <!-- Category Cards + Search -->
-            <section class="pb-6">
-                <div class="max-w-[1200px] mx-auto px-6">
-                    <category-cards :categories="pageData.categories" active-category="poker-strategy"></category-cards>
-                </div>
-            </section>
-
             <!-- Strategy AI Assistant -->
             <section class="pb-6">
                 <div class="max-w-[1200px] mx-auto px-6">
                     <strategy-assistant :articles="pageData.allArticles" category="Poker"></strategy-assistant>
+                </div>
+            </section>
+
+            <!-- Category Cards + Search -->
+            <section class="pb-6">
+                <div class="max-w-[1200px] mx-auto px-6">
+                    <category-cards :categories="pageData.categories" active-category="poker-strategy"></category-cards>
                 </div>
             </section>
 
@@ -427,12 +427,6 @@
                     });
                     return scored.filter(a => a.score > 0).sort((a, b) => b.score - a.score);
                 },
-                getGreeting() {
-                    const h = new Date().getHours();
-                    if (h < 12) return 'Good morning';
-                    if (h < 18) return 'Good afternoon';
-                    return 'Good evening';
-                },
                 getSuggestionChips() {
                     return this.articles.slice(0, 3).map(a => {
                         const short = a.title.split(':')[0].split('–')[0].trim();
@@ -444,9 +438,7 @@
             <div class="bg-[#F5F7FB] rounded-2xl overflow-hidden">
 
                 <!-- Welcome State -->
-                <div v-if="showWelcome" class="px-6 pt-10 pb-6 text-center">
-                    <h3 class="text-[22px] font-bold text-black mb-1">{{ getGreeting() }}</h3>
-                    <p class="text-[15px] text-[#666] mb-8">What can I help you understand today?</p>
+                <div v-if="showWelcome" class="px-6 pt-5 pb-5 text-center">
 
                     <!-- Input -->
                     <div class="max-w-[560px] mx-auto">
