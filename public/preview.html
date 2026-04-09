@@ -82,7 +82,9 @@
                         <h1 class="text-[29px] font-semibold leading-10 mb-2">Gambling Strategy</h1>
                         <p class="text-base leading-relaxed text-gray-500 mb-8">Free strategy guides from our experts</p>
                         <strategy-assistant :articles="pageData.allArticles" category="Gambling"></strategy-assistant>
-                        <category-cards :categories="pageData.categories"></category-cards>
+                        <div class="mt-8">
+                            <category-cards :categories="pageData.categories"></category-cards>
+                        </div>
                     </div>
                 </div>
             </section>
