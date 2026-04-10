@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026 Predictor | Free-to-Play | Gambling.com</title>
+    <meta name="description" content="Predict FIFA World Cup 2026 match scores, climb the leaderboard, and win prizes. Free-to-play predictor game from Gambling.com.">
+    <meta property="og:title" content="World Cup 2026 Predictor | Gambling.com">
+    <meta property="og:description" content="Predict FIFA World Cup 2026 match scores, climb the leaderboard, and win prizes. Free-to-play predictor game.">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://www.gambling.com/free-games/world-cup-predictor">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS v3 CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Vue 3 CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+
+    <style type="text/tailwindcss">
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 400; line-height: 26px; color: #000; background: #fff; }
+        a { color: #0157FF; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        a:hover { color: #003EE6; text-decoration: underline; }
+        a:focus-visible { outline: 2px solid #0157FF; outline-offset: 2px; }
+        img { display: block; max-width: 100%; }
+        ol, ul { list-style: none; }
+        button { font-family: 'Red Hat Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+        /* Custom animations */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(1, 87, 255, 0.3); }
+            50% { box-shadow: 0 0 20px 4px rgba(1, 87, 255, 0.15); }
+        }
+        .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+
+        @keyframes countdown-tick {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Score input styling */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] { -moz-appearance: textfield; }
+    </style>
+
+    <!-- Tailwind Config for GDC tokens -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gdc-blue': '#0157FF',
+                        'gdc-blue-hover': '#003EE6',
+                        'gdc-red': '#FF0000',
+                        'gdc-red-hover': '#E50000',
+                        'gdc-grey': '#ECECEF',
+                        'gdc-black': '#000000',
+                        'gdc-white': '#FFFFFF',
+                        'gdc-gold': '#E1A730',
+                        'gdc-gold-hover': '#B4841E',
+                        'gdc-green': '#39B54A',
+                        'gdc-green-hover': '#2D9238',
+                        'gdc-deep-grey': '#999999',
+                        'gdc-deep-blue-navy': '#050A30',
+                        'gdc-light-blue': '#E6F1FC',
+                    },
+                    fontFamily: {
+                        gdc: ['Red Hat Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+</head>
+<body>
+    <div id="app">
+        <!-- Header Component -->
+        <site-header></site-header>
+
+        <main>
+            <!-- ═══════════════════════════════════════
+                 HERO SECTION
+                 ═══════════════════════════════════════ -->
+            <section class="relative overflow-hidden bg-gdc-deep-blue-navy text-white">
+                <!-- Background pattern -->
+                <div class="absolute inset-0 opacity-10">
+                    <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle at 20% 50%, #0157FF 0%, transparent 50%), radial-gradient(circle at 80% 20%, #0157FF 0%, transparent 40%);"></div>
+                </div>
+                <div class="relative max-w-[1140px] mx-auto px-6 py-12 md:py-16 lg:py-20">
+                    <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+                        <!-- Left: Text content -->
+                        <div class="flex-1 text-center lg:text-left">
+                            <div class="inline-flex items-center gap-2 bg-white/10 rounded-full px-4 py-1.5 mb-4">
+                                <span class="w-2 h-2 bg-gdc-green rounded-full"></span>
+                                <span class="text-sm font-medium text-white/90">Free to Play</span>
+                            </div>
+                            <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4">
+                                World Cup 2026<br>
+                                <span class="text-gdc-blue">Score Predictor</span>
+                            </h1>
+                            <p class="text-lg text-white/80 mb-6 max-w-lg mx-auto lg:mx-0">
+                                Predict match scores, climb the global leaderboard, and win prizes throughout the FIFA World Cup 2026.
+                            </p>
+                            <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+                                <button
+                                    @click="scrollToMatches"
+                                    class="inline-flex items-center justify-center gap-2 bg-gdc-blue hover:bg-gdc-blue-hover text-white font-semibold text-base uppercase px-8 py-3.5 rounded-lg transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+                                >
+                                    START PREDICTING
+                                </button>
+                                <button
+                                    @click="scrollToLeaderboard"
+                                    class="inline-flex items-center justify-center gap-2 border-2 border-white/30 hover:border-white/60 text-white font-semibold text-base uppercase px-8 py-3.5 rounded-lg transition-colors duration-200 bg-transparent focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-2"
+                                >
+                                    VIEW LEADERBOARD
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Right: Countdown -->
+                        <div class="flex-shrink-0">
+                            <div class="text-center mb-3">
+                                <span class="text-sm font-medium text-white/60 uppercase tracking-wider">Tournament Starts</span>
+                            </div>
+                            <div class="flex gap-3">
+                                <div v-for="unit in countdownUnits" :key="unit.label" class="flex flex-col items-center">
+                                    <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl w-[72px] h-[72px] md:w-[80px] md:h-[80px] flex items-center justify-center mb-1.5">
+                                        <span class="text-2xl md:text-3xl font-bold text-white">{{ unit.value }}</span>
+                                    </div>
+                                    <span class="text-xs font-medium text-white/50 uppercase tracking-wider">{{ unit.label }}</span>
+                                </div>
+                            </div>
+                            <div class="text-center mt-4">
+                                <span class="text-sm text-white/60">June 11 – July 19, 2026</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 HOW IT WORKS
+                 ═══════════════════════════════════════ -->
+            <section class="py-12 bg-gdc-grey">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <h2 class="text-2xl font-semibold text-center mb-8">How It Works</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div v-for="step in howItWorks" :key="step.num" class="bg-white rounded-xl p-6 text-center shadow-sm">
+                            <div class="w-12 h-12 bg-gdc-blue rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span class="text-white font-bold text-lg">{{ step.num }}</span>
+                            </div>
+                            <h3 class="text-lg font-semibold mb-2">{{ step.title }}</h3>
+                            <p class="text-sm text-gdc-deep-grey leading-relaxed">{{ step.desc }}</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 SCORING SYSTEM
+                 ═══════════════════════════════════════ -->
+            <section class="py-12 border-b border-gdc-grey">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <h2 class="text-2xl font-semibold text-center mb-8">Scoring System</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div v-for="tier in scoringTiers" :key="tier.label" class="bg-white border border-gdc-grey rounded-xl p-5 text-center hover:shadow-md transition-shadow">
+                            <div class="text-3xl font-bold mb-1" :class="tier.color">{{ tier.points }}</div>
+                            <div class="text-xs font-semibold uppercase tracking-wider text-gdc-deep-grey mb-2">Points</div>
+                            <div class="text-sm font-medium text-gdc-black">{{ tier.label }}</div>
+                            <div class="text-xs text-gdc-deep-grey mt-1">{{ tier.example }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 MATCH PREDICTIONS
+                 ═══════════════════════════════════════ -->
+            <section id="matches" class="py-12 scroll-mt-16">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                        <div>
+                            <h2 class="text-2xl font-semibold">Match Day Predictions</h2>
+                            <p class="text-sm text-gdc-deep-grey mt-1">{{ currentMatchday.label }} &middot; {{ predictionsRemaining }} predictions remaining</p>
+                        </div>
+                        <!-- Matchday tabs -->
+                        <div class="flex gap-2 flex-wrap">
+                            <button
+                                v-for="md in matchdays"
+                                :key="md.id"
+                                @click="selectMatchday(md.id)"
+                                :class="[
+                                    'px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200',
+                                    currentMatchdayId === md.id
+                                        ? 'bg-gdc-blue text-white'
+                                        : 'bg-gdc-grey text-gdc-black hover:bg-gdc-blue/10'
+                                ]"
+                            >
+                                {{ md.shortLabel }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sign-up gate banner (shown when limit reached) -->
+                    <div v-if="showSignUpGate" class="bg-gdc-light-blue border border-gdc-blue/20 rounded-xl p-6 mb-8 text-center">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0157FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                            <span class="text-base font-semibold text-gdc-blue">Sign Up to Unlock All Predictions</span>
+                        </div>
+                        <p class="text-sm text-gdc-deep-grey mb-4">You've used your 3 free predictions. Create an account to predict every match and compete on the leaderboard.</p>
+                        <button
+                            @click="showSignUpModal = true"
+                            class="inline-flex items-center justify-center bg-gdc-blue hover:bg-gdc-blue-hover text-white font-semibold text-sm uppercase px-6 py-3 rounded-lg transition-colors duration-200"
+                        >
+                            SIGN UP FREE
+                        </button>
+                    </div>
+
+                    <!-- Match cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div
+                            v-for="match in currentMatches"
+                            :key="match.id"
+                            class="bg-white border border-gdc-grey rounded-xl p-5 transition-shadow hover:shadow-md"
+                            :class="{ 'opacity-60 pointer-events-none': match.locked }"
+                        >
+                            <!-- Match header -->
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="text-xs font-medium text-gdc-deep-grey uppercase tracking-wider">{{ match.group }}</span>
+                                <span class="text-xs text-gdc-deep-grey">{{ match.date }} &middot; {{ match.time }}</span>
+                            </div>
+
+                            <!-- Teams and score inputs -->
+                            <div class="flex items-center gap-4">
+                                <!-- Home team -->
+                                <div class="flex-1 text-right">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <span class="text-sm font-semibold">{{ match.home.name }}</span>
+                                        <span class="text-xl">{{ match.home.flag }}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Score inputs -->
+                                <div class="flex items-center gap-2">
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="20"
+                                        :value="match.prediction?.homeScore"
+                                        @input="updatePrediction(match.id, 'homeScore', $event.target.value)"
+                                        :disabled="match.locked || (showSignUpGate && !match.prediction)"
+                                        class="w-12 h-12 text-center text-lg font-bold border-2 border-gdc-grey rounded-lg focus:border-gdc-blue focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        :aria-label="'Score for ' + match.home.name"
+                                    >
+                                    <span class="text-gdc-deep-grey font-bold">–</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        max="20"
+                                        :value="match.prediction?.awayScore"
+                                        @input="updatePrediction(match.id, 'awayScore', $event.target.value)"
+                                        :disabled="match.locked || (showSignUpGate && !match.prediction)"
+                                        class="w-12 h-12 text-center text-lg font-bold border-2 border-gdc-grey rounded-lg focus:border-gdc-blue focus:outline-none transition-colors disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        :aria-label="'Score for ' + match.away.name"
+                                    >
+                                </div>
+
+                                <!-- Away team -->
+                                <div class="flex-1 text-left">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xl">{{ match.away.flag }}</span>
+                                        <span class="text-sm font-semibold">{{ match.away.name }}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- W/D/L quick pick -->
+                            <div class="flex gap-2 mt-4 justify-center">
+                                <button
+                                    v-for="outcome in ['Home', 'Draw', 'Away']"
+                                    :key="outcome"
+                                    @click="setOutcome(match.id, outcome)"
+                                    :disabled="match.locked || (showSignUpGate && !match.prediction)"
+                                    :class="[
+                                        'px-4 py-1.5 rounded-md text-xs font-semibold uppercase transition-colors duration-200',
+                                        match.prediction?.outcome === outcome
+                                            ? 'bg-gdc-blue text-white'
+                                            : 'bg-gdc-grey text-gdc-black hover:bg-gdc-blue/10',
+                                        (match.locked || (showSignUpGate && !match.prediction)) ? 'cursor-not-allowed' : 'cursor-pointer'
+                                    ]"
+                                >
+                                    {{ outcome === 'Home' ? match.home.code : outcome === 'Away' ? match.away.code : 'Draw' }}
+                                </button>
+                            </div>
+
+                            <!-- Prediction status -->
+                            <div class="flex items-center justify-between mt-4 pt-3 border-t border-gdc-grey">
+                                <div v-if="match.prediction?.submitted" class="flex items-center gap-1.5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#39B54A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span class="text-xs font-medium text-gdc-green">Prediction Saved</span>
+                                </div>
+                                <div v-else class="text-xs text-gdc-deep-grey">Enter your prediction</div>
+                                <button
+                                    v-if="!match.prediction?.submitted && match.prediction?.homeScore !== undefined && match.prediction?.awayScore !== undefined"
+                                    @click="submitPrediction(match.id)"
+                                    :disabled="match.locked"
+                                    class="text-xs font-semibold text-gdc-blue hover:text-gdc-blue-hover transition-colors"
+                                >
+                                    SAVE
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 BONUS PREDICTIONS
+                 ═══════════════════════════════════════ -->
+            <section class="py-12 bg-gdc-deep-blue-navy text-white">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <h2 class="text-2xl font-semibold text-center mb-2">Bonus Predictions</h2>
+                    <p class="text-sm text-white/60 text-center mb-8">Earn extra points with these tournament-wide picks</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div v-for="bonus in bonusPredictions" :key="bonus.id" class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-5">
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-lg bg-gdc-gold/20 flex items-center justify-center">
+                                    <span class="text-lg">{{ bonus.icon }}</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-semibold">{{ bonus.title }}</h3>
+                                    <span class="text-xs text-gdc-gold font-semibold">+{{ bonus.points }} pts</span>
+                                </div>
+                            </div>
+                            <p class="text-sm text-white/60 mb-3">{{ bonus.description }}</p>
+                            <select
+                                v-model="bonus.selection"
+                                @change="saveBonusPrediction(bonus.id)"
+                                class="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2.5 text-sm text-white appearance-none cursor-pointer focus:border-gdc-blue focus:outline-none"
+                                :aria-label="bonus.title"
+                            >
+                                <option value="" disabled class="text-gdc-black">Select your pick...</option>
+                                <option v-for="opt in bonus.options" :key="opt" :value="opt" class="text-gdc-black">{{ opt }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 LEADERBOARD
+                 ═══════════════════════════════════════ -->
+            <section id="leaderboard" class="py-12 scroll-mt-16">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+                        <div>
+                            <h2 class="text-2xl font-semibold">Global Leaderboard</h2>
+                            <p class="text-sm text-gdc-deep-grey mt-1">Updated after each match day</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button
+                                v-for="tab in ['Global', 'Weekly']"
+                                :key="tab"
+                                @click="leaderboardTab = tab"
+                                :class="[
+                                    'px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200',
+                                    leaderboardTab === tab
+                                        ? 'bg-gdc-blue text-white'
+                                        : 'bg-gdc-grey text-gdc-black hover:bg-gdc-blue/10'
+                                ]"
+                            >
+                                {{ tab }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Podium (Top 3) -->
+                    <div class="flex items-end justify-center gap-3 mb-8">
+                        <!-- 2nd place -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-14 rounded-full bg-gdc-grey flex items-center justify-center mb-2">
+                                <span class="text-lg font-bold text-gdc-deep-grey">{{ topPlayers[1]?.initials }}</span>
+                            </div>
+                            <span class="text-sm font-semibold">{{ topPlayers[1]?.name }}</span>
+                            <span class="text-xs text-gdc-deep-grey">{{ topPlayers[1]?.points }} pts</span>
+                            <div class="w-20 bg-gray-200 rounded-t-lg mt-2" style="height: 80px;"></div>
+                        </div>
+                        <!-- 1st place -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-16 h-16 rounded-full bg-gdc-gold/20 border-2 border-gdc-gold flex items-center justify-center mb-2">
+                                <span class="text-xl font-bold text-gdc-gold">{{ topPlayers[0]?.initials }}</span>
+                            </div>
+                            <span class="text-sm font-semibold">{{ topPlayers[0]?.name }}</span>
+                            <span class="text-xs text-gdc-deep-grey">{{ topPlayers[0]?.points }} pts</span>
+                            <div class="w-20 bg-gdc-gold/20 rounded-t-lg mt-2" style="height: 110px;"></div>
+                        </div>
+                        <!-- 3rd place -->
+                        <div class="flex flex-col items-center">
+                            <div class="w-14 h-14 rounded-full bg-gdc-grey flex items-center justify-center mb-2">
+                                <span class="text-lg font-bold text-gdc-deep-grey">{{ topPlayers[2]?.initials }}</span>
+                            </div>
+                            <span class="text-sm font-semibold">{{ topPlayers[2]?.name }}</span>
+                            <span class="text-xs text-gdc-deep-grey">{{ topPlayers[2]?.points }} pts</span>
+                            <div class="w-20 bg-gray-200 rounded-t-lg mt-2" style="height: 56px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Leaderboard table -->
+                    <div class="bg-white border border-gdc-grey rounded-xl overflow-hidden">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gdc-grey/50">
+                                    <th class="text-left text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3 w-16">#</th>
+                                    <th class="text-left text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3">Player</th>
+                                    <th class="text-center text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3 hidden sm:table-cell">Exact</th>
+                                    <th class="text-center text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3 hidden sm:table-cell">Result</th>
+                                    <th class="text-center text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3 hidden sm:table-cell">Streak</th>
+                                    <th class="text-right text-xs font-semibold text-gdc-deep-grey uppercase tracking-wider px-5 py-3">Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="(player, idx) in leaderboardData"
+                                    :key="player.id"
+                                    :class="[
+                                        'border-t border-gdc-grey transition-colors',
+                                        player.isCurrentUser ? 'bg-gdc-light-blue' : 'hover:bg-gray-50'
+                                    ]"
+                                >
+                                    <td class="px-5 py-3 text-sm font-semibold" :class="idx < 3 ? 'text-gdc-gold' : 'text-gdc-deep-grey'">{{ player.rank }}</td>
+                                    <td class="px-5 py-3">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" :class="player.isCurrentUser ? 'bg-gdc-blue text-white' : 'bg-gdc-grey text-gdc-deep-grey'">
+                                                {{ player.initials }}
+                                            </div>
+                                            <div>
+                                                <span class="text-sm font-semibold">{{ player.name }}</span>
+                                                <div class="flex gap-1 mt-0.5">
+                                                    <span v-for="badge in player.badges" :key="badge" class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-gdc-gold/10 text-gdc-gold">{{ badge }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-5 py-3 text-center text-sm hidden sm:table-cell">{{ player.exactScores }}</td>
+                                    <td class="px-5 py-3 text-center text-sm hidden sm:table-cell">{{ player.correctResults }}</td>
+                                    <td class="px-5 py-3 text-center text-sm hidden sm:table-cell">
+                                        <span v-if="player.streak > 0" class="text-gdc-green font-semibold">{{ player.streak }}</span>
+                                        <span v-else class="text-gdc-deep-grey">–</span>
+                                    </td>
+                                    <td class="px-5 py-3 text-right text-sm font-bold">{{ player.points }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="text-center mt-6" v-if="!isLoggedIn">
+                        <p class="text-sm text-gdc-deep-grey mb-3">Sign up to see your ranking and compete</p>
+                        <button
+                            @click="showSignUpModal = true"
+                            class="inline-flex items-center justify-center bg-gdc-blue hover:bg-gdc-blue-hover text-white font-semibold text-sm uppercase px-6 py-3 rounded-lg transition-colors duration-200"
+                        >
+                            JOIN THE LEADERBOARD
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 BADGES
+                 ═══════════════════════════════════════ -->
+            <section class="py-12 bg-gdc-grey">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <h2 class="text-2xl font-semibold text-center mb-2">Badges &amp; Achievements</h2>
+                    <p class="text-sm text-gdc-deep-grey text-center mb-8">Unlock badges as you play. Show off your prediction skills.</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div
+                            v-for="badge in badges"
+                            :key="badge.id"
+                            class="bg-white rounded-xl p-4 text-center transition-shadow hover:shadow-md"
+                            :class="{ 'opacity-40': !badge.earned }"
+                        >
+                            <div class="text-3xl mb-2">{{ badge.icon }}</div>
+                            <div class="text-sm font-semibold mb-1">{{ badge.name }}</div>
+                            <div class="text-xs text-gdc-deep-grey">{{ badge.description }}</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ═══════════════════════════════════════
+                 PRIZES
+                 ═══════════════════════════════════════ -->
+            <section class="py-12">
+                <div class="max-w-[1140px] mx-auto px-6">
+                    <h2 class="text-2xl font-semibold text-center mb-2">Prizes</h2>
+                    <p class="text-sm text-gdc-deep-grey text-center mb-8">Play for free, win real rewards throughout the tournament</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div v-for="prize in prizes" :key="prize.id" class="bg-white border border-gdc-grey rounded-xl overflow-hidden hover:shadow-md transition-shadow">
+                            <div class="p-1.5">
+                                <div class="rounded-lg overflow-hidden" :class="prize.bgClass" style="height: 160px;">
+                                    <div class="h-full flex items-center justify-center">
+                                        <span class="text-5xl">{{ prize.icon }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="text-xs font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full" :class="prize.tagClass">{{ prize.tag }}</span>
+                                </div>
+                                <h3 class="text-lg font-semibold mb-1">{{ prize.title }}</h3>
+                                <p class="text-sm text-gdc-deep-grey mb-3">{{ prize.description }}</p>
+                                <div v-if="prize.operators?.length" class="flex items-center gap-2 pt-3 border-t border-gdc-grey">
+                                    <span class="text-xs text-gdc-deep-grey">Available at:</span>
+                                    <div class="flex gap-1.5">
+                                        <span v-for="op in prize.operators" :key="op" class="text-xs font-medium bg-gdc-grey px-2 py-0.5 rounded">{{ op }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Component -->
+        <site-footer></site-footer>
+
+        <!-- ═══════════════════════════════════════
+             SIGN UP MODAL
+             ═══════════════════════════════════════ -->
+        <div v-if="showSignUpModal" class="fixed inset-0 z-[200] flex items-center justify-center p-4" @click.self="showSignUpModal = false">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="relative bg-white rounded-2xl w-full max-w-md p-8 shadow-xl" role="dialog" aria-modal="true" aria-label="Sign up">
+                <button @click="showSignUpModal = false" class="absolute top-4 right-4 text-gdc-deep-grey hover:text-gdc-black transition-colors bg-transparent border-none cursor-pointer" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold mb-2">Join the Predictor</h2>
+                    <p class="text-sm text-gdc-deep-grey">Create an account to unlock unlimited predictions, the full leaderboard, and badges.</p>
+                </div>
+                <form @submit.prevent="handleSignUp" class="space-y-4">
+                    <div>
+                        <label for="signup-name" class="block text-sm font-medium text-gdc-black mb-1">Display Name</label>
+                        <input id="signup-name" type="text" v-model="signUpForm.name" required class="w-full border border-gdc-grey rounded-lg px-4 py-3 text-sm focus:border-gdc-blue focus:outline-none transition-colors" placeholder="Enter your display name">
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-sm font-medium text-gdc-black mb-1">Email Address</label>
+                        <input id="signup-email" type="email" v-model="signUpForm.email" required class="w-full border border-gdc-grey rounded-lg px-4 py-3 text-sm focus:border-gdc-blue focus:outline-none transition-colors" placeholder="Enter your email">
+                    </div>
+                    <button type="submit" class="w-full bg-gdc-blue hover:bg-gdc-blue-hover text-white font-semibold text-sm uppercase py-3.5 rounded-lg transition-colors duration-200">
+                        CREATE ACCOUNT
+                    </button>
+                </form>
+                <p class="text-xs text-gdc-deep-grey text-center mt-4">
+                    Already have an account? <a href="#" @click.prevent="handleSignUp" class="text-gdc-blue hover:text-gdc-blue-hover font-semibold no-underline">Log in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         VUE APPLICATION
+         ═══════════════════════════════════════════════ -->
+    <script>
+        const { createApp } = Vue;
+
+        /* ─── Match Data (Group Stage - FIFA World Cup 2026) ─── */
+        const groupStageMatches = {
+            md1: {
+                id: 'md1',
+                label: 'Match Day 1 — June 11',
+                shortLabel: 'MD 1',
+                matches: [
+                    { id: 'm1', group: 'Group A', date: 'Jun 11', time: '20:00', home: { name: 'Mexico', code: 'MEX', flag: '🇲🇽' }, away: { name: 'Serbia', code: 'SRB', flag: '🇷🇸' }, locked: false },
+                    { id: 'm2', group: 'Group A', date: 'Jun 11', time: '17:00', home: { name: 'USA', code: 'USA', flag: '🇺🇸' }, away: { name: 'Colombia', code: 'COL', flag: '🇨🇴' }, locked: false },
+                ]
+            },
+            md2: {
+                id: 'md2',
+                label: 'Match Day 2 — June 12',
+                shortLabel: 'MD 2',
+                matches: [
+                    { id: 'm3', group: 'Group B', date: 'Jun 12', time: '14:00', home: { name: 'England', code: 'ENG', flag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿' }, away: { name: 'Japan', code: 'JPN', flag: '🇯🇵' }, locked: false },
+                    { id: 'm4', group: 'Group B', date: 'Jun 12', time: '17:00', home: { name: 'Brazil', code: 'BRA', flag: '🇧🇷' }, away: { name: 'Morocco', code: 'MAR', flag: '🇲🇦' }, locked: false },
+                    { id: 'm5', group: 'Group C', date: 'Jun 12', time: '20:00', home: { name: 'France', code: 'FRA', flag: '🇫🇷' }, away: { name: 'Australia', code: 'AUS', flag: '🇦🇺' }, locked: false },
+                ]
+            },
+            md3: {
+                id: 'md3',
+                label: 'Match Day 3 — June 13',
+                shortLabel: 'MD 3',
+                matches: [
+                    { id: 'm6', group: 'Group C', date: 'Jun 13', time: '14:00', home: { name: 'Argentina', code: 'ARG', flag: '🇦🇷' }, away: { name: 'Canada', code: 'CAN', flag: '🇨🇦' }, locked: false },
+                    { id: 'm7', group: 'Group D', date: 'Jun 13', time: '17:00', home: { name: 'Germany', code: 'GER', flag: '🇩🇪' }, away: { name: 'South Korea', code: 'KOR', flag: '🇰🇷' }, locked: false },
+                    { id: 'm8', group: 'Group D', date: 'Jun 13', time: '20:00', home: { name: 'Spain', code: 'ESP', flag: '🇪🇸' }, away: { name: 'Netherlands', code: 'NED', flag: '🇳🇱' }, locked: false },
+                ]
+            },
+            md4: {
+                id: 'md4',
+                label: 'Match Day 4 — June 14',
+                shortLabel: 'MD 4',
+                matches: [
+                    { id: 'm9', group: 'Group E', date: 'Jun 14', time: '14:00', home: { name: 'Portugal', code: 'POR', flag: '🇵🇹' }, away: { name: 'Ecuador', code: 'ECU', flag: '🇪🇨' }, locked: false },
+                    { id: 'm10', group: 'Group E', date: 'Jun 14', time: '17:00', home: { name: 'Italy', code: 'ITA', flag: '🇮🇹' }, away: { name: 'Senegal', code: 'SEN', flag: '🇸🇳' }, locked: false },
+                    { id: 'm11', group: 'Group F', date: 'Jun 14', time: '20:00', home: { name: 'Belgium', code: 'BEL', flag: '🇧🇪' }, away: { name: 'Nigeria', code: 'NGA', flag: '🇳🇬' }, locked: false },
+                ]
+            },
+        };
+
+        /* ─── Leaderboard Mock Data ─── */
+        const leaderboardPlayers = [
+            { id: 1, name: 'PredictorKing99', initials: 'PK', points: 247, exactScores: 8, correctResults: 21, streak: 5, badges: ['Hot Streak', 'Sharpshooter'], isCurrentUser: false },
+            { id: 2, name: 'GoalGuru', initials: 'GG', points: 231, exactScores: 7, correctResults: 20, streak: 3, badges: ['Early Bird'], isCurrentUser: false },
+            { id: 3, name: 'FutbolFanatic', initials: 'FF', points: 218, exactScores: 6, correctResults: 22, streak: 0, badges: ['Group Ace'], isCurrentUser: false },
+            { id: 4, name: 'ScoreWizard', initials: 'SW', points: 205, exactScores: 5, correctResults: 19, streak: 2, badges: [], isCurrentUser: false },
+            { id: 5, name: 'MatchDayMaven', initials: 'MM', points: 198, exactScores: 5, correctResults: 18, streak: 4, badges: ['Hot Streak'], isCurrentUser: false },
+            { id: 6, name: 'You', initials: 'YO', points: 142, exactScores: 3, correctResults: 14, streak: 1, badges: ['First Predict'], isCurrentUser: true },
+            { id: 7, name: 'TacticalTom', initials: 'TT', points: 138, exactScores: 3, correctResults: 12, streak: 0, badges: [], isCurrentUser: false },
+            { id: 8, name: 'WorldCupWatcher', initials: 'WW', points: 125, exactScores: 2, correctResults: 15, streak: 1, badges: [], isCurrentUser: false },
+            { id: 9, name: 'PitchPerfect', initials: 'PP', points: 112, exactScores: 2, correctResults: 11, streak: 0, badges: [], isCurrentUser: false },
+            { id: 10, name: 'NetBuster', initials: 'NB', points: 98, exactScores: 1, correctResults: 10, streak: 0, badges: [], isCurrentUser: false },
+        ];
+
+        /* ─── Badges ─── */
+        const allBadges = [
+            { id: 'first-predict', icon: '⚡', name: 'First Predict', description: 'Submit your first prediction', earned: true },
+            { id: 'sharpshooter', icon: '🎯', name: 'Sharpshooter', description: '3 exact scores', earned: true },
+            { id: 'hot-streak', icon: '🔥', name: 'Hot Streak', description: '5 correct in a row', earned: false },
+            { id: 'group-ace', icon: '👑', name: 'Group Ace', description: 'Predict every group match', earned: false },
+            { id: 'early-bird', icon: '🐦', name: 'Early Bird', description: 'Predict 24hrs early', earned: false },
+            { id: 'golden-touch', icon: '✨', name: 'Golden Touch', description: '10 exact scores', earned: false },
+        ];
+
+        /* ─── Shared Header Component (inline) ─── */
+        const SiteHeader = {
+            name: 'SiteHeader',
+            template: `
+                <header class="bg-white shadow-[0px_1px_5px_-2px_#4e4e4e] sticky top-0 z-[100]">
+                    <div class="max-w-[1140px] mx-auto px-6 flex items-center justify-between h-14">
+                        <a href="https://www.gambling.com" class="flex items-center shrink-0 no-underline" aria-label="Gambling.com home">
+                            <img src="https://objects.kaxmedia.com/auto/o/105557/8fbf0fa9e7.svg" alt="gambling.com" width="124" height="42" class="h-[42px] w-auto">
+                        </a>
+                        <nav class="hidden lg:flex items-center gap-0" aria-label="Primary navigation">
+                            <a v-for="item in navItems" :key="item.href" :href="item.href" :aria-current="item.current ? 'page' : undefined" class="text-base font-medium text-black no-underline pl-4 whitespace-nowrap leading-[56px] h-14 flex items-center transition-colors duration-200 hover:text-[#0157FF] hover:no-underline">
+                                {{ item.label }}
+                            </a>
+                        </nav>
+                        <div class="flex items-center gap-3">
+                            <a href="https://www.gambling.com/sign-up" class="inline-flex items-center gap-1.5 text-base font-medium text-black no-underline whitespace-nowrap cursor-pointer hover:underline" aria-label="Sign up">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" class="shrink-0"><path fill-rule="evenodd" clip-rule="evenodd" d="M20.2282 20.7349C22.5503 18.5466 24 15.4426 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 15.4426 1.44967 18.5466 3.77185 20.7349C5.92015 22.7593 8.81518 24 12 24C15.1848 24 18.0799 22.7593 20.2282 20.7349ZM4.794 19.1536C6.48568 17.0434 9.08505 15.6923 12 15.6923C14.9149 15.6923 17.5143 17.0434 19.206 19.1536C17.3665 21.0065 14.8172 22.1538 12 22.1538C9.18277 22.1538 6.63351 21.0065 4.794 19.1536ZM16.6154 8.30769C16.6154 10.8567 14.549 12.9231 12 12.9231C9.45099 12.9231 7.38462 10.8567 7.38462 8.30769C7.38462 5.75869 9.45099 3.69231 12 3.69231C14.549 3.69231 16.6154 5.75869 16.6154 8.30769Z" fill="black"/></svg>
+                                Sign&nbsp;Up
+                            </a>
+                            <div class="inline-flex items-center cursor-pointer no-underline hover:opacity-70" aria-label="Select region" role="button" tabindex="0">
+                                <div class="w-[30px] h-[54px] shrink-0 bg-center bg-no-repeat" style="background-image: url('https://objects.kaxmedia.com/auto/o/263246/a8d6548e5d.svg'); background-size: 26px;"></div>
+                                <div class="flex items-center gap-2 text-base font-medium text-black whitespace-nowrap">
+                                    GX
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="17" height="10" viewBox="0 0 17 10" fill="none" class="shrink-0"><path d="M16 1L8.5 8.5L0.999999 1" stroke="black" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                            </div>
+                            <button class="bg-transparent border-none cursor-pointer p-0 text-black flex items-center" aria-label="Search">
+                                <img src="https://objects.kaxmedia.com/auto/o/139752/7900ca8f22.svg" alt="" width="20" height="25" class="w-5 h-[25px]">
+                            </button>
+                        </div>
+                    </div>
+                </header>
+            `,
+            data() {
+                return {
+                    navItems: [
+                        { label: 'Reviews', href: 'https://www.gambling.com/reviews', current: false },
+                        { label: 'Casino', href: 'https://www.gambling.com/online-casinos', current: false },
+                        { label: 'Betting', href: 'https://www.gambling.com/online-betting', current: false },
+                        { label: 'Free Games', href: 'https://www.gambling.com/free-games', current: true },
+                        { label: 'Guides', href: 'https://www.gambling.com/guides', current: false },
+                        { label: 'News', href: 'https://www.gambling.com/news', current: false },
+                        { label: 'Inside Gambling.com', href: 'https://www.gambling.com/inside', current: false },
+                    ],
+                };
+            },
+        };
+
+        /* ─── Shared Footer Component (inline) ─── */
+        const SiteFooter = {
+            name: 'SiteFooter',
+            template: `
+                <footer class="bg-white text-black border-t border-[#d8d8d8]">
+                    <div class="py-[30px] border-b border-[#d8d8d8]">
+                        <div class="max-w-[1140px] mx-auto px-6 flex flex-wrap">
+                            <div v-for="col in footerColumns" :key="col.title" class="w-1/3 px-4 max-lg:w-1/2 max-md:w-full max-md:pb-6">
+                                <h5 class="text-lg font-semibold text-black bg-[#f7f7f7] rounded-[10px] p-2.5 mb-4">{{ col.title }}</h5>
+                                <ul class="flex flex-col gap-0">
+                                    <li v-for="link in col.links" :key="link.href" class="pb-2.5">
+                                        <a :href="link.href" class="text-[13px] font-normal text-[#0157FF] no-underline leading-5 transition-colors duration-200 hover:text-[#003EE6] hover:underline">{{ link.label }}</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-[30px]">
+                        <div class="max-w-[1140px] mx-auto px-6 flex flex-wrap items-start">
+                            <div class="flex flex-wrap gap-2.5 w-[28%] pr-4 max-lg:w-full max-lg:mb-6">
+                                <a v-for="social in socialLinks" :key="social.href" :href="social.href" class="inline-flex items-center justify-center w-8 h-8 no-underline transition-opacity duration-200 rounded overflow-hidden hover:opacity-70 hover:no-underline" :aria-label="social.label">
+                                    <img :src="social.icon" :alt="social.alt" width="32" height="32" class="w-8 h-8 block">
+                                </a>
+                            </div>
+                            <div class="flex-1 text-base font-normal text-[#999] leading-6">
+                                <p class="mb-3">DISCLAIMER: Online Wagering is illegal in some Jurisdictions. It is your responsibility to check your local regulations before playing online. GDC Media Ltd takes no responsibility for your actions.</p>
+                                <p class="mb-3">&copy; 2011-2026 GDC Media Limited. All Rights Reserved. Gambling.com is a registered trademark of GDC Media Limited.</p>
+                                <p class="mb-3"><a href="https://www.gambling.com/terms" class="text-base text-[#999] no-underline font-normal hover:underline hover:text-black">Terms and Conditions</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://www.gambling.com/privacy-policy" class="text-base text-[#999] no-underline font-normal hover:underline hover:text-black">Privacy and Cookies Policy</a></p>
+                                <p>Gambling can be addictive. Please play Responsibly.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pt-5">
+                        <div class="max-w-[1140px] mx-auto px-6 flex flex-wrap gap-3 items-center justify-center">
+                            <a v-for="flag in countryFlags" :key="flag.href" :href="flag.href" class="inline-flex no-underline transition-opacity duration-200 hover:opacity-70">
+                                <img class="w-[29px] h-[29px] rounded-full object-cover block" :src="flag.icon" :alt="flag.alt" width="29" height="29">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="py-5 pb-[30px]">
+                        <div class="max-w-[1140px] mx-auto px-6 flex flex-wrap justify-center items-center gap-6">
+                            <img v-for="badge in badges" :key="badge.src" :src="badge.src" :alt="badge.alt" :height="badge.height" class="w-auto" :style="{ height: badge.height + 'px' }">
+                        </div>
+                    </div>
+                </footer>
+            `,
+            data() {
+                return {
+                    footerColumns: [
+                        { title: 'Popular Pages', links: [
+                            { label: 'Online Casinos', href: 'https://www.gambling.com/online-casinos' },
+                            { label: 'Online Betting', href: 'https://www.gambling.com/online-betting' },
+                            { label: 'Online Slots', href: 'https://www.gambling.com/online-casinos/slots' },
+                            { label: 'Bingo Sites', href: 'https://www.gambling.com/online-casinos/bingo' },
+                            { label: 'New Casino Sites', href: 'https://www.gambling.com/online-casinos/new' },
+                            { label: 'Poker Sites', href: 'https://www.gambling.com/poker' },
+                            { label: 'Reviews', href: 'https://www.gambling.com/reviews' },
+                            { label: 'Free Games', href: 'https://www.gambling.com/free-games' },
+                        ]},
+                        { title: 'Quick Links', links: [
+                            { label: 'Casino Bonuses', href: 'https://www.gambling.com/online-casinos/bonuses' },
+                            { label: 'Online Blackjack', href: 'https://www.gambling.com/online-casinos/blackjack' },
+                            { label: 'Online Roulette', href: 'https://www.gambling.com/online-casinos/roulette' },
+                            { label: 'Best Payout Casino', href: 'https://www.gambling.com/online-casinos/best-payout' },
+                            { label: 'Fast Withdrawal Casino', href: 'https://www.gambling.com/online-casinos/fast-withdrawal' },
+                            { label: 'Free Spins No Deposit', href: 'https://www.gambling.com/online-casinos/free-spins' },
+                            { label: 'Guides', href: 'https://www.gambling.com/guides' },
+                            { label: 'News', href: 'https://www.gambling.com/news' },
+                        ]},
+                        { title: 'Support', links: [
+                            { label: 'About Us', href: 'https://www.gambling.com/about-us' },
+                            { label: 'Authors', href: 'https://www.gambling.com/authors' },
+                            { label: 'Editorial Guidelines', href: 'https://www.gambling.com/editorial-guidelines' },
+                            { label: 'Contact Us', href: 'https://www.gambling.com/contact' },
+                            { label: 'Corporate', href: 'https://www.gambling.com/corporate' },
+                            { label: 'Responsible Gambling', href: 'https://www.gambling.com/responsible-gambling' },
+                            { label: 'Sitemap', href: 'https://www.gambling.com/sitemap' },
+                            { label: 'Rewards Terms and Conditions', href: 'https://www.gambling.com/rewards-terms' },
+                        ]},
+                    ],
+                    socialLinks: [
+                        { href: 'https://x.com/gamblingcom', icon: 'https://objects.kaxmedia.com/auto/o/163105/6d2bef2635.svg', alt: 'X', label: 'Gambling.com on X' },
+                        { href: 'https://www.youtube.com/@GamblingComGroup', icon: 'https://objects.kaxmedia.com/auto/o/207713/dd9365d09a.svg', alt: 'YouTube', label: 'Gambling.com on YouTube' },
+                        { href: 'https://www.facebook.com/gamblingcom', icon: 'https://objects.kaxmedia.com/auto/o/163103/abf741e7a2.svg', alt: 'Facebook', label: 'Gambling.com on Facebook' },
+                        { href: 'https://www.instagram.com/gambling.com_official', icon: 'https://objects.kaxmedia.com/auto/o/163104/3ccb615a01.svg', alt: 'Instagram', label: 'Gambling.com on Instagram' },
+                        { href: 'https://www.tiktok.com/@gambling.com', icon: 'https://objects.kaxmedia.com/auto/o/207712/fdc1e4a62c.svg', alt: 'TikTok', label: 'Gambling.com on TikTok' },
+                    ],
+                    countryFlags: [
+                        { href: 'https://www.gambling.com/uk/guides', icon: 'https://objects.kaxmedia.com/auto/o/31168/01797ff082.svg', alt: 'United Kingdom' },
+                        { href: 'https://www.gambling.com/au', icon: 'https://objects.kaxmedia.com/auto/o/31174/6503ffd2da.svg', alt: 'Australia' },
+                        { href: 'https://www.gambling.com/ca/strategy', icon: 'https://objects.kaxmedia.com/auto/o/31173/1dfb1fd413.svg', alt: 'Canada' },
+                        { href: 'https://www.gambling.com/de/strategie', icon: 'https://objects.kaxmedia.com/auto/o/31180/50ebfcf79b.svg', alt: 'Germany' },
+                        { href: 'https://www.gambling.com/ie/strategy', icon: 'https://objects.kaxmedia.com/auto/o/31172/289a7c5659.svg', alt: 'Ireland' },
+                        { href: 'https://www.gambling.com/us/strategy', icon: 'https://objects.kaxmedia.com/auto/o/31206/1d224877ce.svg', alt: 'United States' },
+                    ],
+                    badges: [
+                        { src: 'https://objects.kaxmedia.com/auto/o/163122/a668aabbbd.svg', alt: 'GAMB | Nasdaq Listed', height: 40 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163119/d9f4d5eb90.svg', alt: 'GamStop', height: 48 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163118/df5e1b2ddd.svg', alt: 'GamCare', height: 51 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/209377/e0932ff1ed.svg', alt: 'GambleAware', height: 21 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163106/6830429ae0.svg', alt: '18+', height: 51 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163115/4c822cd29c.svg', alt: 'eCOGRA', height: 51 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163120/4564d6de5f.svg', alt: 'Gambling.com Group', height: 40 },
+                        { src: 'https://objects.kaxmedia.com/auto/o/163127/26fee6df5b.svg', alt: 'GPWA Approved Portal', height: 40 },
+                    ],
+                };
+            },
+        };
+
+        /* ─── Main App ─── */
+        const app = createApp({
+            data() {
+                return {
+                    /* State */
+                    isLoggedIn: false,
+                    showSignUpModal: false,
+                    currentMatchdayId: 'md1',
+                    leaderboardTab: 'Global',
+                    predictions: {},
+                    predictionCount: 0,
+                    maxFreePredictions: 3,
+
+                    /* Sign up form */
+                    signUpForm: { name: '', email: '' },
+
+                    /* Static data */
+                    howItWorks: [
+                        { num: 1, title: 'Predict Scores', desc: 'Enter your predicted score for each match. Pick the exact score or just the match outcome.' },
+                        { num: 2, title: 'Earn Points', desc: 'Exact scores earn 10 points, correct results earn 5 points. Bonus predictions earn even more.' },
+                        { num: 3, title: 'Climb the Board', desc: 'Compete on the global leaderboard. Top predictors win free bet credits and weekly prizes.' },
+                    ],
+
+                    scoringTiers: [
+                        { points: '10', label: 'Exact Score', example: 'e.g. 2-1 = 2-1', color: 'text-gdc-gold' },
+                        { points: '7', label: 'Correct Goal Diff', example: 'e.g. 2-0 vs 3-1', color: 'text-gdc-blue' },
+                        { points: '5', label: 'Correct Result', example: 'e.g. Home Win', color: 'text-gdc-green' },
+                        { points: '1', label: 'Participation', example: 'Any prediction made', color: 'text-gdc-deep-grey' },
+                    ],
+
+                    bonusPredictions: [
+                        {
+                            id: 'golden-boot',
+                            icon: '🥇',
+                            title: 'Golden Boot',
+                            description: 'Who will be the tournament\'s top scorer?',
+                            points: 25,
+                            selection: '',
+                            options: ['Kylian Mbappé', 'Erling Haaland', 'Harry Kane', 'Lionel Messi', 'Vinícius Jr', 'Mohamed Salah', 'Bukayo Saka', 'Lautaro Martínez'],
+                        },
+                        {
+                            id: 'dark-horse',
+                            icon: '🐴',
+                            title: 'Dark Horse',
+                            description: 'Which team will surprise everyone and reach the quarters?',
+                            points: 20,
+                            selection: '',
+                            options: ['Japan', 'Morocco', 'South Korea', 'Canada', 'Ecuador', 'Senegal', 'Nigeria', 'Australia'],
+                        },
+                        {
+                            id: 'champion',
+                            icon: '🏆',
+                            title: 'Tournament Winner',
+                            description: 'Pick the team that will lift the trophy.',
+                            points: 30,
+                            selection: '',
+                            options: ['Argentina', 'France', 'Brazil', 'England', 'Spain', 'Germany', 'Portugal', 'USA', 'Netherlands', 'Belgium', 'Italy'],
+                        },
+                    ],
+
+                    badges: allBadges,
+
+                    prizes: [
+                        {
+                            id: 'weekly',
+                            icon: '🎁',
+                            tag: 'Weekly',
+                            tagClass: 'bg-gdc-blue/10 text-gdc-blue',
+                            bgClass: 'bg-gradient-to-br from-gdc-light-blue to-blue-100',
+                            title: 'Match Day Prizes',
+                            description: 'Top 10 predictors each match day win free bet credits worth up to $25.',
+                            operators: ['BetMGM', 'DraftKings', 'FanDuel'],
+                        },
+                        {
+                            id: 'monthly',
+                            icon: '⭐',
+                            tag: 'Knockout Stage',
+                            tagClass: 'bg-gdc-gold/10 text-gdc-gold',
+                            bgClass: 'bg-gradient-to-br from-yellow-50 to-amber-100',
+                            title: 'Knockout Bonus',
+                            description: 'Correctly predict 3 knockout results in a row for a $50 free bet bonus.',
+                            operators: ['BetMGM', 'Caesars'],
+                        },
+                        {
+                            id: 'grand',
+                            icon: '🏆',
+                            tag: 'Grand Prize',
+                            tagClass: 'bg-gdc-green/10 text-gdc-green',
+                            bgClass: 'bg-gradient-to-br from-green-50 to-emerald-100',
+                            title: 'Leaderboard Champion',
+                            description: 'The overall leaderboard winner at tournament end receives $500 in free bet credits.',
+                            operators: ['BetMGM', 'DraftKings', 'FanDuel', 'Caesars'],
+                        },
+                    ],
+
+                    /* Countdown */
+                    countdownUnits: [
+                        { label: 'Days', value: '--' },
+                        { label: 'Hours', value: '--' },
+                        { label: 'Mins', value: '--' },
+                        { label: 'Secs', value: '--' },
+                    ],
+                };
+            },
+
+            computed: {
+                matchdays() {
+                    return Object.values(groupStageMatches);
+                },
+                currentMatchday() {
+                    return groupStageMatches[this.currentMatchdayId] || groupStageMatches.md1;
+                },
+                currentMatches() {
+                    return this.currentMatchday.matches.map(m => ({
+                        ...m,
+                        prediction: this.predictions[m.id] || null,
+                    }));
+                },
+                showSignUpGate() {
+                    return !this.isLoggedIn && this.predictionCount >= this.maxFreePredictions;
+                },
+                predictionsRemaining() {
+                    if (this.isLoggedIn) return 'Unlimited';
+                    const remaining = this.maxFreePredictions - this.predictionCount;
+                    return remaining > 0 ? `${remaining} free` : '0 free';
+                },
+                topPlayers() {
+                    return leaderboardPlayers.slice(0, 3);
+                },
+                leaderboardData() {
+                    return leaderboardPlayers.map((p, i) => ({ ...p, rank: i + 1 }));
+                },
+            },
+
+            methods: {
+                selectMatchday(id) {
+                    this.currentMatchdayId = id;
+                    this.trackEvent('matchday_select', 'engagement', id);
+                },
+
+                updatePrediction(matchId, field, value) {
+                    if (!this.predictions[matchId]) {
+                        if (this.showSignUpGate) return;
+                        this.predictions[matchId] = { homeScore: undefined, awayScore: undefined, outcome: null, submitted: false };
+                    }
+                    this.predictions[matchId][field] = value === '' ? undefined : parseInt(value, 10);
+                },
+
+                setOutcome(matchId, outcome) {
+                    if (!this.predictions[matchId]) {
+                        if (this.showSignUpGate) return;
+                        this.predictions[matchId] = { homeScore: undefined, awayScore: undefined, outcome: null, submitted: false };
+                    }
+                    this.predictions[matchId].outcome = outcome;
+                },
+
+                submitPrediction(matchId) {
+                    const pred = this.predictions[matchId];
+                    if (!pred || pred.homeScore === undefined || pred.awayScore === undefined) return;
+                    pred.submitted = true;
+                    if (!this.isLoggedIn) this.predictionCount++;
+                    this.trackEvent('prediction_submit', 'conversion', matchId);
+                },
+
+                saveBonusPrediction(bonusId) {
+                    this.trackEvent('bonus_prediction', 'conversion', bonusId);
+                },
+
+                handleSignUp() {
+                    this.isLoggedIn = true;
+                    this.showSignUpModal = false;
+                    this.predictionCount = 0;
+                    this.trackEvent('sign_up', 'conversion', 'predictor_signup');
+                },
+
+                scrollToMatches() {
+                    document.getElementById('matches')?.scrollIntoView({ behavior: 'smooth' });
+                    this.trackEvent('cta_click', 'navigation', 'hero_start_predicting');
+                },
+
+                scrollToLeaderboard() {
+                    document.getElementById('leaderboard')?.scrollIntoView({ behavior: 'smooth' });
+                    this.trackEvent('cta_click', 'navigation', 'hero_view_leaderboard');
+                },
+
+                /* ─── Countdown Timer ─── */
+                updateCountdown() {
+                    const target = new Date('2026-06-11T17:00:00Z');
+                    const now = new Date();
+                    const diff = target - now;
+
+                    if (diff <= 0) {
+                        this.countdownUnits = [
+                            { label: 'Days', value: '0' },
+                            { label: 'Hours', value: '0' },
+                            { label: 'Mins', value: '0' },
+                            { label: 'Secs', value: '0' },
+                        ];
+                        return;
+                    }
+
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+                    this.countdownUnits = [
+                        { label: 'Days', value: String(days) },
+                        { label: 'Hours', value: String(hours).padStart(2, '0') },
+                        { label: 'Mins', value: String(mins).padStart(2, '0') },
+                        { label: 'Secs', value: String(secs).padStart(2, '0') },
+                    ];
+                },
+
+                /* ─── GA4 Tracking ─── */
+                trackEvent(eventName, category, label) {
+                    window.dataLayer = window.dataLayer || [];
+                    window.dataLayer.push({
+                        event: eventName,
+                        event_category: category,
+                        event_label: label,
+                        event_action: eventName,
+                    });
+                },
+
+                /* ─── Intersection Observer for section views ─── */
+                setupSectionObservers() {
+                    const sections = document.querySelectorAll('section[id]');
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                this.trackEvent('page_section_view', 'engagement', entry.target.id);
+                            }
+                        });
+                    }, { threshold: 0.3 });
+                    sections.forEach(s => observer.observe(s));
+                },
+            },
+
+            mounted() {
+                this.updateCountdown();
+                this._countdownInterval = setInterval(() => this.updateCountdown(), 1000);
+                this.$nextTick(() => this.setupSectionObservers());
+                this.trackEvent('page_view', 'engagement', 'world_cup_predictor');
+            },
+
+            beforeUnmount() {
+                if (this._countdownInterval) clearInterval(this._countdownInterval);
+            },
+        });
+
+        /* Register components */
+        app.component('site-header', SiteHeader);
+        app.component('site-footer', SiteFooter);
+        app.mount('#app');
+    </script>
+</body>
+</html>
