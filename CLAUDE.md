@@ -1,85 +1,65 @@
-# CLAUDE.md — Website Creation Playbook
+# CLAUDE.md — Claude Code Project Advisor
 
-## Goal
-Build clean, fast, responsive marketing pages that match provided references (screenshots/wireframes) and follow best-practice UX, SEO, and accessibility.
+## Project Overview
+Internal back-office tool for the GDC dev/design team. Helps approach each Claude Code project with a tailored workflow by capturing project dimensions and generating four outputs: Initial Prompt, Workflow, CLAUDE.md, and Checklist.
 
-## Default Stack
-- Single `index.html` unless user requests a multi-page structure
-- Tailwind via CDN
-- Vanilla JS only (no frameworks) unless explicitly requested
-- Mobile-first responsive layout
-- No external build tools unless requested
+## Stack
+- Next.js 16 (App Router) with TypeScript
+- Tailwind CSS v4 — clean neutral palette (NOT GDC brand tokens)
+- Anthropic SDK for optional AI enrichment
+- No database — stateless generation + localStorage for saved projects
 
-## Workflow (always follow)
-1. **Clarify inputs**
-   - If a screenshot exists, treat it as the primary source of truth.
-   - If no screenshot, infer layout from the user’s description and propose a simple structure.
-   - If branding exists, reuse colors, fonts, spacing rules.
+## Architecture
 
-2. **Plan structure**
-   - Identify page sections (hero, social proof, features, pricing, FAQ, footer).
-   - Choose a layout grid and spacing scale.
-   - Define reusable components (buttons, cards, nav, sections).
+### File Structure
+```
+app/
+├── layout.tsx              # Root layout, Inter font
+├── page.tsx                # Renders AdvisorApp
+├── globals.css             # Tailwind + neutral theme variables
+└── api/enrich/route.ts     # POST → Anthropic API for CLAUDE.md enrichment
+lib/
+├── types.ts                # ProjectInputs, WorkflowPhase, ChecklistItem, SavedProject
+├── constants.ts            # All dimension options (type, complexity, stakeholder, etc.)
+└── engine.ts               # generateInitialPrompt(), generateWorkflow(), generateClaudeMd(), generateChecklist()
+components/
+├── AdvisorApp.tsx           # Main stateful component — form + results
+├── InputForm.tsx            # Project name, spec textarea, all dimension selectors
+├── DimensionGroup.tsx       # Reusable card-based selector grid
+├── OptionCard.tsx           # Individual selectable card (icon + label + desc)
+├── ResultsView.tsx          # Tabs container + tab switching
+├── InitialPromptTab.tsx     # Prompt display + copy button
+├── WorkflowTab.tsx          # Phased workflow display
+├── ClaudeMdTab.tsx          # CLAUDE.md preview + copy + AI enrich button
+├── ChecklistTab.tsx         # Interactive checklist with completion tracking
+└── SavedProjects.tsx        # Save/load panel with localStorage
+```
 
-3. **Generate HTML**
-   - Use semantic tags: `header`, `main`, `section`, `footer`
-   - Ensure headings are hierarchical (`h1` once, then `h2`, `h3`)
-   - Add SEO essentials:
-     - `title`, `meta description`
-     - Open Graph tags
-     - `canonical` placeholder
-   - Use accessible patterns:
-     - Proper `label` for inputs
-     - `alt` text for images
-     - Visible focus states
+### Engine Logic
+The engine is purely deterministic — no API calls. Each generator function takes `ProjectInputs` and returns structured output. The rule engine adapts output based on combinations of:
+- Project type × Complexity → scope of workflow phases
+- Stakeholder → review cadence, communication style
+- Design readiness → Figma MCP instructions vs. freeform
+- QA level → checklist depth, testing requirements
+- Dev context → stack conventions, component references
+- Data tracking → GA4/KTag integration instructions
+- Platform impact → Genesis/Eve/Origins context
 
-4. **Styling rules (Tailwind)**
-   - Use consistent spacing: `py-16`, `gap-6`, `max-w-6xl`
-   - Prefer `container mx-auto px-4`
-   - Use modern rounded corners and shadows:
-     - `rounded-2xl`, `shadow-sm/md`
-   - Buttons:
-     - Primary: solid background, bold, hover + focus
-     - Secondary: subtle border, hover background
+### GDC Context (embedded in outputs, not in UI)
+- Genesis = CMS for content management and template publishing
+- Eve = commercial tool for operator data, offers, affiliate placements
+- Origins = media tool for editorial content and asset management
+- GA4 = external analytics (dataLayer.push() pattern)
+- KTag = internal tracking system
+- Jira: GDCU project | Confluence space: 2373230
+- Figma Design System: file key `tv4qY8lj7ZAxj6wuefWsjw`, node `7610-437`
+- Stack: Red Hat Display 400/600, gdc-blue #0157FF, gdc-red #FF0000, uppercase CTAs, 1200px max
+- Shared: SiteHeader.vue, SiteFooter.vue from gdc-shared-components
 
-5. **Performance**
-   - Avoid huge images; use placeholders if not provided
-   - Minimize JS; prefer CSS-first interaction
-   - Do not add heavy libraries unless asked
-
-6. **Iteration mode (if matching a reference)**
-   - After first pass, list mismatches to fix:
-     - spacing/padding (px)
-     - font sizes/weights/line-height
-     - colors (exact hex)
-     - alignment and grid behavior
-     - component sizing (buttons/cards)
-   - Apply fixes and repeat until close match.
-
-## File Conventions
-- `index.html` is the deliverable unless told otherwise
-- If multi-page:
-  - `/pages/*.html`
-  - shared CSS in `/assets/styles.css` (only if requested)
-- Images:
-  - Use `/assets/` if files provided
-  - Otherwise use placeholder blocks (not random external images)
-
-## Output Requirements
-- Always provide:
-  - Complete HTML file
-  - Brief section map (what’s on the page)
-  - Any assumptions made (fonts/colors/content)
-
-## Defaults (unless overridden)
-- Font: system-ui stack
-- Max width: `max-w-6xl`
-- Primary CTA: prominent
-- Navigation: sticky only if asked
-- Dark mode: only if asked
-
-## Don’ts
-- Don’t invent brand colors if provided
-- Don’t add animations unless requested
-- Don’t ship broken responsive layouts
-- Don’t use placeholder lorem ipsum for key sections unless user asks—prefer realistic copy.
+## Conventions
+- TypeScript strict mode
+- Functional components with hooks
+- `@/` alias maps to project root
+- No external UI libraries — Tailwind utilities only
+- Copy buttons use navigator.clipboard API
+- All generation is synchronous except AI enrichment

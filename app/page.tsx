@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import AdvisorApp from '@/components/AdvisorApp';
 
 export default function Home() {
-  redirect("/preview.html");
+  return <AdvisorApp />;
 }
