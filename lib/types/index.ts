@@ -167,6 +167,31 @@ export interface RoadmapSuggestion {
   tags: string[];
 }
 
+// ── CMS types ────────────────────────────────────────────────────────────────
+
+export type CMSContentStatus = 'draft' | 'in_review' | 'published' | 'archived';
+export type CMSContentType = 'announcement' | 'release_note' | 'blog_post' | 'internal_doc';
+
+export interface CMSContent {
+  id: string;
+  title: string;
+  slug: string;
+  type: CMSContentType;
+  status: CMSContentStatus;
+  body: string;
+  excerpt: string;
+  authorId: string;
+  authorName: string;
+  tags: string[];
+  seoTitle: string;
+  seoDescription: string;
+  publishedAt: string | null;
+  scheduledAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  readTime: number;
+}
+
 // ── Workspace types ──────────────────────────────────────────────────────────
 
 export type WorkspaceRole = 'owner' | 'admin' | 'member' | 'viewer';

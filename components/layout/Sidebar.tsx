@@ -8,6 +8,7 @@ import {
   Map,
   Target,
   Lightbulb,
+  FileText,
   Settings,
   PanelLeftClose,
   PanelLeftOpen,
@@ -27,6 +28,7 @@ const NAV_ITEMS = [
   { href: '/roadmap', label: 'Visual Roadmap', icon: Map },
   { href: '/okrs', label: 'OKRs', icon: Target },
   { href: '/suggestions', label: 'Suggestions', icon: Lightbulb },
+  { href: '/cms', label: 'Content', icon: FileText },
 ];
 
 export function Sidebar() {
