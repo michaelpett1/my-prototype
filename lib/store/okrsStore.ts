@@ -14,8 +14,7 @@ import {
 } from '@/lib/supabase/queries';
 import { useActivityStore } from './activityStore';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 interface OKRsState {
   objectives: Objective[];
@@ -63,10 +62,22 @@ export const useOKRsStore = create<OKRsState>()(
         }
 
         if (!hasSupabase) return;
+
+        // READ-ON-EMPTY: Only fetch from Supabase if local store is empty.
+        const localObjectives = get().objectives;
+        if (localObjectives.length > 0) {
+          console.log('[okrsStore] Local data exists (%d objectives), skipping Supabase fetch', localObjectives.length);
+          return;
+        }
+
         set({ isLoading: true });
         try {
+          console.log('[okrsStore] No local data, fetching from Supabase...');
           const objectives = await fetchObjectives(workspaceId);
-          if (objectives.length > 0) set({ objectives });
+          if (objectives.length > 0) {
+            set({ objectives });
+            console.log('[okrsStore] Loaded %d objectives from Supabase', objectives.length);
+          }
         } catch (err) {
           console.error('[okrsStore] load failed:', err);
         } finally {

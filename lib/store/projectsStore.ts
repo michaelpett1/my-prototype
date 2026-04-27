@@ -15,8 +15,10 @@ import {
 import { useActivityStore } from './activityStore';
 import { useRoadmapStore } from './roadmapStore';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabase = !!(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 const DEFAULT_GROUPS: TimelineGroup[] = [
   { id: 'grp-1', name: 'New Features', color: '#2563EB' },
@@ -77,13 +79,25 @@ export const useProjectsStore = create<ProjectsState>()(
         }
 
         if (!hasSupabase) return;
+
+        // READ-ON-EMPTY: Only fetch from Supabase if local store is empty.
+        const localItems = get().items;
+        if (localItems.length > 0) {
+          console.log('[projectsStore] Local data exists (%d items), skipping Supabase fetch', localItems.length);
+          return;
+        }
+
         set({ isLoading: true });
         try {
+          console.log('[projectsStore] No local data, fetching from Supabase...');
           const [items, groups] = await Promise.all([
             fetchTimelineItems(workspaceId),
             fetchTimelineGroups(workspaceId),
           ]);
-          if (items.length > 0) set({ items });
+          if (items.length > 0) {
+            set({ items });
+            console.log('[projectsStore] Loaded %d items from Supabase', items.length);
+          }
           if (groups.length > 0) set({ groups });
         } catch (err) {
           console.error('[projectsStore] load failed:', err);

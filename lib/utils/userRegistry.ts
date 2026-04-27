@@ -5,7 +5,12 @@
  *
  * This is stored in a separate localStorage key that is NOT cleared
  * on sign-out, so the data persists across sessions.
+ *
+ * User data comes from lib/config/tenant.ts — edit that file to
+ * add/remove users or change workspace details.
  */
+
+import { WORKSPACE, USERS } from '@/lib/config/tenant';
 
 const REGISTRY_KEY = 'northstar-user-registry';
 
@@ -44,51 +49,36 @@ export function lookupUser(email: string): UserRecord | null {
   return registry[key] ?? null;
 }
 
-/** All GDC team members — seeded so any of them can sign in and land in the workspace. */
-const GDC_WORKSPACE = {
-  id: 'ws-gdc-product-features',
-  name: 'GDC Product Features',
-  slug: 'gdc-product-features',
-  createdBy: 'u7',
-  createdAt: '2025-01-01T00:00:00.000Z',
-};
-
-const GDC_SEED_USERS: Array<{ email: string; userId: string; name: string }> = [
-  { email: 'dean.ryan@gdcgroup.com',        userId: 'u1', name: 'Dean Ryan' },
-  { email: 'gabriel.cornoiu@gdcgroup.com',   userId: 'u2', name: 'Gabriel Cornoiu' },
-  { email: 'chloe.christie@gdcgroup.com',    userId: 'u3', name: 'Chloe Christie' },
-  { email: 'colin.brannigan@gdcgroup.com',   userId: 'u4', name: 'Colin Brannigan' },
-  { email: 'jessica.dordevic@gdcgroup.com',  userId: 'u5', name: 'Jessica Dordevic Cioffi' },
-  { email: 'miguel.migneco@gdcgroup.com',    userId: 'u6', name: 'Miguel Migneco' },
-  { email: 'michael.pett@gdcgroup.com',      userId: 'u7', name: 'Mike Pett' },
-  { email: 'ciara.carroll@gdcgroup.com',     userId: 'u8', name: 'Ciara Carroll' },
-  { email: 'victoria.dadson@gdcgroup.com',   userId: 'u9', name: 'Vic Dadson' },
-];
-
-/** Seed known users so returning sign-ins work even if registry wasn't populated yet. */
+/**
+ * Seed all tenant users so any of them can sign in and land in the workspace.
+ * Reads from lib/config/tenant.ts — no GDC-specific values here.
+ */
 export function seedRegistryIfEmpty() {
   if (typeof window === 'undefined') return;
   const registry = getRegistry();
   let changed = false;
 
-  for (const user of GDC_SEED_USERS) {
+  for (const user of USERS) {
     const key = user.email.toLowerCase();
     if (!registry[key]) {
       registry[key] = {
-        userId: user.userId,
+        userId: user.id,
         email: key,
         name: user.name,
-        workspaces: [GDC_WORKSPACE],
+        workspaces: [WORKSPACE],
       };
       changed = true;
     } else if (registry[key].userId === 'user-gdc-founder') {
-      // Migrate old Michael Pett entry to consistent u7 ID
-      registry[key].userId = 'u7';
-      registry[key].name = 'Mike Pett';
-      registry[key].workspaces = registry[key].workspaces.map(ws =>
-        ws.id === 'ws-gdc-product-features' ? { ...ws, createdBy: 'u7' } : ws
-      );
-      changed = true;
+      // Migrate legacy founder ID to the consistent tenant user ID
+      const tenantUser = USERS.find(u => u.email.toLowerCase() === key);
+      if (tenantUser) {
+        registry[key].userId = tenantUser.id;
+        registry[key].name = tenantUser.name;
+        registry[key].workspaces = registry[key].workspaces.map(ws =>
+          ws.id === WORKSPACE.id ? { ...ws, createdBy: WORKSPACE.createdBy } : ws
+        );
+        changed = true;
+      }
     }
   }
 

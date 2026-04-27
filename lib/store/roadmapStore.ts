@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { RoadmapTask, Priority } from '@/lib/types';
 import { GDC_SEED_ROADMAP_TASKS } from '@/lib/data/mockData';
+import { ROADMAP_PROJECTS as TENANT_ROADMAP_PROJECTS, SPRINT_CONFIG } from '@/lib/config/tenant';
 import {
   fetchRoadmapTasks,
   upsertRoadmapTask,
@@ -14,20 +15,22 @@ import {
   upsertRoadmapProject,
 } from '@/lib/supabase/queries';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 const P_RANK: Record<Priority, number> = { p0: 0, p1: 1, p2: 2, p3: 3 };
 
-// Sprints: 2-week sprints starting 2026-01-01. Generate 26 sprints (full year).
-export function generateSprints(count = 26) {
-  // Sprint 7 is current (starts Apr 2 2026)
-  const base = new Date('2026-01-08');
+// Sprints: configurable cadence from tenant config.
+// Each sprint starts on a Thursday and runs for SPRINT_CONFIG.sprintLengthDays.
+// The transition between sprints happens at SPRINT_CONFIG.transitionHour (e.g. 4 PM)
+// on the Thursday when the new sprint begins.
+export function generateSprints(count = SPRINT_CONFIG.totalSprints) {
+  const base = new Date(SPRINT_CONFIG.baseDate);
+  const len = SPRINT_CONFIG.sprintLengthDays;
   return Array.from({ length: count }, (_, i) => {
     const start = new Date(base);
-    start.setDate(base.getDate() + i * 14);
+    start.setDate(base.getDate() + i * len);
     const end = new Date(start);
-    end.setDate(start.getDate() + 13);
+    end.setDate(start.getDate() + len - 1);
     const month = start.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
     return {
       number: i + 1,
@@ -39,17 +42,35 @@ export function generateSprints(count = 26) {
   });
 }
 
-const ALL_SPRINTS = generateSprints(26);
+const ALL_SPRINTS = generateSprints();
 
+/**
+ * Returns the current sprint number, accounting for the 4 PM Thursday transition.
+ *
+ * On the Thursday when a new sprint begins:
+ *  - Before transitionHour → previous sprint is still "current"
+ *  - At/after transitionHour → new sprint is "current"
+ *
+ * This means the old sprint automatically drops off the visual roadmap at 4 PM
+ * every second Thursday, and the new sprint appears at the top.
+ */
 export function getCurrentSprintNumber(): number {
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-  for (const s of ALL_SPRINTS) {
-    if (todayStr >= s.startDate && todayStr <= s.endDate) return s.number;
-  }
-  // If before first sprint, return 1; if after all, return last
-  if (todayStr < ALL_SPRINTS[0].startDate) return 1;
-  return ALL_SPRINTS[ALL_SPRINTS.length - 1].number;
+  const now = new Date();
+  const base = new Date(SPRINT_CONFIG.baseDate);
+  const len = SPRINT_CONFIG.sprintLengthDays;
+  const hour = SPRINT_CONFIG.transitionHour;
+
+  // Calculate milliseconds elapsed since the transition instant of Sprint 1.
+  // The transition instant is baseDate at transitionHour (e.g. Dec 25 2025 @ 16:00).
+  const transitionBase = new Date(base);
+  transitionBase.setHours(hour, 0, 0, 0);
+
+  const elapsedMs = now.getTime() - transitionBase.getTime();
+  const msPerSprint = len * 24 * 60 * 60 * 1000;
+
+  if (elapsedMs < 0) return 1; // before Sprint 1 even begins
+  const sprintIndex = Math.floor(elapsedMs / msPerSprint);
+  return Math.min(sprintIndex + 1, ALL_SPRINTS.length);
 }
 
 export interface SprintCapacity {
@@ -106,7 +127,7 @@ export const useRoadmapStore = create<RoadmapState>()(
 
       return {
       tasks: [],
-      projects: ['Design Hygiene', 'Genesis', 'IUJs', 'Existing Product Enhancements', 'Existing Product Improvements', 'Hygiene Improvements', 'Promo Campaigns', 'New Features', 'Free to Play'],
+      projects: TENANT_ROADMAP_PROJECTS,
       teams: ['UX', 'DEV'],
       sprintCapacities: {},
       _undoStack: [] as UndoSnapshot[],
@@ -132,7 +153,18 @@ export const useRoadmapStore = create<RoadmapState>()(
         }
 
         if (!hasSupabase) return;
+
+        // READ-ON-EMPTY: Only fetch from Supabase if local store is empty.
+        // Prevents stale DB data from overwriting newer local edits.
+        // New browsers (empty localStorage) will pull from Supabase.
+        const localTasks2 = get().tasks;
+        if (localTasks2.length > 0) {
+          console.log('[roadmapStore] Local data exists (%d tasks), skipping Supabase fetch', localTasks2.length);
+          return;
+        }
+
         try {
+          console.log('[roadmapStore] No local data, fetching from Supabase...');
           const [tasks, caps, projects] = await Promise.all([
             fetchRoadmapTasks(workspaceId),
             fetchSprintCapacities(workspaceId),
@@ -146,6 +178,7 @@ export const useRoadmapStore = create<RoadmapState>()(
                 ? (t.priority ? 'p0' as Priority : 'p2' as Priority)
                 : (['p0','p1','p2','p3'].includes(t.priority) ? t.priority : 'p2' as Priority),
             }))});
+            console.log('[roadmapStore] Loaded %d tasks from Supabase', tasks.length);
           }
           if (Object.keys(caps).length > 0) set({ sprintCapacities: caps });
           if (projects.length > 0) set({ projects });

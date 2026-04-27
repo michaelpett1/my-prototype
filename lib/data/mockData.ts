@@ -1,79 +1,11 @@
 import type { TeamMember, TimelineItem, Objective, ActivityEvent, RoadmapSuggestion, RoadmapTask } from '@/lib/types';
+import { getTenantTeamMembers } from '@/lib/config/tenant';
 
-export const TEAM_MEMBERS: TeamMember[] = [
-  {
-    id: 'u1',
-    name: 'Dean Ryan',
-    email: 'dean.ryan@gdcgroup.com',
-    role: 'Senior Director Content Marketing',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Dean+Ryan&background=3B82F6&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-  {
-    id: 'u2',
-    name: 'Gabriel Cornoiu',
-    email: 'gabriel.cornoiu@gdcgroup.com',
-    role: 'Senior Director Product Development',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Gabriel+Cornoiu&background=8B5CF6&color=fff&size=40',
-    workspaceRole: 'admin',
-  },
-  {
-    id: 'u3',
-    name: 'Chloe Christie',
-    email: 'chloe.christie@gdcgroup.com',
-    role: 'Product Owner',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Chloe+Christie&background=10B981&color=fff&size=40',
-    workspaceRole: 'admin',
-  },
-  {
-    id: 'u4',
-    name: 'Colin Brannigan',
-    email: 'colin.brannigan@gdcgroup.com',
-    role: 'SVP GDC Core',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Colin+Brannigan&background=F59E0B&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-  {
-    id: 'u5',
-    name: 'Jessica Dordevic Cioffi',
-    email: 'jessica.dordevic@gdcgroup.com',
-    role: 'Product Designer',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Jessica+Dordevic+Cioffi&background=EC4899&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-  {
-    id: 'u6',
-    name: 'Miguel Migneco',
-    email: 'miguel.migneco@gdcgroup.com',
-    role: 'Senior Product Designer',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Miguel+Migneco&background=6366F1&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-  {
-    id: 'u7',
-    name: 'Mike Pett',
-    email: 'michael.pett@gdcgroup.com',
-    role: 'Product Manager',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Mike+Pett&background=2563EB&color=fff&size=40',
-    workspaceRole: 'owner',
-  },
-  {
-    id: 'u8',
-    name: 'Ciara Carroll',
-    email: 'ciara.carroll@gdcgroup.com',
-    role: 'Head of Design',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Ciara+Carroll&background=14B8A6&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-  {
-    id: 'u9',
-    name: 'Vic Dadson',
-    email: 'victoria.dadson@gdcgroup.com',
-    role: 'Web Analyst',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Vic+Dadson&background=F97316&color=fff&size=40',
-    workspaceRole: 'member',
-  },
-];
+/**
+ * Team members are defined in lib/config/tenant.ts.
+ * This export is kept for backwards compatibility with the rest of the app.
+ */
+export const TEAM_MEMBERS: TeamMember[] = getTenantTeamMembers();
 
 const today = new Date();
 const d = (offsetDays: number) => {

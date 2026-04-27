@@ -6,8 +6,7 @@ import {
   fetchActivityEvents,
 } from '@/lib/supabase/queries';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 interface ActivityState {
   events: ActivityEvent[];
@@ -27,6 +26,11 @@ export const useActivityStore = create<ActivityState>((set, get) => ({
     const wsId = workspaceId ?? null;
     set({ _loadedWorkspaceId: wsId });
     if (!hasSupabase) return;
+
+    // READ-ON-EMPTY: Only fetch from Supabase if local store is empty.
+    const localEvents = get().events;
+    if (localEvents.length > 0) return;
+
     try {
       const events = await fetchActivityEvents(workspaceId);
       if (events.length > 0) set({ events });

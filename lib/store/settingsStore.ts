@@ -14,15 +14,9 @@ import {
   upsertWorkspaceSettings as dbUpsertWorkspaceSettings,
 } from '@/lib/supabase/queries';
 import { TEAM_MEMBERS } from '@/lib/data/mockData';
+import { WORKSPACE, DEPARTMENTS as TENANT_DEPARTMENTS, SEED_KEYS } from '@/lib/config/tenant';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
-
-const DEFAULT_DEPARTMENTS: Department[] = [
-  { id: 'dept-1', name: 'GDC Product Led Growth', color: '#22C55E', password: 'PLG2026!' },
-  { id: 'dept-2', name: 'Design', color: '#F97316', password: 'Design2026!' },
-  { id: 'dept-3', name: 'Web Analysts', color: '#3B82F6', password: 'Analytics2026!' },
-];
+const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 interface SettingsState extends AppSettings {
   teamMembers: TeamMember[];
@@ -78,12 +72,12 @@ export const useSettingsStore = create<SettingsState>()(
 
         // Workspace changed — reset team members for the new workspace
         if (prevWsId !== wsId) {
-          if (wsId === 'ws-gdc-product-features') {
-            // GDC workspace: seed once, flag prevents re-seeding after user edits
-            const seeded = typeof window !== 'undefined' && localStorage.getItem('northstar-team-seeded');
+          if (wsId === WORKSPACE.id) {
+            // Tenant workspace: seed once, flag prevents re-seeding after user edits
+            const seeded = typeof window !== 'undefined' && localStorage.getItem(SEED_KEYS.teamSeeded);
             if (!seeded) {
               set({ teamMembers: TEAM_MEMBERS, _loadedWorkspaceId: wsId });
-              if (typeof window !== 'undefined') localStorage.setItem('northstar-team-seeded', '1');
+              if (typeof window !== 'undefined') localStorage.setItem(SEED_KEYS.teamSeeded, '1');
             } else {
               // Already seeded before — but members may have been cleared by workspace switch
               const current = useSettingsStore.getState().teamMembers;
@@ -107,27 +101,35 @@ export const useSettingsStore = create<SettingsState>()(
           }
         }
 
-        if (!hasSupabase) {
-          // Deduplicate by email AND by id (fixes stale duplicates from earlier bugs)
-          const current = useSettingsStore.getState().teamMembers;
-          if (current.length > 0) {
-            const seenEmails = new Set<string>();
-            const seenIds = new Set<string>();
-            const deduped = current.filter(m => {
-              const emailKey = m.email.toLowerCase();
-              if (seenEmails.has(emailKey) || seenIds.has(m.id)) return false;
-              seenEmails.add(emailKey);
-              seenIds.add(m.id);
-              return true;
-            });
-            if (deduped.length !== current.length) {
-              set({ teamMembers: deduped });
-            }
+        // Always deduplicate by email AND by id (fixes stale duplicates)
+        const current = useSettingsStore.getState().teamMembers;
+        if (current.length > 0) {
+          const seenEmails = new Set<string>();
+          const seenIds = new Set<string>();
+          const deduped = current.filter(m => {
+            const emailKey = m.email.toLowerCase();
+            if (seenEmails.has(emailKey) || seenIds.has(m.id)) return false;
+            seenEmails.add(emailKey);
+            seenIds.add(m.id);
+            return true;
+          });
+          if (deduped.length !== current.length) {
+            console.log('[settingsStore] Deduped team members: %d → %d', current.length, deduped.length);
+            set({ teamMembers: deduped });
           }
+        }
+
+        if (!hasSupabase) return;
+
+        // READ-ON-EMPTY: Only fetch from Supabase if local store is empty.
+        if (current.length > 0) {
+          console.log('[settingsStore] Local data exists (%d members), skipping Supabase fetch', current.length);
           return;
         }
+
         set({ isLoadingTeam: true });
         try {
+          console.log('[settingsStore] No local data, fetching from Supabase...');
           const [teamMembers, wsSettings] = await Promise.all([
             fetchTeamMembers(workspaceId),
             workspaceId ? fetchWorkspaceSettings(workspaceId) : Promise.resolve(null),
@@ -225,12 +227,12 @@ export const useSettingsStore = create<SettingsState>()(
           return;
         }
         if (typeof window === 'undefined') return;
-        if (workspaceId === 'ws-gdc-product-features') {
+        if (workspaceId === WORKSPACE.id) {
           // Only seed if this browser has never been seeded (permanent flag)
-          const gdcSeeded = localStorage.getItem('northstar-gdc-initial-seed-v3');
+          const tenantSeeded = localStorage.getItem(SEED_KEYS.initialSeed);
           const currentDepts = useSettingsStore.getState().departments;
-          if (currentDepts.length === 0 && !gdcSeeded) {
-            set({ departments: DEFAULT_DEPARTMENTS });
+          if (currentDepts.length === 0 && !tenantSeeded) {
+            set({ departments: TENANT_DEPARTMENTS });
           }
         }
       },

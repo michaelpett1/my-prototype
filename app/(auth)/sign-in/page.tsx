@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useSettingsStore } from '@/lib/store/settingsStore';
 import { lookupUser, seedRegistryIfEmpty } from '@/lib/utils/userRegistry';
+import { SIMULATED_PASSWORD } from '@/lib/config/tenant';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 export default function SignInPage() {
@@ -110,7 +111,7 @@ function SignInForm() {
       const existingRecord = lookupUser(email);
 
       // Validate password for registered users
-      if (existingRecord && password !== 'P@ssword!123') {
+      if (existingRecord && password !== SIMULATED_PASSWORD) {
         setError('Invalid email or password.');
         setLoading(false);
         return;

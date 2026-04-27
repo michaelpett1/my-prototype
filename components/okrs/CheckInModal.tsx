@@ -33,6 +33,15 @@ export function CheckInModal({ kr, objectiveId, onClose }: CheckInModalProps) {
   const { addCheckIn, updateKeyResult } = useOKRsStore();
 
   const progress = calcKRProgress(kr.startValue, value, kr.targetValue);
+  const clampedProgress = Math.min(100, Math.max(0, Math.round(progress)));
+
+  // Convert percentage (0-100) → raw value
+  // Works for all metric types including binary (start=0, target=1 → 0–100% maps to 0–1)
+  const setFromPercent = (pct: number) => {
+    const clamped = Math.min(100, Math.max(0, pct));
+    const raw = kr.startValue + (clamped / 100) * (kr.targetValue - kr.startValue);
+    setValue(Math.round(raw * 100) / 100);
+  };
 
   const fireConfetti = () => {
     // Fire from both sides for a celebration effect
@@ -83,6 +92,17 @@ export function CheckInModal({ kr, objectiveId, onClose }: CheckInModalProps) {
     transition: 'border-color 150ms ease-out',
   };
 
+  // Data-led KRs (number, currency) use the actual value range on the slider
+  const isDataLed = kr.metricType !== 'binary' && kr.metricType !== 'percentage';
+
+  // Colour helpers based on progress
+  const accentColor = progress >= 100 ? '#16A34A' : progress >= 50 ? '#2563EB' : 'var(--text-primary)';
+  const trackBg = progress >= 100 ? '#BBF7D0' : progress >= 50 ? '#BFDBFE' : '#E5E7EB';
+
+  // Sensible step for the value slider (1 for small ranges, larger for big ranges)
+  const range = kr.targetValue - kr.startValue;
+  const sliderStep = range > 1000 ? 10 : range > 100 ? 1 : 0.01;
+
   // Tick marks for 0%, 25%, 50%, 75%, 100%
   const ticks = [0, 25, 50, 75, 100];
   const closestTick = ticks.reduce((prev, curr) =>
@@ -93,97 +113,167 @@ export function CheckInModal({ kr, objectiveId, onClose }: CheckInModalProps) {
     <Modal open onClose={onClose} title="Update Achieved Target">
       <div style={{ minWidth: 380 }}>
         {/* KR Title */}
-        <p className="text-[14px] font-bold leading-snug mb-1" style={{ color: 'var(--text-primary)' }}>
+        <p className="text-[14px] font-bold leading-snug mb-3" style={{ color: 'var(--text-primary)' }}>
           {kr.title}
         </p>
-        <p className="text-[13px] mb-4" style={{ color: '#16A34A', fontWeight: 500 }}>
-          Completion progress: <strong>{Math.round(progress)}%</strong>
-        </p>
 
-        {/* Slider + number input */}
-        <div className="mb-5">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-[12px] font-mono" style={{ color: 'var(--text-tertiary)' }}>
-              {kr.metricType === 'binary' ? 0 : kr.startValue}
+        {/* Progress update — slider + input */}
+        <div
+          className="mb-5 rounded-xl"
+          style={{
+            background: progress >= 100
+              ? 'linear-gradient(135deg, #DCFCE7 0%, #D1FAE5 100%)'
+              : progress >= 50
+                ? 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)'
+                : 'linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%)',
+            padding: '16px 20px',
+            border: `1px solid ${progress >= 100 ? '#BBF7D0' : progress >= 50 ? '#BFDBFE' : 'var(--border)'}`,
+          }}
+        >
+          {/* Header: label + value tally */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[12px] font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+              Current Progress
             </span>
-            <div className="flex-1 flex items-center gap-2">
-              {kr.metricType === 'binary' ? (
-                <select
-                  value={value}
-                  onChange={e => setValue(Number(e.target.value))}
-                  style={inputStyle}
-                >
-                  <option value={0}>Not done</option>
-                  <option value={1}>Done</option>
-                </select>
-              ) : (
-                <>
-                  <input
-                    type="number"
-                    value={value}
-                    onChange={e => setValue(Number(e.target.value))}
-                    style={{
-                      ...inputStyle,
-                      width: 70,
-                      textAlign: 'center',
-                      padding: '6px 4px',
-                      fontWeight: 600,
-                    }}
-                  />
-                  <div className="flex items-center" style={{ color: 'var(--text-disabled)' }}>
-                    <button
-                      type="button"
-                      onClick={() => setValue(v => v + 1)}
-                      className="block text-[10px] leading-none px-0.5"
-                      style={{ color: 'var(--text-muted)', cursor: 'pointer', background: 'none', border: 'none' }}
-                    >
-                      &#9650;
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setValue(v => v - 1)}
-                      className="block text-[10px] leading-none px-0.5"
-                      style={{ color: 'var(--text-muted)', cursor: 'pointer', background: 'none', border: 'none' }}
-                    >
-                      &#9660;
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-            <span className="text-[12px] font-mono" style={{ color: 'var(--text-tertiary)' }}>
-              {kr.metricType === 'binary' ? 1 : kr.targetValue}
+            <span className="text-[13px] font-semibold" style={{ color: accentColor }}>
+              {fmt(kr, value)} / {fmt(kr, kr.targetValue)}
             </span>
           </div>
 
-          {/* Progress bar with ticks */}
-          {kr.metricType !== 'binary' && (
-            <div className="relative mt-1">
-              <div
-                className="w-full rounded-full overflow-hidden"
-                style={{ height: 6, background: 'var(--border-light)' }}
-              >
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, Math.max(0, progress))}%`, background: 'var(--text-primary)' }}
+          {isDataLed ? (
+            /* ── Data-led KR: slider + input use actual values (start → target) ── */
+            <>
+              {/* Large value display + editable input */}
+              <div className="flex items-center justify-center gap-1.5 mb-3">
+                {kr.metricType === 'currency' && (
+                  <span className="text-[22px] font-extrabold leading-none" style={{ color: accentColor }}>$</span>
+                )}
+                <input
+                  type="number"
+                  min={kr.startValue}
+                  max={kr.targetValue}
+                  value={value}
+                  onChange={e => setValue(Number(e.target.value))}
+                  className="text-center font-extrabold leading-none"
+                  style={{
+                    fontSize: 32,
+                    width: kr.metricType === 'currency' ? 140 : 100,
+                    color: accentColor,
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `2px solid ${accentColor}`,
+                    outline: 'none',
+                    letterSpacing: '-0.02em',
+                    padding: '0 2px 2px',
+                    MozAppearance: 'textfield',
+                  }}
                 />
+                {kr.metricType === 'percentage' && (
+                  <span className="text-[22px] font-extrabold leading-none" style={{ color: accentColor }}>%</span>
+                )}
               </div>
-              {/* Tick labels */}
-              <div className="flex justify-between mt-1.5">
-                {ticks.map(t => (
-                  <span
-                    key={t}
-                    className="text-[11px]"
-                    style={{
-                      color: t === closestTick ? '#16A34A' : 'var(--text-muted)',
-                      fontWeight: t === closestTick ? 600 : 400,
-                    }}
-                  >
-                    {t}%
+
+              {/* Range slider: start value → target value */}
+              <div className="relative" style={{ padding: '0 2px' }}>
+                <input
+                  type="range"
+                  min={kr.startValue}
+                  max={kr.targetValue}
+                  step={sliderStep}
+                  value={Math.min(kr.targetValue, Math.max(kr.startValue, value))}
+                  onChange={e => setValue(Number(e.target.value))}
+                  className="progress-slider"
+                  style={{
+                    width: '100%',
+                    height: 8,
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    borderRadius: 999,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    background: `linear-gradient(to right, ${accentColor} ${clampedProgress}%, ${trackBg} ${clampedProgress}%)`,
+                  }}
+                />
+                {/* Start / Target labels */}
+                <div className="flex justify-between mt-1.5">
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                    {fmt(kr, kr.startValue)}
                   </span>
-                ))}
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>
+                    {fmt(kr, kr.targetValue)}
+                  </span>
+                </div>
               </div>
-            </div>
+            </>
+          ) : (
+            /* ── Binary / percentage-only KR: slider uses 0–100% ── */
+            <>
+              {/* Large % display + editable input */}
+              <div className="flex items-center justify-center gap-1 mb-3">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={clampedProgress}
+                  onChange={e => setFromPercent(Number(e.target.value))}
+                  className="text-center font-extrabold leading-none"
+                  style={{
+                    fontSize: 32,
+                    width: 80,
+                    color: accentColor,
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: `2px solid ${accentColor}`,
+                    outline: 'none',
+                    letterSpacing: '-0.02em',
+                    padding: '0 2px 2px',
+                    MozAppearance: 'textfield',
+                  }}
+                />
+                <span className="text-[24px] font-extrabold leading-none" style={{ color: accentColor }}>
+                  %
+                </span>
+              </div>
+
+              {/* Range slider: 0–100% */}
+              <div className="relative" style={{ padding: '0 2px' }}>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={clampedProgress}
+                  onChange={e => setFromPercent(Number(e.target.value))}
+                  className="progress-slider"
+                  style={{
+                    width: '100%',
+                    height: 8,
+                    appearance: 'none',
+                    WebkitAppearance: 'none',
+                    borderRadius: 999,
+                    outline: 'none',
+                    cursor: 'pointer',
+                    background: `linear-gradient(to right, ${accentColor} ${clampedProgress}%, ${trackBg} ${clampedProgress}%)`,
+                  }}
+                />
+                {/* Tick labels */}
+                <div className="flex justify-between mt-1.5">
+                  {ticks.map(t => (
+                    <span
+                      key={t}
+                      className="text-[10px]"
+                      style={{
+                        color: t === closestTick
+                          ? accentColor
+                          : 'var(--text-muted)',
+                        fontWeight: t === closestTick ? 700 : 400,
+                      }}
+                    >
+                      {t}%
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
 

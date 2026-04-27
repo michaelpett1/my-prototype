@@ -7,7 +7,8 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { useRoadmapStore } from '@/lib/store/roadmapStore';
 import { useSuggestionsStore } from '@/lib/store/suggestionsStore';
 import { useActivityStore } from '@/lib/store/activityStore';
-import { TIMELINE_ITEMS, OBJECTIVES, GDC_SEED_ROADMAP_TASKS, TEAM_MEMBERS } from '@/lib/data/mockData';
+import { TIMELINE_ITEMS, OBJECTIVES, GDC_SEED_ROADMAP_TASKS } from '@/lib/data/mockData';
+import { WORKSPACE, TIMELINE_GROUPS, SEED_KEYS } from '@/lib/config/tenant';
 import {
   upsertTimelineItem,
   upsertObjective,
@@ -17,26 +18,24 @@ import {
   upsertTeamMember,
   upsertDepartment,
   upsertRoadmapProject,
+  upsertSprintCapacity,
+  upsertSuggestion as dbUpsertSuggestion,
 } from '@/lib/supabase/queries';
 
-const hasSupabase = false; // TODO: restore when Supabase is configured
-// const hasSupabase = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const hasSupabase = !!(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
-const GDC_WS_ID = 'ws-gdc-product-features';
-const GDC_INITIAL_SEED_KEY = 'northstar-gdc-initial-seed-v3';
-const GDC_SUPABASE_SYNC_KEY = 'northstar-gdc-supabase-synced-v3';
-
-const DEFAULT_GROUPS = [
-  { id: 'grp-1', name: 'New Features', color: '#2563EB' },
-  { id: 'grp-2', name: 'Existing Product Improvements', color: '#22C55E' },
-  { id: 'grp-3', name: 'Hygiene Improvements', color: '#EC4899' },
-  { id: 'grp-4', name: 'Free to Play', color: '#F59E0B' },
-];
+// All tenant-specific identifiers now come from lib/config/tenant.ts
+const GDC_WS_ID = WORKSPACE.id;
+const GDC_INITIAL_SEED_KEY = SEED_KEYS.initialSeed;
+const DEFAULT_GROUPS = TIMELINE_GROUPS;
 
 /**
  * One-time seed for the GDC demo workspace.
  * Only runs if this browser has NEVER been seeded before.
- * The flag is never cleared by onboarding or workspace switching.
+ * Seeds localStorage only — Supabase gets data via write-through.
  */
 function seedGDCOnce() {
   if (typeof window === 'undefined') return;
@@ -66,96 +65,122 @@ function seedGDCOnce() {
 
   // Mark as done — never re-seed
   localStorage.setItem(GDC_INITIAL_SEED_KEY, '1');
-
-  // If Supabase is available, push seed data to the DB
-  if (hasSupabase) {
-    syncSeedToSupabase();
-  }
 }
 
 /**
- * Push GDC seed data to Supabase so it persists server-side.
- * Runs once per browser (separate flag from the seed itself).
+ * Push the CURRENT Zustand store state to Supabase.
+ * Runs once per browser when Supabase is available and the store has local data.
+ * This ensures new users/browsers can pull shared data from Supabase.
+ *
+ * KEY DESIGN: This only WRITES to Supabase. It never reads back or overwrites
+ * local state. The read-on-empty pattern in each store handles reads.
  */
-async function syncSeedToSupabase() {
+async function syncStateToSupabase(wsId: string) {
   if (typeof window === 'undefined') return;
-  if (localStorage.getItem(GDC_SUPABASE_SYNC_KEY)) return;
+  if (localStorage.getItem(SEED_KEYS.stateSync)) return;
+
+  console.log('[useDataInit] Syncing current state to Supabase (write-only, no overwrite)...');
 
   try {
-    // Always push the FULL seed constants — not whatever is in the store
-    // This ensures all seed data makes it to Supabase even if the store
-    // was partially loaded from a previous incomplete sync.
+    // Push current roadmap tasks
+    const tasks = useRoadmapStore.getState().tasks;
+    for (const task of tasks) {
+      await upsertRoadmapTask(task, wsId).catch(err =>
+        console.warn('[sync] upsertRoadmapTask failed:', task.id, err?.message)
+      );
+    }
+
+    // Push sprint capacities
+    const caps = useRoadmapStore.getState().sprintCapacities;
+    for (const [sprintStr, cap] of Object.entries(caps)) {
+      await upsertSprintCapacity(Number(sprintStr), cap.dev, cap.ux, wsId).catch(err =>
+        console.warn('[sync] upsertSprintCapacity failed:', sprintStr, err?.message)
+      );
+    }
 
     // Push timeline items
-    for (const item of TIMELINE_ITEMS) {
-      await upsertTimelineItem(item, GDC_WS_ID).catch(() => {});
-    }
-
-    // Push objectives + key results from the constant
-    for (const obj of OBJECTIVES) {
-      await upsertObjective(obj, GDC_WS_ID).catch(() => {});
-      for (const kr of obj.keyResults) {
-        await upsertKeyResult(kr, GDC_WS_ID).catch(() => {});
-      }
-    }
-
-    // Push roadmap tasks
-    for (const task of GDC_SEED_ROADMAP_TASKS) {
-      await upsertRoadmapTask(task, GDC_WS_ID).catch(() => {});
+    const items = useProjectsStore.getState().items;
+    for (const item of items) {
+      await upsertTimelineItem(item, wsId).catch(err =>
+        console.warn('[sync] upsertTimelineItem failed:', item.id, err?.message)
+      );
     }
 
     // Push timeline groups
-    for (let i = 0; i < DEFAULT_GROUPS.length; i++) {
-      await upsertTimelineGroup(DEFAULT_GROUPS[i], i, GDC_WS_ID).catch(() => {});
+    const groups = useProjectsStore.getState().groups;
+    for (let i = 0; i < groups.length; i++) {
+      await upsertTimelineGroup(groups[i], i, wsId).catch(err =>
+        console.warn('[sync] upsertTimelineGroup failed:', groups[i].id, err?.message)
+      );
+    }
+
+    // Push objectives + key results
+    const objectives = useOKRsStore.getState().objectives;
+    for (const obj of objectives) {
+      await upsertObjective(obj, wsId).catch(err =>
+        console.warn('[sync] upsertObjective failed:', obj.id, err?.message)
+      );
+      for (const kr of obj.keyResults) {
+        await upsertKeyResult(kr, wsId).catch(err =>
+          console.warn('[sync] upsertKeyResult failed:', kr.id, err?.message)
+        );
+      }
     }
 
     // Push team members
-    for (const member of TEAM_MEMBERS) {
-      await upsertTeamMember(member, GDC_WS_ID).catch(() => {});
+    const teamMembers = useSettingsStore.getState().teamMembers;
+    for (const member of teamMembers) {
+      await upsertTeamMember(member, wsId).catch(err =>
+        console.warn('[sync] upsertTeamMember failed:', member.id, err?.message)
+      );
     }
 
     // Push departments
-    const DEFAULT_DEPARTMENTS = [
-      { id: 'dept-1', name: 'GDC Product Led Growth', color: '#22C55E', password: 'PLG2026!' },
-      { id: 'dept-2', name: 'Design', color: '#F97316', password: 'Design2026!' },
-      { id: 'dept-3', name: 'Web Analysts', color: '#3B82F6', password: 'Analytics2026!' },
-    ];
-    for (const dept of DEFAULT_DEPARTMENTS) {
-      await upsertDepartment(dept, GDC_WS_ID).catch(() => {});
+    const departments = useSettingsStore.getState().departments;
+    for (const dept of departments) {
+      await upsertDepartment(dept, wsId).catch(err =>
+        console.warn('[sync] upsertDepartment failed:', dept.id, err?.message)
+      );
     }
 
     // Push roadmap projects
-    const ROADMAP_PROJECTS = ['Design Hygiene', 'Genesis', 'IUJs', 'Existing Product Enhancements', 'Existing Product Improvements', 'Hygiene Improvements', 'Promo Campaigns', 'New Features', 'Free to Play'];
-    for (const name of ROADMAP_PROJECTS) {
-      await upsertRoadmapProject(name, GDC_WS_ID).catch(() => {});
+    const projects = useRoadmapStore.getState().projects;
+    for (const name of projects) {
+      await upsertRoadmapProject(name, wsId).catch(err =>
+        console.warn('[sync] upsertRoadmapProject failed:', name, err?.message)
+      );
     }
 
-    // Now refresh stores from Supabase to ensure state matches DB
-    const objectives = await import('@/lib/supabase/queries').then(q => q.fetchObjectives(GDC_WS_ID));
-    if (objectives.length > 0) {
-      useOKRsStore.setState({ objectives });
-    }
-    const items = await import('@/lib/supabase/queries').then(q => q.fetchTimelineItems(GDC_WS_ID));
-    if (items.length > 0) {
-      useProjectsStore.setState({ items });
-    }
-    const tasks = await import('@/lib/supabase/queries').then(q => q.fetchRoadmapTasks(GDC_WS_ID));
-    if (tasks.length > 0) {
-      useRoadmapStore.setState({ tasks });
+    // Push suggestions
+    const suggestions = useSuggestionsStore.getState().suggestions;
+    for (const s of suggestions) {
+      await dbUpsertSuggestion(s, wsId).catch(err =>
+        console.warn('[sync] upsertSuggestion failed:', s.id, err?.message)
+      );
     }
 
-    localStorage.setItem(GDC_SUPABASE_SYNC_KEY, '1');
-    console.log('[useDataInit] GDC seed synced to Supabase');
+    // NOTE: We intentionally do NOT read back from Supabase here.
+    // Local state is the truth. Supabase is the shared copy.
+    localStorage.setItem(SEED_KEYS.stateSync, '1');
+    console.log('[useDataInit] State synced to Supabase successfully (no overwrite)');
   } catch (err) {
-    console.error('[useDataInit] Supabase sync failed:', err);
+    console.error('[useDataInit] State sync to Supabase failed:', err);
   }
 }
 
 /**
  * Call once at the app shell level. Loads all remote data on mount.
- * Falls back silently to mock data when Supabase env vars are absent.
- * Scopes all queries to the current workspace.
- * Re-loads when workspace changes.
+ *
+ * ARCHITECTURE (read-on-empty + write-through):
+ * ─────────────────────────────────────────────
+ * 1. Stores rehydrate from localStorage (Zustand persist middleware).
+ * 2. Each store's load() checks if local data exists:
+ *    - YES: Skip Supabase fetch. Local data is the truth.
+ *    - NO:  Fetch from Supabase (new browser gets shared data).
+ * 3. All writes (add/update/delete) go to BOTH local state AND Supabase.
+ * 4. First user's syncStateToSupabase() pushes local state so others can read it.
+ *
+ * This prevents Supabase from EVER overwriting existing local edits.
  */
 export function useDataInit() {
   const currentWorkspaceId = useRef<string | null>(null);
@@ -179,29 +204,36 @@ export function useDataInit() {
 
     currentWorkspaceId.current = wsId;
 
-    Promise.all([
-      loadProjects(wsId),
-      loadOKRs(wsId),
-      loadTeam(wsId),
-      loadRoadmap(wsId),
-      loadSuggestions(wsId),
-      loadActivity(wsId),
-    ]).then(() => {
-      // One-time GDC demo seed (only on very first app use, never again)
+    const doInit = async () => {
+      // ── Step 1: Load all stores ──
+      // Each store uses read-on-empty: keeps local data if present,
+      // fetches from Supabase only if localStorage is empty.
+      await Promise.all([
+        loadProjects(wsId),
+        loadOKRs(wsId),
+        loadTeam(wsId),
+        loadRoadmap(wsId),
+        loadSuggestions(wsId),
+        loadActivity(wsId),
+      ]);
+
+      // ── Step 2: One-time local seed (first ever app use) ──
       if (wsId === GDC_WS_ID) {
         seedGDCOnce();
-        // Also sync existing seed data to Supabase if not done yet
-        if (hasSupabase && !localStorage.getItem(GDC_SUPABASE_SYNC_KEY)) {
-          syncSeedToSupabase();
-        }
       }
 
-      // Seed workspace-specific data for known workspaces if empty
+      // Seed workspace-specific data if empty
       seedRoadmap(wsId);
       seedDepts(wsId);
 
-      // Ensure the current user is always in the team members list as owner
-      // (handles new workspaces where the creator must appear)
+      // ── Step 3: Push local state to Supabase (write-only, one-time) ──
+      // This runs AFTER seeding so Supabase gets the full dataset.
+      // It never reads back or overwrites local state.
+      if (hasSupabase && !localStorage.getItem(SEED_KEYS.stateSync)) {
+        syncStateToSupabase(wsId);
+      }
+
+      // ── Step 4: Ensure current user is in team members ──
       if (user?.email) {
         const settings = useSettingsStore.getState();
         const alreadyExists = settings.teamMembers.some(
@@ -220,8 +252,10 @@ export function useDataInit() {
           });
         }
       }
-    }).catch(() => {
-      // Errors are logged per-store; app degrades to mock data gracefully
+    };
+
+    doInit().catch((err) => {
+      console.error('[useDataInit] init failed:', err);
     });
   }, [loadProjects, loadOKRs, loadTeam, seedDepts, seedRoadmap, loadRoadmap, loadSuggestions, loadActivity, currentWorkspace, user]);
 }
