@@ -47,7 +47,7 @@ const Flag = ({ code }) => {
 const TrendIcon = ({ trend, delta }) => {
   if (trend === 'up') return <span className="lb-trend up"><Icon name="arrowUp" size={10}/>{delta || ''}</span>;
   if (trend === 'down') return <span className="lb-trend down"><Icon name="arrowDown" size={10}/>{delta || ''}</span>;
-  return <span className="lb-trend flat">·</span>;
+  return <span className="lb-trend flat" aria-label="No change">—</span>;
 };
 
 window.Icon = Icon;

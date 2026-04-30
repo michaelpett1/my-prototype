@@ -83,12 +83,39 @@ const SubNav = ({ active, setActive }) => {
 const AppHeader = () => null;
 const BottomNav = () => null;
 
+// Live countdown to next fixture lock — re-renders every second.
+function useCountdown(target) {
+  const [now, setNow] = React.useState(() => Date.now());
+  React.useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const diff = Math.max(0, target - now);
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff / 3600000) % 24);
+  const mins = Math.floor((diff / 60000) % 60);
+  const secs = Math.floor((diff / 1000) % 60);
+  const pad = (n) => String(n).padStart(2, '0');
+  return { days: pad(days), hrs: pad(hrs), mins: pad(mins), secs: pad(secs), done: diff === 0 };
+}
+
 // =================== HOME / LANDING ===================
 const HomeScreen = ({ setActive }) => {
-  const { FIXTURES, LEADERBOARD } = window.WC_DATA;
+  const { FIXTURES, LEADERBOARD, ME } = window.WC_DATA;
   const live = FIXTURES.find(f => f.status === 'live');
   const upcoming = FIXTURES.filter(f => f.status === 'open' && !f.myPick).slice(0, 3);
   const me = LEADERBOARD.find(l => l.me);
+
+  // Anchor the countdown to a fixed instant computed once on mount so it
+  // always reads ~2 days out and visibly ticks. This avoids drift between
+  // re-renders.
+  const lockTarget = React.useRef(Date.now() + 2 * 86400000 + 14 * 3600000 + 22 * 60000).current;
+  const cd = useCountdown(lockTarget);
+
+  const handleNav = (id) => (e) => {
+    e.preventDefault();
+    setActive(id);
+  };
 
   return (
     <div className="screen">
@@ -96,25 +123,25 @@ const HomeScreen = ({ setActive }) => {
         <div className="wc-hero-grid">
           <div>
             <div className="eyebrow"><span className="dot"/>Tournament live · Matchday 1</div>
-            <h1>Pick smart.<br/>Win <em>big.</em></h1>
+            <h1>Pick smart. Win <em>big.</em></h1>
             <p className="lede">Predict every match of the FIFA World Cup 2026. Free to play. £10,000 in prizes for the sharpest minds — courtesy of the team at Gambling.com.</p>
             <div style={{display:'flex', gap: 10, marginTop: 22, flexWrap: 'wrap'}}>
-              <button className="btn" onClick={() => setActive('predict')}>Make your picks →</button>
-              <button className="btn btn-secondary" style={{background:'rgba(255,255,255,0.10)', color:'#fff', borderColor:'transparent'}} onClick={() => setActive('how')}>How it works</button>
+              <button type="button" className="btn" onClick={handleNav('predict')}>Make your picks →</button>
+              <button type="button" className="btn btn-secondary" style={{background:'rgba(255,255,255,0.10)', color:'#fff', borderColor:'transparent'}} onClick={handleNav('how')}>How it works</button>
             </div>
           </div>
           <div>
-            <div className="countdown">
-              <div className="cd-cell"><div className="v">02</div><div className="l">Days</div></div>
-              <div className="cd-cell"><div className="v">14</div><div className="l">Hrs</div></div>
-              <div className="cd-cell"><div className="v">22</div><div className="l">Min</div></div>
-              <div className="cd-cell"><div className="v">38</div><div className="l">Sec</div></div>
+            <div className="countdown" aria-live="polite">
+              <div className="cd-cell"><div className="v">{cd.days}</div><div className="l">Days</div></div>
+              <div className="cd-cell"><div className="v">{cd.hrs}</div><div className="l">Hrs</div></div>
+              <div className="cd-cell"><div className="v">{cd.mins}</div><div className="l">Min</div></div>
+              <div className="cd-cell"><div className="v">{cd.secs}</div><div className="l">Sec</div></div>
             </div>
             <div style={{fontSize: 10.5, marginTop: 10, opacity: 0.75, letterSpacing: '0.1em', textAlign:'center'}}>UNTIL NEXT FIXTURE LOCKS</div>
             <div className="stat-row">
-              <div className="stat"><div className="v">142</div><div className="l">Your pts</div></div>
-              <div className="stat"><div className="v">#247</div><div className="l">Global</div></div>
-              <div className="stat"><div className="v">9/12</div><div className="l">Picks set</div></div>
+              <div className="stat"><div className="v">{ME.pts}</div><div className="l">Your pts</div></div>
+              <div className="stat"><div className="v">#{ME.rank}</div><div className="l">Global</div></div>
+              <div className="stat"><div className="v">{ME.groupPicks.done}/{ME.groupPicks.total}</div><div className="l">Picks set</div></div>
             </div>
           </div>
         </div>
@@ -125,7 +152,7 @@ const HomeScreen = ({ setActive }) => {
           <div>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12}}>
               <h2 style={{margin:0, fontSize: 17, fontWeight: 700}}>Predictions due</h2>
-              <span className="more" style={{fontSize:12, fontWeight:600, color:'var(--gdc-blue-600)', cursor:'pointer'}} onClick={() => setActive('predict')}>See all →</span>
+              <button type="button" className="link-more" onClick={handleNav('predict')}>See all →</button>
             </div>
             {live && <FixtureCard fixture={live} compact/>}
             {upcoming.map(f => <FixtureCard key={f.id} fixture={f}/>)}
@@ -133,7 +160,7 @@ const HomeScreen = ({ setActive }) => {
           <div>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12}}>
               <h2 style={{margin:0, fontSize: 17, fontWeight: 700}}>Top of the table</h2>
-              <span className="more" style={{fontSize:12, fontWeight:600, color:'var(--gdc-blue-600)', cursor:'pointer'}} onClick={() => setActive('leagues')}>Full board →</span>
+              <button type="button" className="link-more" onClick={handleNav('leagues')}>Full board →</button>
             </div>
             {LEADERBOARD.slice(0, 6).map(r => <LeaderRow key={r.rank} row={r}/>)}
             <LeaderRow row={me}/>
@@ -165,6 +192,15 @@ const FixtureCard = ({ fixture: f, compact, onUpdate }) => {
   const isLive = f.status === 'live';
   const isFinal = f.status === 'final';
   const hasPick = h !== '' && a !== '';
+  const partial = (h !== '' || a !== '') && !hasPick;
+  const clampScore = (raw) => {
+    const digits = raw.replace(/\D/g, '').slice(0, 2);
+    if (digits === '') return '';
+    return String(Math.min(20, parseInt(digits, 10)));
+  };
+  const handleBlur = () => {
+    if (partial) { setH(''); setA(''); writeBack('', ''); }
+  };
 
   return (
     <div className={`fixture ${isLive ? 'is-live' : ''} ${isFinal ? 'is-locked' : ''}`}>
@@ -198,8 +234,11 @@ const FixtureCard = ({ fixture: f, compact, onUpdate }) => {
             <input
               className={`score-box ${h !== '' ? 'set' : ''}`}
               value={h}
-              onChange={(e) => { const v = e.target.value.replace(/\D/g,'').slice(0,2); setH(v); writeBack(v, a); }}
+              onChange={(e) => { const v = clampScore(e.target.value); setH(v); writeBack(v, a); }}
+              onBlur={handleBlur}
               inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
               placeholder="–"
               aria-label={`${home.name} score`}
             />
@@ -207,8 +246,11 @@ const FixtureCard = ({ fixture: f, compact, onUpdate }) => {
             <input
               className={`score-box ${a !== '' ? 'set' : ''}`}
               value={a}
-              onChange={(e) => { const v = e.target.value.replace(/\D/g,'').slice(0,2); setA(v); writeBack(h, v); }}
+              onChange={(e) => { const v = clampScore(e.target.value); setA(v); writeBack(h, v); }}
+              onBlur={handleBlur}
               inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
               placeholder="–"
               aria-label={`${away.name} score`}
             />
@@ -224,7 +266,15 @@ const FixtureCard = ({ fixture: f, compact, onUpdate }) => {
 
       {!compact && !isFinal && (
         <div className="fixture-extras">
-          <span>{hasPick ? <><Icon name="check" size={12}/> &nbsp;Pick saved</> : 'Tap a box to predict'}</span>
+          <span>
+            {isLive
+              ? <><Icon name="lock" size={12}/> &nbsp;Locked at kick-off</>
+              : hasPick
+                ? <><Icon name="check" size={12}/> &nbsp;Pick saved</>
+                : partial
+                  ? <span style={{color: 'var(--gdc-red-600)', fontWeight: 600}}>Pick incomplete — enter both scores</span>
+                  : 'Tap a box to predict'}
+          </span>
           <span className="points">Up to <b>3 pts</b></span>
         </div>
       )}
@@ -408,7 +458,7 @@ const BracketScreen = () => {
                         <span className="t"><span className="fl">{away.flag}</span>{away.short}</span>
                         <span className="s">{has?.a ?? '–'}</span>
                       </div>
-                      {!has && <div style={{padding:'8px 12px 4px', fontSize:11, color:'var(--gdc-blue-600)', fontWeight:600}}>Tap to predict →</div>}
+                      {!has && <button type="button" className="bk-cta">Tap to predict →</button>}
                     </div>
                   );
                 }
@@ -501,8 +551,8 @@ const LeaguesScreen = () => {
             <div className="card" style={{display:'flex', alignItems:'center', gap:12, padding:12}}>
               <div className="lb-avatar" style={{width: 40, height: 40, fontSize: 13}}>Y</div>
               <div style={{flex:1}}>
-                <div style={{fontWeight: 700, fontSize: 13}}>You · 142 pts</div>
-                <div style={{fontSize: 11, color: 'var(--gdc-gray-650)'}}>Move up <b style={{color:'var(--gdc-blue-600)'}}>59 pts</b> to crack the Top 100</div>
+                <div style={{fontWeight: 700, fontSize: 13}}>You · {me.pts} pts</div>
+                <div style={{fontSize: 11, color: 'var(--gdc-gray-650)'}}>Climb <b style={{color:'var(--gdc-blue-600)'}}>147 places</b> to crack the Top 100</div>
               </div>
               <div style={{textAlign:'right'}}>
                 <div style={{fontSize:10, color:'var(--gdc-gray-650)', letterSpacing:'0.06em'}}>RANK</div>
@@ -596,7 +646,7 @@ const ProfileScreen = ({ openPrizes }) => {
 
       <div className="section-title">
         <h2>Recent results</h2>
-        <span className="more">All →</span>
+        <button type="button" className="link-more">All →</button>
       </div>
       <div className="screen-section" style={{paddingTop: 0}}>
         {finals.map(f => <FixtureCard key={f.id} fixture={f}/>)}
@@ -604,7 +654,7 @@ const ProfileScreen = ({ openPrizes }) => {
 
       <div className="section-title">
         <h2>Your prize tier</h2>
-        <span className="more" onClick={openPrizes}>All prizes →</span>
+        <button type="button" className="link-more" onClick={openPrizes}>All prizes →</button>
       </div>
       <div className="screen-section" style={{paddingTop: 0}}>
         <div className="prize">
@@ -768,7 +818,7 @@ const HowItWorksScreen = ({ onBack }) => (
             <div className="num">2</div>
             <div>
               <h4>Predict every match</h4>
-              <p>Lock in a score for each fixture before kick-off. Group stage, knockouts, final — all 64 matches.</p>
+              <p>Lock in a score for each fixture before kick-off — group stage through to the final.</p>
             </div>
           </div>
           <div className="step">
@@ -782,7 +832,7 @@ const HowItWorksScreen = ({ onBack }) => (
             <div className="num">4</div>
             <div>
               <h4>Win prizes</h4>
-              <p>Top of the global leaderboard wins World Cup Final tickets, £500 free bets and more. Full prize tiers in the Prizes tab.</p>
+              <p>£10,000 in cash across two leaderboards: £8,000 for the top three on the main board, plus a separate £2,000 pool for points earned in the knockout stage. Full breakdown in the Prizes tab.</p>
             </div>
           </div>
         </div>

@@ -72,10 +72,10 @@ const OutrightsScreen = () => {
       <div className="screen-header">
         <div>
           <h1>Tournament outrights</h1>
-          <div className="sub">Lock at first kick-off · 28 pts available + tiebreaker</div>
+          <div className="sub">Locked at first kick-off · 28 pts available + tiebreaker</div>
         </div>
-        <span className="tag blue" style={{height:'fit-content'}}>
-          <Icon name="lock" size={11}/> &nbsp;Locks Jun 11
+        <span className="tag locked" style={{height:'fit-content'}}>
+          <Icon name="lock" size={11}/> &nbsp;Locked
         </span>
       </div>
 
@@ -186,10 +186,10 @@ const OutrightsScreen = () => {
 
         <div className="outright-summary">
           <div>
-            <div className="outright-summary-l">Outrights submitted</div>
-            <div className="outright-summary-v">28 pts at stake · tiebreaker locked in</div>
+            <div className="outright-summary-l">Your outrights</div>
+            <div className="outright-summary-v">28 pts at stake · save before kick-off to lock them in</div>
           </div>
-          <button className="btn" onClick={() => {
+          <button type="button" className="btn" onClick={() => {
             try { localStorage.setItem('wcp.outrights.v1', JSON.stringify(picks)); } catch (e) {}
             window.dispatchEvent(new CustomEvent('wcp:toast', { detail: 'Outrights saved' }));
           }}>Save outrights</button>

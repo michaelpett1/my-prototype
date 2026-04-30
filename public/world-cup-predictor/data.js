@@ -182,18 +182,18 @@ const OUTRIGHTS = {
   ],
 };
 
-// Leaderboard — designed to show prize cutoff lines (3rd / 5th / 10th)
+// Leaderboard — only top 3 are prize-eligible; rows below show running pack
 const LEADERBOARD = [
-  { rank: 1,   name: 'GambleKing94',   loc: 'London, UK',     pts: 247, trend: 'up',   prize: '£5,000' },
-  { rank: 2,   name: 'PunditPete',     loc: 'Manchester, UK', pts: 241, trend: 'up',   prize: '£2,000' },
-  { rank: 3,   name: 'OddsBoss',       loc: 'Madrid, ES',     pts: 235, trend: 'down', prize: '£1,000' },
-  { rank: 4,   name: 'BettingBlue',    loc: 'Toronto, CA',    pts: 229, trend: 'up',   prize: '£500' },
-  { rank: 5,   name: 'StrikerStu',     loc: 'Dublin, IE',     pts: 224, trend: 'flat', prize: '£500' },
-  { rank: 6,   name: 'CornerKick',     loc: 'Berlin, DE',     pts: 218, trend: 'down', prize: '£200' },
-  { rank: 7,   name: 'GoalDigger',     loc: 'New York, US',   pts: 214, trend: 'up',   prize: '£200' },
-  { rank: 8,   name: 'ShotCaller',     loc: 'Sydney, AU',     pts: 210, trend: 'up',   prize: '£200' },
-  { rank: 9,   name: 'GroupSeed',      loc: 'Lisbon, PT',     pts: 206, trend: 'flat', prize: '£200' },
-  { rank: 10,  name: 'KnockoutPete',   loc: 'Paris, FR',      pts: 201, trend: 'down', prize: '£200' },
+  { rank: 1,   name: 'GambleKing94',   loc: 'London, UK',     pts: 312, trend: 'up',   prize: '£5,000' },
+  { rank: 2,   name: 'PunditPete',     loc: 'Manchester, UK', pts: 298, trend: 'up',   prize: '£2,000' },
+  { rank: 3,   name: 'OddsBoss',       loc: 'Madrid, ES',     pts: 285, trend: 'down', prize: '£1,000' },
+  { rank: 4,   name: 'BettingBlue',    loc: 'Toronto, CA',    pts: 271, trend: 'up'   },
+  { rank: 5,   name: 'StrikerStu',     loc: 'Dublin, IE',     pts: 264, trend: 'flat' },
+  { rank: 6,   name: 'CornerKick',     loc: 'Berlin, DE',     pts: 258, trend: 'down' },
+  { rank: 7,   name: 'GoalDigger',     loc: 'New York, US',   pts: 251, trend: 'up'   },
+  { rank: 8,   name: 'ShotCaller',     loc: 'Sydney, AU',     pts: 244, trend: 'up'   },
+  { rank: 9,   name: 'GroupSeed',      loc: 'Lisbon, PT',     pts: 238, trend: 'flat' },
+  { rank: 10,  name: 'KnockoutPete',   loc: 'Paris, FR',      pts: 231, trend: 'down' },
   // surrounding ranks for "You" anchor
   { rank: 245, name: 'BoltOn',         loc: 'Bristol, UK',    pts: 144, trend: 'flat' },
   { rank: 246, name: 'KitOff',         loc: 'Amsterdam, NL',  pts: 143, trend: 'up' },
@@ -220,9 +220,9 @@ const PRIZE_POOLS = [
     poolLabel: '£8,000',
     description: 'Points earned across the entire tournament — group stage, knockouts and outrights.',
     tiers: [
-      { rank: '1st', val: '£5,000', total: 5000, desc: 'Outright winner of the tournament' },
-      { rank: '2nd', val: '£2,000', total: 2000, desc: 'Runner-up' },
-      { rank: '3rd', val: '£1,000', total: 1000, desc: 'Third place' },
+      { rank: '1st', val: '£5,000', total: 5000, desc: 'Top points scorer on the main leaderboard' },
+      { rank: '2nd', val: '£2,000', total: 2000, desc: 'Runner-up on the main leaderboard' },
+      { rank: '3rd', val: '£1,000', total: 1000, desc: 'Third on the main leaderboard' },
     ],
   },
   {
@@ -246,7 +246,7 @@ const PRIZES = PRIZE_POOLS[0].tiers;
 // Daily Acca CTA — end-of-matchday module
 // 4-fold from yesterday's results: shows what £10 would have returned
 const DAILY_ACCA = {
-  date: 'Yesterday · Matchday 6',
+  date: 'Yesterday · Matchday 1',
   stake: 10,
   totalOdds: 28.74,
   return: 287.40,
@@ -263,9 +263,9 @@ const DAILY_ACCA = {
 const ME = {
   pts: 142,
   rank: 247,
-  prizeGap: 'Outside top 10 by 59 pts',
-  groupPicks: { done: 9, total: 12 },
-  knockoutPicks: { done: 5, total: 8, label: 'R32 unlocked' },
+  prizeGap: 'Outside the £1,000 third-place tier by 143 pts',
+  groupPicks: { done: 9, total: 48 },
+  knockoutPicks: { done: 0, total: 16, label: 'R32 unlocks after groups' },
   outrightsDone: true,
   accuracy: { exact: 4, result: 6, miss: 7 }, // 4×3 + 6×1 = 18 from these matches
   trend: '+12 places this week',

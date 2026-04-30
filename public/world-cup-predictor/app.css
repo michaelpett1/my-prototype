@@ -192,8 +192,13 @@ html, body { background: #fff; }
   background: #fff;
   border: 1px solid var(--gdc-gray-300);
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   min-width: 0;
+}
+.screen > .wc-hero,
+.screen > :first-child {
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
 }
 .screen-header {
   padding: 22px 24px 12px;
@@ -648,12 +653,34 @@ html, body { background: #fff; }
   border-radius: 3px;
 }
 .round-col {
-  flex: 0 0 220px;
+  flex: 0 0 200px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   scroll-snap-align: start;
 }
+.bk-cta {
+  background: none; border: 0;
+  padding: 8px 12px 4px;
+  font-family: inherit;
+  font-size: 11px; font-weight: 600;
+  color: var(--gdc-blue-600);
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+.bk-cta:hover { color: var(--gdc-blue-700); }
+.bk-cta:focus-visible { outline: 2px solid var(--gdc-blue-600); outline-offset: 2px; border-radius: 4px; }
+.link-more {
+  background: none; border: 0;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 12px; font-weight: 600;
+  color: var(--gdc-blue-600);
+  cursor: pointer;
+}
+.link-more:hover { color: var(--gdc-blue-700); }
+.link-more:focus-visible { outline: 2px solid var(--gdc-blue-600); outline-offset: 2px; border-radius: 4px; }
 
 /* Mobile-only round picker (chip strip) — hidden on desktop where we scroll */
 .bracket-round-picker { display: none; }
