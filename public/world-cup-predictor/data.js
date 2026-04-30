@@ -209,14 +209,39 @@ const LEAGUES = [
   { id: 'l3', name: 'Family World Cup 2026', members: 22, pos: 11, total: 22, icon: 'F', invite: 'gamb.ly/wcp/fam-2026' },
 ];
 
-// Prize tiers — £10,000 pool per spec
-const PRIZES = [
-  { rank: '1st',     val: '£5,000', total: 5000, desc: 'Outright winner of the tournament' },
-  { rank: '2nd',     val: '£2,000', total: 2000, desc: 'Runner-up' },
-  { rank: '3rd',     val: '£1,000', total: 1000, desc: 'Third place' },
-  { rank: '4th–5th', val: '£500',   total: 1000, desc: '£500 each · 2 winners' },
-  { rank: '6th–10th',val: '£200',   total: 1000, desc: '£200 each · 5 winners' },
+// Prize structure — two pools, £10,000 total
+//  • Main: top three across the whole tournament (£8k)
+//  • Knockout: top three for points earned from R32 onwards (£2k)
+const PRIZE_POOLS = [
+  {
+    id: 'main',
+    label: 'Main leaderboard',
+    pool: 8000,
+    poolLabel: '£8,000',
+    description: 'Points earned across the entire tournament — group stage, knockouts and outrights.',
+    tiers: [
+      { rank: '1st', val: '£5,000', total: 5000, desc: 'Outright winner of the tournament' },
+      { rank: '2nd', val: '£2,000', total: 2000, desc: 'Runner-up' },
+      { rank: '3rd', val: '£1,000', total: 1000, desc: 'Third place' },
+    ],
+  },
+  {
+    id: 'knockout',
+    label: 'Knockout-stage leaderboard',
+    pool: 2000,
+    poolLabel: '£2,000',
+    description: 'Separate competition. Counts only points earned from the Round of 32 onwards — anyone can win, even if you missed the group stage.',
+    tiers: [
+      { rank: '1st', val: '£1,250', total: 1250, desc: 'Most knockout-stage points' },
+      { rank: '2nd', val: '£500',   total: 500,  desc: 'Runner-up' },
+      { rank: '3rd', val: '£250',   total: 250,  desc: 'Third place' },
+    ],
+  },
 ];
+
+// Backwards-compat: flat array of main-pool tiers, used by PrizesScreen
+// fallbacks and the profile "your tier" card.
+const PRIZES = PRIZE_POOLS[0].tiers;
 
 // Daily Acca CTA — end-of-matchday module
 // 4-fold from yesterday's results: shows what £10 would have returned
@@ -246,4 +271,4 @@ const ME = {
   trend: '+12 places this week',
 };
 
-window.WC_DATA = { TEAMS, FIXTURES, KNOCKOUT, OUTRIGHTS, LEADERBOARD, LEAGUES, PRIZES, DAILY_ACCA, ME };
+window.WC_DATA = { TEAMS, FIXTURES, KNOCKOUT, OUTRIGHTS, LEADERBOARD, LEAGUES, PRIZES, PRIZE_POOLS, DAILY_ACCA, ME };

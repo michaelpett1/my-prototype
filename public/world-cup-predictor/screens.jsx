@@ -622,7 +622,9 @@ const ProfileScreen = ({ openPrizes }) => {
 
 // =================== PRIZES (modal-ish full screen) ===================
 const PrizesScreen = ({ onBack }) => {
-  const { PRIZES } = window.WC_DATA;
+  const { PRIZE_POOLS } = window.WC_DATA;
+  const totalPool = PRIZE_POOLS.reduce((sum, p) => sum + p.pool, 0);
+  const totalLabel = '£' + totalPool.toLocaleString('en-GB');
   return (
     <div className="screen">
       <div className="screen-header">
@@ -631,30 +633,51 @@ const PrizesScreen = ({ onBack }) => {
         </button>
         <div style={{flex:1, marginLeft: 12}}>
           <h1>Prizes</h1>
-          <div className="sub">£10,000 total prize pool · top 10 finishers</div>
+          <div className="sub">{totalLabel} total across two prize pools</div>
         </div>
       </div>
 
       <div className="screen-section" style={{paddingTop: 8}}>
-        <div className="card" style={{padding: 20, marginBottom: 14, background: 'linear-gradient(135deg, #050A30 0%, #0157FF 100%)', color:'#fff', border: 'none'}}>
+        <div className="card" style={{padding: 20, marginBottom: 18, background: 'linear-gradient(135deg, #050A30 0%, #0157FF 100%)', color:'#fff', border: 'none'}}>
           <div style={{fontSize: 11, letterSpacing: '0.12em', fontWeight:700, opacity: 0.7, marginBottom: 6}}>TOTAL PRIZE POOL</div>
-          <div style={{fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em'}}>£10,000</div>
-          <div style={{fontSize: 13, opacity: 0.85, marginTop: 8}}>Shared between the top 10 finishers on the global leaderboard. Tiebreakers settled by Total Tournament Goals + Cards.</div>
+          <div style={{fontSize: 44, fontWeight: 800, lineHeight: 1, letterSpacing: '-0.02em'}}>{totalLabel}</div>
+          <div className="pool-split">
+            {PRIZE_POOLS.map(p => (
+              <div key={p.id} className="pool-split-item">
+                <div className="pool-split-amt">{p.poolLabel}</div>
+                <div className="pool-split-lbl">{p.label}</div>
+              </div>
+            ))}
+          </div>
+          <div style={{fontSize: 12.5, opacity: 0.78, marginTop: 14, lineHeight: 1.5}}>
+            Tiebreakers settled by combined accuracy on Total Tournament Goals + Cards.
+          </div>
         </div>
 
-        {PRIZES.map((p, i) => {
-          const medals = ['s1', 's2', 's3', 's3', 's4'];
-          return (
-            <div className="prize" key={i}>
-              <div className={`prize-medal ${medals[i]}`}>{p.rank.split('–')[0].replace(/(\d+)\D*/, '$1')}</div>
+        {PRIZE_POOLS.map(pool => (
+          <div key={pool.id} className="prize-pool-block">
+            <div className="prize-pool-head">
               <div>
-                <h3>{p.rank}</h3>
-                <div className="desc">{p.desc}</div>
+                <h3>{pool.label}</h3>
+                <p>{pool.description}</p>
               </div>
-              <div className="val">{p.val}</div>
+              <div className="prize-pool-amt">{pool.poolLabel}</div>
             </div>
-          );
-        })}
+            {pool.tiers.map((p, i) => {
+              const medal = ['s1', 's2', 's3'][i] || 's4';
+              return (
+                <div className="prize" key={i}>
+                  <div className={`prize-medal ${medal}`}>{i + 1}</div>
+                  <div>
+                    <h3>{p.rank}</h3>
+                    <div className="desc">{p.desc}</div>
+                  </div>
+                  <div className="val">{p.val}</div>
+                </div>
+              );
+            })}
+          </div>
+        ))}
 
         <div className="card" style={{marginTop: 14, background: 'var(--responsible-beige)'}}>
           <div style={{display:'flex', gap: 10, alignItems:'flex-start'}}>
