@@ -1,53 +1,126 @@
 // World Cup Predictor — Outrights + Daily Acca screens
 
-// =================== DAILY ACCA CARD (re-usable on Home + standalone) ===================
+// =================== DAILY ACCA CARD ==================================
+// Forward-looking: builds an acca from the user's predictions for today
+// (or tomorrow if there are none for today) and shows what £10 would return.
 const DailyAccaCard = ({
-  onCTA
+  onCTA,
+  stake = 10
 }) => {
   const {
-    DAILY_ACCA,
-    TEAMS
+    FIXTURES,
+    TEAMS,
+    DAILY_ACCA
   } = window.WC_DATA;
-  const a = DAILY_ACCA;
+  const op = DAILY_ACCA.operator;
+
+  // Re-render when picks change so the acca stays in sync with the score
+  // inputs on the same page.
+  const [, force] = React.useState(0);
+  React.useEffect(() => {
+    const h = () => force(n => n + 1);
+    window.addEventListener('wcp:picks-changed', h);
+    return () => window.removeEventListener('wcp:picks-changed', h);
+  }, []);
+
+  // Pull stored picks from the same store the FixtureCard writes to.
+  let stored = {};
+  try {
+    stored = JSON.parse(localStorage.getItem('wcp.picks.v1') || '{}');
+  } catch (e) {}
+  const pickFor = f => stored[f.id] || f.myPick;
+
+  // Build leg odds from the predicted result. Bigger margins read longer.
+  const legOdds = pick => {
+    const h = parseInt(pick.h, 10);
+    const a = parseInt(pick.a, 10);
+    if (Number.isNaN(h) || Number.isNaN(a)) return null;
+    if (h === a) return 3.40;
+    const margin = Math.abs(h - a);
+    const base = h > a ? 1.85 : 2.20;
+    return +(base + margin * 0.30).toFixed(2);
+  };
+  const selectionFor = (pick, home, away) => {
+    const h = parseInt(pick.h, 10);
+    const a = parseInt(pick.a, 10);
+    if (h === a) return 'Draw';
+    return h > a ? `${home.name} win` : `${away.name} win`;
+  };
+
+  // Today's open picks first; fall back to tomorrow's; cap at 4 legs.
+  const todayPicks = FIXTURES.filter(f => f.date === 'Today' && f.status === 'open' && pickFor(f));
+  const tomorrowPicks = FIXTURES.filter(f => f.date === 'Tomorrow' && f.status === 'open' && pickFor(f));
+  const sourceList = todayPicks.length > 0 ? todayPicks : tomorrowPicks;
+  const dayLabel = todayPicks.length > 0 ? 'TODAY' : tomorrowPicks.length > 0 ? 'TOMORROW' : null;
+  const legs = sourceList.slice(0, 4).map(f => {
+    const pick = pickFor(f);
+    const home = TEAMS[f.home];
+    const away = TEAMS[f.away];
+    const odds = legOdds(pick);
+    if (odds == null) return null;
+    return {
+      home,
+      away,
+      score: `${pick.h}–${pick.a}`,
+      selection: selectionFor(pick, home, away),
+      odds
+    };
+  }).filter(Boolean);
+
+  // Empty state — no picks set for today or tomorrow.
+  if (legs.length === 0) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "acca-card"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "acca-head"
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "acca-eyebrow"
+    }, "DAILY ACCA"), /*#__PURE__*/React.createElement("h3", {
+      className: "acca-headline"
+    }, "Make picks for today's matches and we'll show what they'd be worth as an acca with ", /*#__PURE__*/React.createElement("em", null, op.name), "."))), /*#__PURE__*/React.createElement("div", {
+      className: "acca-cta-row"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "acca-foot"
+    }, op.tagline)));
+  }
+  const totalOdds = legs.reduce((acc, leg) => acc * leg.odds, 1);
+  const potentialReturn = stake * totalOdds;
   return /*#__PURE__*/React.createElement("div", {
     className: "acca-card"
   }, /*#__PURE__*/React.createElement("div", {
     className: "acca-head"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "acca-eyebrow"
-  }, "DAILY ACCA \xB7 ", a.date.toUpperCase()), /*#__PURE__*/React.createElement("h3", {
+  }, "DAILY ACCA \xB7 ", dayLabel), /*#__PURE__*/React.createElement("h3", {
     className: "acca-headline"
-  }, "A \xA3", a.stake, " acca on yesterday's 4 results would have returned ", /*#__PURE__*/React.createElement("em", null, "\xA3", a.return.toFixed(2)))), /*#__PURE__*/React.createElement("div", {
+  }, "A \xA3", stake, " acca on your ", legs.length === 1 ? 'pick' : `${legs.length} picks`, " for today could return ", /*#__PURE__*/React.createElement("em", null, "\xA3", potentialReturn.toFixed(2)))), /*#__PURE__*/React.createElement("div", {
     className: "acca-odds"
   }, /*#__PURE__*/React.createElement("div", {
     className: "t"
   }, "Combined odds"), /*#__PURE__*/React.createElement("div", {
     className: "v"
-  }, a.totalOdds.toFixed(2)))), /*#__PURE__*/React.createElement("div", {
+  }, totalOdds.toFixed(2)))), /*#__PURE__*/React.createElement("div", {
     className: "acca-legs"
-  }, a.legs.map((leg, i) => {
-    const home = TEAMS[leg.home];
-    const away = TEAMS[leg.away];
-    return /*#__PURE__*/React.createElement("div", {
-      className: "acca-leg",
-      key: i
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "acca-leg-teams"
-    }, /*#__PURE__*/React.createElement("span", null, home?.flag, " ", home?.short), /*#__PURE__*/React.createElement("span", {
-      className: "acca-score"
-    }, leg.score), /*#__PURE__*/React.createElement("span", null, away?.short, " ", away?.flag)), /*#__PURE__*/React.createElement("div", {
-      className: "acca-leg-pick"
-    }, leg.selection), /*#__PURE__*/React.createElement("div", {
-      className: "acca-leg-odds"
-    }, leg.odds.toFixed(2)));
-  })), /*#__PURE__*/React.createElement("div", {
+  }, legs.map((leg, i) => /*#__PURE__*/React.createElement("div", {
+    className: "acca-leg",
+    key: i
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "acca-leg-teams"
+  }, /*#__PURE__*/React.createElement("span", null, leg.home.flag, " ", leg.home.short), /*#__PURE__*/React.createElement("span", {
+    className: "acca-score"
+  }, leg.score), /*#__PURE__*/React.createElement("span", null, leg.away.short, " ", leg.away.flag)), /*#__PURE__*/React.createElement("div", {
+    className: "acca-leg-pick"
+  }, leg.selection), /*#__PURE__*/React.createElement("div", {
+    className: "acca-leg-odds"
+  }, leg.odds.toFixed(2))))), /*#__PURE__*/React.createElement("div", {
     className: "acca-cta-row"
   }, /*#__PURE__*/React.createElement("div", {
     className: "acca-foot"
-  }, a.operator.tagline), /*#__PURE__*/React.createElement("button", {
+  }, op.tagline), /*#__PURE__*/React.createElement("button", {
+    type: "button",
     className: "btn btn-sm acca-cta",
     onClick: onCTA
-  }, a.operator.cta, " \u2192")));
+  }, "Place this acca with ", op.name, " \u2192")));
 };
 
 // =================== OUTRIGHTS SCREEN ===================

@@ -152,9 +152,16 @@ const HomeScreen = ({
     LEADERBOARD,
     ME
   } = window.WC_DATA;
-  const live = FIXTURES.find(f => f.status === 'live');
-  const upcoming = FIXTURES.filter(f => f.status === 'open' && !f.myPick).slice(0, 3);
   const me = LEADERBOARD.find(l => l.me);
+
+  // "Today's Predictions" → fall back to tomorrow's if nothing's on today.
+  // Live fixtures count as today.
+  const today = FIXTURES.filter(f => f.date === 'Today' && (f.status === 'open' || f.status === 'live'));
+  const tomorrow = FIXTURES.filter(f => f.date === 'Tomorrow' && f.status === 'open');
+  const dayLabel = today.length > 0 ? "Today's predictions" : "Tomorrow's predictions";
+  const dayList = today.length > 0 ? today : tomorrow;
+  const live = dayList.find(f => f.status === 'live');
+  const dayUpcoming = dayList.filter(f => f.status !== 'live');
 
   // Anchor the countdown to a fixed instant computed once on mount so it
   // always reads ~2 days out and visibly ticks. This avoids drift between
@@ -272,17 +279,19 @@ const HomeScreen = ({
       fontSize: 17,
       fontWeight: 700
     }
-  }, "Predictions due"), /*#__PURE__*/React.createElement("button", {
+  }, dayLabel), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "link-more",
     onClick: handleNav('predict')
   }, "See all \u2192")), live && /*#__PURE__*/React.createElement(FixtureCard, {
     fixture: live,
     compact: true
-  }), upcoming.map(f => /*#__PURE__*/React.createElement(FixtureCard, {
+  }), dayUpcoming.map(f => /*#__PURE__*/React.createElement(FixtureCard, {
     key: f.id,
     fixture: f
-  }))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  })), dayList.length === 0 && /*#__PURE__*/React.createElement("div", {
+    className: "empty"
+  }, "No fixtures scheduled \u2014 check back soon.")), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       alignItems: 'center',
@@ -755,9 +764,7 @@ const LeaderRow = ({
     className: "lb-avatar"
   }, initial), /*#__PURE__*/React.createElement("div", {
     className: "lb-name"
-  }, row.name, /*#__PURE__*/React.createElement("span", {
-    className: "h"
-  }, row.loc)), /*#__PURE__*/React.createElement("div", {
+  }, row.name), /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'right'
     }

@@ -102,9 +102,16 @@ function useCountdown(target) {
 // =================== HOME / LANDING ===================
 const HomeScreen = ({ setActive }) => {
   const { FIXTURES, LEADERBOARD, ME } = window.WC_DATA;
-  const live = FIXTURES.find(f => f.status === 'live');
-  const upcoming = FIXTURES.filter(f => f.status === 'open' && !f.myPick).slice(0, 3);
   const me = LEADERBOARD.find(l => l.me);
+
+  // "Today's Predictions" → fall back to tomorrow's if nothing's on today.
+  // Live fixtures count as today.
+  const today = FIXTURES.filter(f => f.date === 'Today' && (f.status === 'open' || f.status === 'live'));
+  const tomorrow = FIXTURES.filter(f => f.date === 'Tomorrow' && f.status === 'open');
+  const dayLabel = today.length > 0 ? "Today's predictions" : "Tomorrow's predictions";
+  const dayList = today.length > 0 ? today : tomorrow;
+  const live = dayList.find(f => f.status === 'live');
+  const dayUpcoming = dayList.filter(f => f.status !== 'live');
 
   // Anchor the countdown to a fixed instant computed once on mount so it
   // always reads ~2 days out and visibly ticks. This avoids drift between
@@ -151,11 +158,14 @@ const HomeScreen = ({ setActive }) => {
         <div className="home-grid">
           <div>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12}}>
-              <h2 style={{margin:0, fontSize: 17, fontWeight: 700}}>Predictions due</h2>
+              <h2 style={{margin:0, fontSize: 17, fontWeight: 700}}>{dayLabel}</h2>
               <button type="button" className="link-more" onClick={handleNav('predict')}>See all →</button>
             </div>
             {live && <FixtureCard fixture={live} compact/>}
-            {upcoming.map(f => <FixtureCard key={f.id} fixture={f}/>)}
+            {dayUpcoming.map(f => <FixtureCard key={f.id} fixture={f}/>)}
+            {dayList.length === 0 && (
+              <div className="empty">No fixtures scheduled — check back soon.</div>
+            )}
           </div>
           <div>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom: 12}}>
@@ -511,7 +521,6 @@ const LeaderRow = ({ row }) => {
       <div className="lb-avatar">{initial}</div>
       <div className="lb-name">
         {row.name}
-        <span className="h">{row.loc}</span>
       </div>
       <div style={{textAlign:'right'}}>
         <div className="lb-pts">{row.pts}</div>
