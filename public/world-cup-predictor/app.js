@@ -1,13 +1,13 @@
 // World Cup Predictor — App shell
-const {
-  useState,
-  useEffect
-} = React;
+// Use React.* directly — every other script in this prototype already
+// destructures useState/useEffect at top level, and across plain script
+// tags those bindings would collide with a SyntaxError.
+
 function App() {
-  const [active, setActive] = useState('home');
-  const [overlay, setOverlay] = useState(null);
-  const [toast, setToast] = useState(null);
-  useEffect(() => {
+  const [active, setActive] = React.useState('home');
+  const [overlay, setOverlay] = React.useState(null);
+  const [toast, setToast] = React.useState(null);
+  React.useEffect(() => {
     const onToast = e => {
       setToast(e.detail);
       setTimeout(() => setToast(null), 2200);
