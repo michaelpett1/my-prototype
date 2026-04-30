@@ -1,0 +1,214 @@
+/* Gambling.com / GDC — Colors & Typography
+   Source of truth: orion-design-system.md + Figma tokens */
+
+/* Red Hat Display — brand-provided TTFs */
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:300; font-display:swap; src:url('fonts/RedHatDisplay-Light.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:300; font-display:swap; src:url('fonts/RedHatDisplay-LightItalic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:400; font-display:swap; src:url('fonts/RedHatDisplay-Regular.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:400; font-display:swap; src:url('fonts/RedHatDisplay-Italic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:500; font-display:swap; src:url('fonts/RedHatDisplay-Medium.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:500; font-display:swap; src:url('fonts/RedHatDisplay-MediumItalic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:600; font-display:swap; src:url('fonts/RedHatDisplay-SemiBold.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:600; font-display:swap; src:url('fonts/RedHatDisplay-SemiBoldItalic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:700; font-display:swap; src:url('fonts/RedHatDisplay-Bold.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:700; font-display:swap; src:url('fonts/RedHatDisplay-BoldItalic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:800; font-display:swap; src:url('fonts/RedHatDisplay-ExtraBold.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:800; font-display:swap; src:url('fonts/RedHatDisplay-ExtraBoldItalic.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:normal; font-weight:900; font-display:swap; src:url('fonts/RedHatDisplay-Black.ttf') format('truetype'); }
+@font-face { font-family:'Red Hat Display'; font-style:italic; font-weight:900; font-display:swap; src:url('fonts/RedHatDisplay-BlackItalic.ttf') format('truetype'); }
+
+/* Inter — Google Fonts (no brand TTFs supplied) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ============ GDC BLUE (PRIMARY) ============ */
+  --gdc-blue-50:  #E6F1FC;
+  --gdc-blue-500: #3B82F6;
+  --gdc-blue-600: #0157FF;   /* PRIMARY — CTAs, links, selected states */
+  --gdc-blue-700: #003EE6;   /* Hover on all interactive elements */
+
+  /* ============ NEUTRAL RAMP (21 stops) ============ */
+  --gdc-gray-50:   #F9F9F9;
+  --gdc-gray-100:  #F7F7F7;
+  --gdc-gray-150:  #F5F5F5;
+  --gdc-gray-200:  #ECEDEF;  /* table header bg */
+  --gdc-gray-250:  #ECECEC;  /* blockquote borders */
+  --gdc-gray-300:  #E0E0E0;  /* input borders */
+  --gdc-gray-350:  #D9D9D9;
+  --gdc-gray-400:  #C4C4C4;
+  --gdc-gray-450:  #999999;  /* breadcrumb / muted */
+  --gdc-gray-500:  #9A9A9A;
+  --gdc-gray-550:  #808080;
+  --gdc-gray-600:  #777777;
+  --gdc-gray-650:  #757575;
+  --gdc-gray-700:  #6C757D;
+  --gdc-gray-750:  #676767;
+  --gdc-gray-800:  #5A5A5A;
+  --gdc-gray-850:  #444444;
+  --gdc-gray-900:  #333333;
+  --gdc-gray-950:  #212529;
+  --gdc-gray-1000: #1E202C;  /* near-black body */
+
+  /* ============ RED (content links, errors) ============ */
+  --gdc-red-50:  #FFF0F0;
+  --gdc-red-100: #FFDDDD;
+  --gdc-red-200: #FFC0C0;
+  --gdc-red-300: #FF9494;
+  --gdc-red-400: #FF5757;
+  --gdc-red-500: #FF2323;
+  --gdc-red-600: #FF0000;    /* Editorial body links */
+  --gdc-red-700: #D70000;
+  --gdc-red-800: #B10303;
+  --gdc-red-900: #920A0A;
+  --gdc-red-950: #500000;
+
+  /* ============ EXTENDED NAMED PALETTES ============ */
+  --blue-ribbon-50:  #EDF7FF;
+  --blue-ribbon-500: #1E8CFF;
+  --blue-ribbon-700: #0157FF;
+  --blue-ribbon-950: #0E265D;
+
+  --golden-grass-50:  #FCF8EA;
+  --golden-grass-500: #D19021;
+  --golden-grass-700: #905018;
+  --golden-grass-950: #3B1B0D;
+
+  --tangaroa-50:  #E8F3FF;
+  --tangaroa-500: #305AFF;
+  --tangaroa-950: #050A30;
+
+  --zumthor-50:  #F0F7FE;
+  --zumthor-500: #4B91E6;
+  --zumthor-950: #1C2C4F;
+
+  --athens-gray-50:  #F6F7F8;
+  --athens-gray-500: #9094A1;
+  --athens-gray-950: #333438;
+
+  /* ============ SPECIAL PURPOSE ============ */
+  --dutch-orange:      #FF9B00;   /* orange-variant exit links */
+  --responsible-green: #8FB08C;   /* responsible-gambling copy */
+  --responsible-beige: #FAF8F2;   /* responsible-gambling bg */
+  --success-green:     #39B54A;   /* validation OK */
+  --check-green:       #8CD221;   /* table tick icons */
+  --table-divider:     #DDDDDD;
+  --form-focus:        #2563EB;
+
+  /* ============ SEMANTIC (foreground / background) ============ */
+  --fg-1: #000000;                 /* body text */
+  --fg-2: var(--gdc-gray-1000);
+  --fg-3: var(--gdc-gray-600);     /* muted copy, captions */
+  --fg-muted: var(--gdc-gray-450); /* breadcrumbs, disabled */
+  --fg-link: var(--gdc-blue-600);
+  --fg-link-hover: var(--gdc-blue-700);
+  --fg-editorial-link: var(--gdc-red-600);
+  --fg-error: var(--gdc-red-600);
+  --fg-success: var(--success-green);
+  --fg-inverse: #FFFFFF;
+
+  --bg-1: #FFFFFF;                 /* page bg */
+  --bg-2: var(--gdc-gray-50);      /* alt / stripe */
+  --bg-3: var(--gdc-gray-200);     /* table header */
+  --bg-responsible: var(--responsible-beige);
+
+  --border-1: var(--gdc-gray-300);
+  --border-2: var(--table-divider);
+  --border-soft: var(--gdc-gray-250);
+
+  /* ============ TYPOGRAPHY ============ */
+  --font-body:    'Red Hat Display', system-ui, sans-serif;
+  --font-display: 'Red Hat Display', system-ui, sans-serif;
+  --font-inter:   'Inter', 'Red Hat Display', sans-serif;
+  --font-mono:    'Menlo', ui-monospace, monospace;
+
+  /* Type scale — major second (1.125) */
+  --text-xxs:  0.702rem;   /* 11.24px — legal */
+  --text-xs:   0.79rem;    /* 12.64px — captions, breadcrumbs */
+  --text-sm:   1rem;       /* 16px */
+  --text-base: 1rem;       /* 16px body */
+  --text-lg:   1.125rem;   /* 18px — H5, table header */
+  --text-xl:   1.266rem;   /* 20.25px — H4 */
+  --text-2xl:  1.424rem;   /* 22.78px — H3 */
+  --text-3xl:  1.602rem;   /* 25.63px — H2 */
+  --text-4xl:  1.802rem;   /* 28.83px — H1 */
+  --text-5xl:  3rem;       /* 48px — section hero */
+  --text-6xl:  3.75rem;    /* 60px — display */
+  --text-7xl:  4.5rem;     /* 72px — hero display */
+
+  --weight-light:     300;
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;   /* all headings default */
+  --weight-bold:      700;   /* strong / b */
+  --weight-extrabold: 800;
+  --weight-black:     900;
+
+  --leading-tight: 1.2;
+  --leading-body:  1.6;
+
+  /* ============ SPACING / RADII / SHADOWS ============ */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  24px;
+  --space-6:  32px;
+  --space-7:  48px;
+  --space-8:  64px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 40px;
+
+  --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.075);
+  --shadow-card-hover: 0 0 20px 1px #b5b5b5;
+  --shadow-card-hover-home: 0 4px 22px -10px #b5b5b5;
+  --shadow-dropdown: 0 6px 12px rgba(0, 0, 0, 0.175);
+
+  /* ============ BREAKPOINTS (custom) ============ */
+  --bp-sm: 540px;
+  --bp-md: 720px;
+  --bp-ipad: 767px;
+  --bp-lg: 960px;
+  --bp-xl: 1140px;
+  --bp-desktop: 1600px;
+}
+
+/* ============ BASE ============ */
+html, body {
+  font-family: var(--font-body);
+  color: var(--fg-1);
+  background: var(--bg-1);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  font-size: var(--text-base);
+  -webkit-font-smoothing: antialiased;
+  font-synthesis-weight: none;
+}
+
+/* Headings — all semibold Red Hat Display (brand rule) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  font-weight: var(--weight-semibold);
+  color: var(--fg-1);
+  font-style: normal;        /* never italic */
+}
+h1 { font-size: var(--text-4xl); line-height: 2.5rem; margin: .75rem 0 1rem; }
+h2 { font-size: var(--text-3xl); line-height: 2rem;   margin: 2rem 0 1rem; }
+h3 { font-size: var(--text-2xl); line-height: 1.8rem; margin: 2rem 0 1rem; }
+h4 { font-size: var(--text-xl);  line-height: 2rem;   margin: 2rem 0 .5rem; }
+h5 { font-size: var(--text-lg);  line-height: 1.5rem; margin: 2rem 0 .5rem; }
+h6 { font-size: var(--text-base); line-height: 1.2rem; margin: 1.5rem 0 .5rem; }
+
+p { font-size: var(--text-base); line-height: var(--leading-body); margin: 0 0 1rem; }
+b, strong { font-weight: var(--weight-bold); }
+code, pre, kbd { font-family: var(--font-mono); }
+
+a { color: var(--fg-link); text-decoration: none; }
+a:hover { color: var(--fg-link-hover); }
+
+/* Content-body editorial link (inside articles) */
+.body-content a:not([class]) { color: var(--fg-editorial-link); }
+.body-content a:not([class]):hover { text-decoration: underline; }
