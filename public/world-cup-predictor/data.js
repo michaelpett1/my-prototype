@@ -29,26 +29,82 @@ const TEAMS = {
   DEN: { name: 'Denmark', flag: '🇩🇰', short: 'DEN', form: 'LWDWW' },
   SUI: { name: 'Switzerland', flag: '🇨🇭', short: 'SUI', form: 'WDWLW' },
   POL: { name: 'Poland', flag: '🇵🇱', short: 'POL', form: 'DWLDW' },
+  AUS: { name: 'Australia', flag: '🇦🇺', short: 'AUS', form: 'WLDWL' },
+  IRN: { name: 'Iran', flag: '🇮🇷', short: 'IRN', form: 'DWLWD' },
+  NOR: { name: 'Norway', flag: '🇳🇴', short: 'NOR', form: 'WWLDW' },
+  CHL: { name: 'Chile', flag: '🇨🇱', short: 'CHL', form: 'LDWWL' },
+  AUT: { name: 'Austria', flag: '🇦🇹', short: 'AUT', form: 'WDWLW' },
+  EGY: { name: 'Egypt', flag: '🇪🇬', short: 'EGY', form: 'WLWDW' },
+  SRB: { name: 'Serbia', flag: '🇷🇸', short: 'SRB', form: 'DWWLW' },
+  GHA: { name: 'Ghana', flag: '🇬🇭', short: 'GHA', form: 'LWDWL' },
 };
 
-// Group stage fixtures — covers live, open, locked, finished states across groups
+// Group stage fixtures — full 48-match schedule (8 groups of 4 × 6 matches).
+// Mix of finished / live / open states so scoring + interactions can be demoed.
 const FIXTURES = [
-  // Live (today)
-  { id: 'm-001', group: 'A', md: 1, kickoff: 'LIVE · 67\'', date: 'Today', home: 'MEX', away: 'CAN', live: { h: 1, a: 1 }, status: 'live' },
-  // Open today
-  { id: 'm-002', group: 'B', md: 1, kickoff: '20:00 ET', date: 'Today', home: 'USA', away: 'KSA', status: 'open' },
-  { id: 'm-003', group: 'C', md: 1, kickoff: '14:00 ET', date: 'Tomorrow', home: 'ENG', away: 'JPN', status: 'open' },
-  { id: 'm-004', group: 'D', md: 1, kickoff: '17:00 ET', date: 'Tomorrow', home: 'ARG', away: 'POR', status: 'open' },
-  // Predicted (lock pending)
-  { id: 'm-005', group: 'E', md: 1, kickoff: 'Sun 14:00', date: 'Sunday', home: 'FRA', away: 'CRO', myPick: { h: 2, a: 1 }, status: 'open' },
-  { id: 'm-006', group: 'F', md: 1, kickoff: 'Sun 17:00', date: 'Sunday', home: 'BRA', away: 'SEN', myPick: { h: 3, a: 0 }, status: 'open' },
-  { id: 'm-007', group: 'G', md: 1, kickoff: 'Mon 14:00', date: 'Monday', home: 'BEL', away: 'MAR', myPick: { h: 2, a: 0 }, status: 'open' },
-  { id: 'm-008', group: 'H', md: 1, kickoff: 'Mon 17:00', date: 'Monday', home: 'NED', away: 'KOR', status: 'open' },
-  // Finished — give us scoring breakdown variety: exact (3), result (1), miss (0)
-  { id: 'm-000', group: 'A', md: 0, kickoff: 'Final', date: 'Yesterday', home: 'GER', away: 'POL', myPick: { h: 2, a: 1 }, actual: { h: 2, a: 1 }, status: 'final', earned: 3, rule: 'exact' },
-  { id: 'm-00a', group: 'B', md: 0, kickoff: 'Final', date: 'Yesterday', home: 'SUI', away: 'DEN', myPick: { h: 2, a: 0 }, actual: { h: 1, a: 1 }, status: 'final', earned: 0, rule: 'miss' },
-  { id: 'm-00b', group: 'C', md: 0, kickoff: 'Final', date: 'Thurs', home: 'ESP', away: 'ITA', myPick: { h: 1, a: 0 }, actual: { h: 2, a: 1 }, status: 'final', earned: 1, rule: 'result' },
-  { id: 'm-00c', group: 'D', md: 0, kickoff: 'Final', date: 'Thurs', home: 'COL', away: 'URU', myPick: { h: 1, a: 1 }, actual: { h: 1, a: 1 }, status: 'final', earned: 3, rule: 'exact' },
+  // ───────── Group A — MEX, CAN, GER, POL ─────────
+  { id: 'm-A-1', group: 'A', md: 1, kickoff: 'Final', date: 'Yesterday', home: 'GER', away: 'POL', myPick: { h: 2, a: 1 }, actual: { h: 2, a: 1 }, status: 'final', earned: 3, rule: 'exact' },
+  { id: 'm-A-2', group: 'A', md: 1, kickoff: "LIVE · 67'", date: 'Today',   home: 'MEX', away: 'CAN', live: { h: 1, a: 1 }, status: 'live' },
+  { id: 'm-A-3', group: 'A', md: 2, kickoff: 'Sat 14:00', date: 'Saturday', home: 'MEX', away: 'GER', status: 'open' },
+  { id: 'm-A-4', group: 'A', md: 2, kickoff: 'Sat 17:00', date: 'Saturday', home: 'POL', away: 'CAN', status: 'open' },
+  { id: 'm-A-5', group: 'A', md: 3, kickoff: 'Wed 20:00', date: 'Wed',      home: 'MEX', away: 'POL', status: 'open' },
+  { id: 'm-A-6', group: 'A', md: 3, kickoff: 'Wed 20:00', date: 'Wed',      home: 'CAN', away: 'GER', status: 'open' },
+
+  // ───────── Group B — USA, KSA, SUI, DEN ─────────
+  { id: 'm-B-1', group: 'B', md: 1, kickoff: 'Final',     date: 'Yesterday', home: 'SUI', away: 'DEN', myPick: { h: 2, a: 0 }, actual: { h: 1, a: 1 }, status: 'final', earned: 0, rule: 'miss' },
+  { id: 'm-B-2', group: 'B', md: 1, kickoff: '20:00 ET',  date: 'Today',     home: 'USA', away: 'KSA', status: 'open' },
+  { id: 'm-B-3', group: 'B', md: 2, kickoff: 'Sat 12:00', date: 'Saturday',  home: 'USA', away: 'SUI', status: 'open' },
+  { id: 'm-B-4', group: 'B', md: 2, kickoff: 'Sat 15:00', date: 'Saturday',  home: 'DEN', away: 'KSA', status: 'open' },
+  { id: 'm-B-5', group: 'B', md: 3, kickoff: 'Thu 20:00', date: 'Thu',       home: 'USA', away: 'DEN', status: 'open' },
+  { id: 'm-B-6', group: 'B', md: 3, kickoff: 'Thu 20:00', date: 'Thu',       home: 'KSA', away: 'SUI', status: 'open' },
+
+  // ───────── Group C — ENG, JPN, ESP, ITA ─────────
+  { id: 'm-C-1', group: 'C', md: 1, kickoff: 'Final',     date: 'Thurs',     home: 'ESP', away: 'ITA', myPick: { h: 1, a: 0 }, actual: { h: 2, a: 1 }, status: 'final', earned: 1, rule: 'result' },
+  { id: 'm-C-2', group: 'C', md: 1, kickoff: '14:00 ET',  date: 'Tomorrow',  home: 'ENG', away: 'JPN', status: 'open' },
+  { id: 'm-C-3', group: 'C', md: 2, kickoff: 'Sun 14:00', date: 'Sunday',    home: 'ENG', away: 'ESP', status: 'open' },
+  { id: 'm-C-4', group: 'C', md: 2, kickoff: 'Sun 17:00', date: 'Sunday',    home: 'JPN', away: 'ITA', status: 'open' },
+  { id: 'm-C-5', group: 'C', md: 3, kickoff: 'Fri 20:00', date: 'Fri',       home: 'ENG', away: 'ITA', status: 'open' },
+  { id: 'm-C-6', group: 'C', md: 3, kickoff: 'Fri 20:00', date: 'Fri',       home: 'JPN', away: 'ESP', status: 'open' },
+
+  // ───────── Group D — ARG, POR, COL, URU ─────────
+  { id: 'm-D-1', group: 'D', md: 1, kickoff: 'Final',     date: 'Thurs',     home: 'COL', away: 'URU', myPick: { h: 1, a: 1 }, actual: { h: 1, a: 1 }, status: 'final', earned: 3, rule: 'exact' },
+  { id: 'm-D-2', group: 'D', md: 1, kickoff: '17:00 ET',  date: 'Tomorrow',  home: 'ARG', away: 'POR', status: 'open' },
+  { id: 'm-D-3', group: 'D', md: 2, kickoff: 'Mon 14:00', date: 'Monday',    home: 'ARG', away: 'COL', status: 'open' },
+  { id: 'm-D-4', group: 'D', md: 2, kickoff: 'Mon 17:00', date: 'Monday',    home: 'POR', away: 'URU', status: 'open' },
+  { id: 'm-D-5', group: 'D', md: 3, kickoff: 'Sat 20:00', date: 'Sat',       home: 'ARG', away: 'URU', status: 'open' },
+  { id: 'm-D-6', group: 'D', md: 3, kickoff: 'Sat 20:00', date: 'Sat',       home: 'POR', away: 'COL', status: 'open' },
+
+  // ───────── Group E — FRA, CRO, AUS, IRN ─────────
+  { id: 'm-E-1', group: 'E', md: 1, kickoff: 'Sun 14:00', date: 'Sunday',    home: 'FRA', away: 'CRO', myPick: { h: 2, a: 1 }, status: 'open' },
+  { id: 'm-E-2', group: 'E', md: 1, kickoff: 'Sun 17:00', date: 'Sunday',    home: 'AUS', away: 'IRN', status: 'open' },
+  { id: 'm-E-3', group: 'E', md: 2, kickoff: 'Tue 14:00', date: 'Tuesday',   home: 'FRA', away: 'AUS', status: 'open' },
+  { id: 'm-E-4', group: 'E', md: 2, kickoff: 'Tue 17:00', date: 'Tuesday',   home: 'IRN', away: 'CRO', status: 'open' },
+  { id: 'm-E-5', group: 'E', md: 3, kickoff: 'Sun 20:00', date: 'Sun',       home: 'FRA', away: 'IRN', status: 'open' },
+  { id: 'm-E-6', group: 'E', md: 3, kickoff: 'Sun 20:00', date: 'Sun',       home: 'CRO', away: 'AUS', status: 'open' },
+
+  // ───────── Group F — BRA, SEN, NOR, CHL ─────────
+  { id: 'm-F-1', group: 'F', md: 1, kickoff: 'Sun 17:00', date: 'Sunday',    home: 'BRA', away: 'SEN', myPick: { h: 3, a: 0 }, status: 'open' },
+  { id: 'm-F-2', group: 'F', md: 1, kickoff: 'Sun 20:00', date: 'Sunday',    home: 'NOR', away: 'CHL', status: 'open' },
+  { id: 'm-F-3', group: 'F', md: 2, kickoff: 'Wed 14:00', date: 'Wed',       home: 'BRA', away: 'NOR', status: 'open' },
+  { id: 'm-F-4', group: 'F', md: 2, kickoff: 'Wed 17:00', date: 'Wed',       home: 'CHL', away: 'SEN', status: 'open' },
+  { id: 'm-F-5', group: 'F', md: 3, kickoff: 'Mon 20:00', date: 'Mon',       home: 'BRA', away: 'CHL', status: 'open' },
+  { id: 'm-F-6', group: 'F', md: 3, kickoff: 'Mon 20:00', date: 'Mon',       home: 'SEN', away: 'NOR', status: 'open' },
+
+  // ───────── Group G — BEL, MAR, AUT, EGY ─────────
+  { id: 'm-G-1', group: 'G', md: 1, kickoff: 'Mon 14:00', date: 'Monday',    home: 'BEL', away: 'MAR', myPick: { h: 2, a: 0 }, status: 'open' },
+  { id: 'm-G-2', group: 'G', md: 1, kickoff: 'Mon 17:00', date: 'Monday',    home: 'AUT', away: 'EGY', status: 'open' },
+  { id: 'm-G-3', group: 'G', md: 2, kickoff: 'Thu 14:00', date: 'Thursday',  home: 'BEL', away: 'AUT', status: 'open' },
+  { id: 'm-G-4', group: 'G', md: 2, kickoff: 'Thu 17:00', date: 'Thursday',  home: 'EGY', away: 'MAR', status: 'open' },
+  { id: 'm-G-5', group: 'G', md: 3, kickoff: 'Tue 20:00', date: 'Tue',       home: 'BEL', away: 'EGY', status: 'open' },
+  { id: 'm-G-6', group: 'G', md: 3, kickoff: 'Tue 20:00', date: 'Tue',       home: 'MAR', away: 'AUT', status: 'open' },
+
+  // ───────── Group H — NED, KOR, SRB, GHA ─────────
+  { id: 'm-H-1', group: 'H', md: 1, kickoff: 'Mon 17:00', date: 'Monday',    home: 'NED', away: 'KOR', status: 'open' },
+  { id: 'm-H-2', group: 'H', md: 1, kickoff: 'Mon 20:00', date: 'Monday',    home: 'SRB', away: 'GHA', status: 'open' },
+  { id: 'm-H-3', group: 'H', md: 2, kickoff: 'Fri 14:00', date: 'Friday',    home: 'NED', away: 'SRB', status: 'open' },
+  { id: 'm-H-4', group: 'H', md: 2, kickoff: 'Fri 17:00', date: 'Friday',    home: 'GHA', away: 'KOR', status: 'open' },
+  { id: 'm-H-5', group: 'H', md: 3, kickoff: 'Wed 20:00', date: 'Wed',       home: 'NED', away: 'GHA', status: 'open' },
+  { id: 'm-H-6', group: 'H', md: 3, kickoff: 'Wed 20:00', date: 'Wed',       home: 'KOR', away: 'SRB', status: 'open' },
 ];
 
 // Knockout bracket — sequential unlock states

@@ -62,7 +62,6 @@ const SubNav = ({ active, setActive }) => {
     { id: 'bracket', label: 'Knockout bracket', icon: 'bracket' },
     { id: 'outrights', label: 'Outrights', icon: 'trophy' },
     { id: 'leagues', label: 'Leaderboards', icon: 'leaderboard' },
-    { id: 'profile', label: 'My picks', icon: 'user' },
     { id: 'prizes', label: 'Prizes', icon: 'medal' },
     { id: 'how', label: 'How it works', icon: 'info' },
   ];
@@ -75,11 +74,6 @@ const SubNav = ({ active, setActive }) => {
             {it.label}
           </button>
         ))}
-        <span className="spacer"/>
-        <span className="points-pill">
-          <Icon name="target" size={14}/>
-          142 pts · #247
-        </span>
       </div>
     </div>
   );
@@ -325,6 +319,22 @@ const BracketScreen = () => {
   const order = ['R32', 'R16', 'QF', 'SF', 'F'];
   const accent = { open: 'var(--gdc-blue-600)', tbd: 'var(--gdc-gray-450)', locked: 'var(--gdc-gray-450)' };
 
+  // Round filter for narrow viewports — defaults to "all" on desktop. The CSS
+  // hides the picker above 720px so the desktop horizontal-scroll grid stays.
+  const [activeRound, setActiveRound] = React.useState('R32');
+  const isMobile = typeof window !== 'undefined' && window.matchMedia
+    ? window.matchMedia('(max-width: 720px)').matches : false;
+  const [mobile, setMobile] = React.useState(isMobile);
+  React.useEffect(() => {
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 720px)');
+    const h = () => setMobile(mq.matches);
+    mq.addEventListener?.('change', h);
+    return () => mq.removeEventListener?.('change', h);
+  }, []);
+
+  const visibleRounds = mobile ? [activeRound] : order;
+
   return (
     <div className="screen">
       <div className="screen-header">
@@ -349,8 +359,25 @@ const BracketScreen = () => {
         </div>
       </div>
 
+      <div className="bracket-round-picker" role="tablist" aria-label="Knockout round">
+        {order.map(key => {
+          const r = KNOCKOUT[key];
+          return (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={activeRound === key}
+              className={`brp-btn ${activeRound === key ? 'active' : ''} state-${r.state}`}
+              onClick={() => setActiveRound(key)}
+            >
+              {r.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="bracket-grid">
-        {order.map((key) => {
+        {visibleRounds.map((key) => {
           const r = KNOCKOUT[key];
           return (
             <div className="round-col" key={key}>
