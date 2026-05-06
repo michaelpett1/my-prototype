@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Predictor 26 — Free WC 2026 Predictor Game · £10,000 Prize Pool</title>
-<meta name="description" content="Predict every match of World Cup 2026. Free to play. Closest predictor wins £10,000. Group stage, knockouts, outrights and private leagues." />
-<meta property="og:title" content="Predictor 26 — Predict the World Cup, Win £10K" />
-<meta property="og:description" content="Free WC 2026 predictor game. 104 matches. £10,000 prize pool. No fees." />
+<title>Predictor 26 - Free Tournament Predictor Game · £10,000 Prize Pool</title>
+<meta name="description" content="Predict every match of the 2026 tournament. Free to play. Closest predictor wins £10,000. Group stage, knockouts, outrights and private leagues." />
+<meta property="og:title" content="Predictor 26 - Predict the Tournament, Win £10K" />
+<meta property="og:description" content="Free 2026 tournament predictor game. 104 matches. £10,000 prize pool. No fees." />
 <meta property="og:type" content="website" />
 <link rel="canonical" href="" />
 
@@ -19,7 +19,7 @@
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
 
 <style>
-/* Predictor 26 — global tokens & shared styles */
+/* Predictor 26 - global tokens & shared styles */
 :root {
   --bg: #06120e;
   --bg-2: #0a1a14;
@@ -184,63 +184,114 @@ body {
 
 <script type="text/babel" data-presets="env,react">
 /* =========================================================
-   Predictor 26 — production build (single-file)
+   Predictor 26 - production build (single-file)
    Source: design handoff bundle, inlined.
    ========================================================= */
 
 // ============ DATA ============
+// Real Final Draw - December 5, 2025 (en.wikipedia.org/wiki/2026_FIFA_World_Cup_seeding)
 const TEAMS = [
-  { code: 'MEX', name: 'Mexico', group: 'A', color: '#2d6a4f', alt: '#e63946' },
-  { code: 'CAN', name: 'Canada', group: 'A', color: '#d62828', alt: '#fff' },
-  { code: 'JAM', name: 'Jamaica', group: 'A', color: '#1b9e3e', alt: '#ffd60a' },
-  { code: 'NOR', name: 'Norway', group: 'A', color: '#dc2626', alt: '#1e3a8a' },
-  { code: 'USA', name: 'USA', group: 'B', color: '#1e3a8a', alt: '#dc2626' },
-  { code: 'ARG', name: 'Argentina', group: 'B', color: '#7dd3fc', alt: '#fff' },
-  { code: 'EGY', name: 'Egypt', group: 'B', color: '#dc2626', alt: '#000' },
-  { code: 'KOR', name: 'South Korea', group: 'B', color: '#dc2626', alt: '#1e3a8a' },
-  { code: 'CAN', name: 'Canada', group: 'C', color: '#d62828', alt: '#fff' },
-  { code: 'BRA', name: 'Brazil', group: 'C', color: '#fbbf24', alt: '#16a34a' },
-  { code: 'JPN', name: 'Japan', group: 'C', color: '#1e40af', alt: '#fff' },
-  { code: 'SCO', name: 'Scotland', group: 'C', color: '#1e3a8a', alt: '#fff' },
-  { code: 'ENG', name: 'England', group: 'D', color: '#fff', alt: '#dc2626' },
-  { code: 'POR', name: 'Portugal', group: 'D', color: '#16a34a', alt: '#dc2626' },
-  { code: 'ECU', name: 'Ecuador', group: 'D', color: '#fbbf24', alt: '#1e3a8a' },
-  { code: 'CIV', name: "Côte d'Ivoire", group: 'D', color: '#f97316', alt: '#16a34a' },
-  { code: 'FRA', name: 'France', group: 'E', color: '#1e3a8a', alt: '#dc2626' },
-  { code: 'GER', name: 'Germany', group: 'E', color: '#000', alt: '#dc2626' },
-  { code: 'AUS', name: 'Australia', group: 'E', color: '#fbbf24', alt: '#16a34a' },
-  { code: 'TUN', name: 'Tunisia', group: 'E', color: '#dc2626', alt: '#fff' },
-  { code: 'ESP', name: 'Spain', group: 'F', color: '#dc2626', alt: '#fbbf24' },
-  { code: 'BEL', name: 'Belgium', group: 'F', color: '#000', alt: '#fbbf24' },
-  { code: 'MAR', name: 'Morocco', group: 'F', color: '#16a34a', alt: '#dc2626' },
-  { code: 'URU', name: 'Uruguay', group: 'F', color: '#7dd3fc', alt: '#fff' },
-  { code: 'NED', name: 'Netherlands', group: 'G', color: '#f97316', alt: '#1e3a8a' },
-  { code: 'CRO', name: 'Croatia', group: 'G', color: '#dc2626', alt: '#fff' },
-  { code: 'NGA', name: 'Nigeria', group: 'G', color: '#16a34a', alt: '#fff' },
-  { code: 'PAN', name: 'Panama', group: 'G', color: '#dc2626', alt: '#1e3a8a' },
-  { code: 'ITA', name: 'Italy', group: 'H', color: '#1e40af', alt: '#fff' },
-  { code: 'SEN', name: 'Senegal', group: 'H', color: '#16a34a', alt: '#fbbf24' },
-  { code: 'CHI', name: 'Chile', group: 'H', color: '#dc2626', alt: '#1e3a8a' },
-  { code: 'NZL', name: 'New Zealand', group: 'H', color: '#000', alt: '#fff' },
+  // Group A
+  { code: 'MEX', name: 'Mexico',          group: 'A', color: '#2d6a4f', alt: '#fff' },
+  { code: 'RSA', name: 'South Africa',    group: 'A', color: '#006e3a', alt: '#ffd60a' },
+  { code: 'KOR', name: 'South Korea',     group: 'A', color: '#dc2626', alt: '#1e3a8a' },
+  { code: 'CZE', name: 'Czech Republic',  group: 'A', color: '#d62828', alt: '#fff' },
+  // Group B
+  { code: 'CAN', name: 'Canada',          group: 'B', color: '#d62828', alt: '#fff' },
+  { code: 'BIH', name: 'Bosnia & Herz.',  group: 'B', color: '#1e40af', alt: '#fde68a' },
+  { code: 'QAT', name: 'Qatar',           group: 'B', color: '#831843', alt: '#fff' },
+  { code: 'SUI', name: 'Switzerland',     group: 'B', color: '#dc2626', alt: '#fff' },
+  // Group C
+  { code: 'BRA', name: 'Brazil',          group: 'C', color: '#fbbf24', alt: '#16a34a' },
+  { code: 'MAR', name: 'Morocco',         group: 'C', color: '#16a34a', alt: '#dc2626' },
+  { code: 'HAI', name: 'Haiti',           group: 'C', color: '#1e40af', alt: '#dc2626' },
+  { code: 'SCO', name: 'Scotland',        group: 'C', color: '#1e3a8a', alt: '#fff' },
+  // Group D
+  { code: 'USA', name: 'USA',             group: 'D', color: '#1e3a8a', alt: '#dc2626' },
+  { code: 'PAR', name: 'Paraguay',        group: 'D', color: '#dc2626', alt: '#fff' },
+  { code: 'AUS', name: 'Australia',       group: 'D', color: '#fbbf24', alt: '#16a34a' },
+  { code: 'TUR', name: 'Turkey',          group: 'D', color: '#dc2626', alt: '#fff' },
+  // Group E
+  { code: 'GER', name: 'Germany',         group: 'E', color: '#000',    alt: '#dc2626' },
+  { code: 'CUW', name: 'Curaçao',         group: 'E', color: '#1e3a8a', alt: '#fde68a' },
+  { code: 'CIV', name: "Côte d'Ivoire",   group: 'E', color: '#f97316', alt: '#16a34a' },
+  { code: 'ECU', name: 'Ecuador',         group: 'E', color: '#fbbf24', alt: '#1e3a8a' },
+  // Group F
+  { code: 'NED', name: 'Netherlands',     group: 'F', color: '#f97316', alt: '#1e3a8a' },
+  { code: 'JPN', name: 'Japan',           group: 'F', color: '#1e40af', alt: '#fff' },
+  { code: 'SWE', name: 'Sweden',          group: 'F', color: '#fbbf24', alt: '#1e3a8a' },
+  { code: 'TUN', name: 'Tunisia',         group: 'F', color: '#dc2626', alt: '#fff' },
+  // Group G
+  { code: 'BEL', name: 'Belgium',         group: 'G', color: '#000',    alt: '#fbbf24' },
+  { code: 'EGY', name: 'Egypt',           group: 'G', color: '#dc2626', alt: '#000' },
+  { code: 'IRN', name: 'Iran',            group: 'G', color: '#dc2626', alt: '#16a34a' },
+  { code: 'NZL', name: 'New Zealand',     group: 'G', color: '#000',    alt: '#fff' },
+  // Group H
+  { code: 'ESP', name: 'Spain',           group: 'H', color: '#dc2626', alt: '#fbbf24' },
+  { code: 'CPV', name: 'Cape Verde',      group: 'H', color: '#1e40af', alt: '#fff' },
+  { code: 'KSA', name: 'Saudi Arabia',    group: 'H', color: '#16a34a', alt: '#fff' },
+  { code: 'URU', name: 'Uruguay',         group: 'H', color: '#7dd3fc', alt: '#fff' },
+  // Group I
+  { code: 'FRA', name: 'France',          group: 'I', color: '#1e3a8a', alt: '#dc2626' },
+  { code: 'SEN', name: 'Senegal',         group: 'I', color: '#16a34a', alt: '#fde68a' },
+  { code: 'IRQ', name: 'Iraq',            group: 'I', color: '#dc2626', alt: '#fff' },
+  { code: 'NOR', name: 'Norway',          group: 'I', color: '#dc2626', alt: '#1e3a8a' },
+  // Group J
+  { code: 'ARG', name: 'Argentina',       group: 'J', color: '#7dd3fc', alt: '#fff' },
+  { code: 'ALG', name: 'Algeria',         group: 'J', color: '#16a34a', alt: '#dc2626' },
+  { code: 'AUT', name: 'Austria',         group: 'J', color: '#dc2626', alt: '#fff' },
+  { code: 'JOR', name: 'Jordan',          group: 'J', color: '#dc2626', alt: '#000' },
+  // Group K
+  { code: 'POR', name: 'Portugal',        group: 'K', color: '#16a34a', alt: '#dc2626' },
+  { code: 'COD', name: 'DR Congo',        group: 'K', color: '#1e40af', alt: '#fde68a' },
+  { code: 'UZB', name: 'Uzbekistan',      group: 'K', color: '#1e40af', alt: '#fff' },
+  { code: 'COL', name: 'Colombia',        group: 'K', color: '#fbbf24', alt: '#dc2626' },
+  // Group L
+  { code: 'ENG', name: 'England',         group: 'L', color: '#fff',    alt: '#dc2626' },
+  { code: 'CRO', name: 'Croatia',         group: 'L', color: '#dc2626', alt: '#fff' },
+  { code: 'GHA', name: 'Ghana',           group: 'L', color: '#dc2626', alt: '#fde68a' },
+  { code: 'PAN', name: 'Panama',          group: 'L', color: '#dc2626', alt: '#1e3a8a' },
 ];
-const GROUPS = ['A','B','C','D','E','F','G','H'];
+const GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L'];
+
+// Real match dates by group/matchday (en.wikipedia.org/wiki/2026_FIFA_World_Cup §Match schedule)
+// Pairings: MD1 1v2 / 3v4 · MD2 1v3 / 4v2 · MD3 4v1 / 2v3
+const GROUP_DATES = {
+  A: { md1: ['Jun 11','Jun 11'], md2: ['Jun 18','Jun 18'], md3: ['Jun 24','Jun 24'] },
+  B: { md1: ['Jun 12','Jun 13'], md2: ['Jun 18','Jun 18'], md3: ['Jun 24','Jun 24'] },
+  C: { md1: ['Jun 13','Jun 13'], md2: ['Jun 19','Jun 19'], md3: ['Jun 24','Jun 24'] },
+  D: { md1: ['Jun 12','Jun 13'], md2: ['Jun 19','Jun 19'], md3: ['Jun 25','Jun 25'] },
+  E: { md1: ['Jun 14','Jun 14'], md2: ['Jun 20','Jun 20'], md3: ['Jun 25','Jun 25'] },
+  F: { md1: ['Jun 14','Jun 14'], md2: ['Jun 20','Jun 20'], md3: ['Jun 25','Jun 25'] },
+  G: { md1: ['Jun 15','Jun 15'], md2: ['Jun 21','Jun 21'], md3: ['Jun 26','Jun 26'] },
+  H: { md1: ['Jun 15','Jun 15'], md2: ['Jun 21','Jun 21'], md3: ['Jun 26','Jun 26'] },
+  I: { md1: ['Jun 16','Jun 16'], md2: ['Jun 22','Jun 22'], md3: ['Jun 26','Jun 26'] },
+  J: { md1: ['Jun 16','Jun 16'], md2: ['Jun 22','Jun 22'], md3: ['Jun 27','Jun 27'] },
+  K: { md1: ['Jun 17','Jun 17'], md2: ['Jun 23','Jun 23'], md3: ['Jun 27','Jun 27'] },
+  L: { md1: ['Jun 17','Jun 17'], md2: ['Jun 23','Jun 23'], md3: ['Jun 27','Jun 27'] },
+};
+const GROUP_VENUES = {
+  A: 'Mexico City',  B: 'Toronto',       C: 'Atlanta',      D: 'Los Angeles',
+  E: 'Houston',      F: 'Boston',        G: 'Dallas',       H: 'San Francisco',
+  I: 'Kansas City',  J: 'Miami',         K: 'Philadelphia', L: 'Vancouver',
+};
 
 function buildGroupFixtures() {
   const fixtures = [];
   let id = 1;
-  const startDates = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18'];
-  GROUPS.forEach((g, gi) => {
+  // [home,away] index pairs, in matchday order
+  const pairs = [[0,1],[2,3], [0,2],[3,1], [3,0],[1,2]];
+  GROUPS.forEach((g) => {
     const teams = TEAMS.filter(t => t.group === g);
-    const pairs = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]];
     pairs.forEach((p, i) => {
       const md = Math.floor(i / 2) + 1;
-      const dayBase = (md - 1) * 4 + (gi % 4);
+      const matchInMd = i % 2;
       fixtures.push({
         id: `G${id++}`, group: g, matchday: md,
         home: teams[p[0]], away: teams[p[1]],
-        date: startDates[dayBase % startDates.length] || 'Jun 18',
+        date: GROUP_DATES[g][`md${md}`][matchInMd],
         time: ['12:00','15:00','18:00','21:00'][i % 4],
-        venue: ['Mexico City','Toronto','Los Angeles','New York','Dallas','Atlanta','Seattle','Miami'][gi],
+        venue: GROUP_VENUES[g],
       });
     });
   });
@@ -265,7 +316,6 @@ const PRIZE_TIERS = [
   { rank: '1st', amount: '£5,000', tone: 'gold' },
   { rank: '2nd', amount: '£2,000', tone: 'silver' },
   { rank: '3rd', amount: '£1,000', tone: 'bronze' },
-  { rank: '4th – 10th', amount: '£285 ea', tone: 'tier' },
 ];
 const KO_PRIZES = [
   { rank: '1st', amount: '£1,250' },
@@ -404,11 +454,11 @@ function LandingScreen({ onNav, onSignIn }) {
             <Pill icon>FREE TO PLAY · OPENS JUN 11</Pill>
             <h1 className="p26-display" style={{ fontSize: 92, lineHeight: 0.92, margin: '20px 0 24px', letterSpacing: '0.005em' }}>
               PREDICT THE<br />
-              <span style={{ color: 'var(--accent)' }}>WORLD CUP.</span><br />
+              <span style={{ color: 'var(--accent)' }}>TOURNAMENT.</span><br />
               WIN <span className="p26-gold-text">£10,000</span>.
             </h1>
             <p style={{ fontSize: 17, color: 'var(--text-2)', maxWidth: 480, lineHeight: 1.55, margin: '0 0 32px' }}>
-              Pick scorelines for all 104 matches across the 2026 tournament. Closest predictor across the group stage and knockouts wins the pot. No stakes. No fees. Just football.
+              Pick scorelines for all 104 matches of the 2026 tournament. Closest predictor across the group stage and knockouts wins the pot. No stakes. No fees. Just football.
             </p>
             <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
               <button className="p26-btn" style={{ padding: '14px 24px', fontSize: 14 }} onClick={() => onNav('group')}>
@@ -417,7 +467,7 @@ function LandingScreen({ onNav, onSignIn }) {
               <button className="p26-btn is-ghost" onClick={() => onNav('leaderboard')}>View Prize Pool</button>
             </div>
             <div style={{ display: 'flex', gap: 28, marginTop: 40, flexWrap: 'wrap' }}>
-              {[{k:'104',l:'Matches'},{k:'£10K',l:'Prize Pool'},{k:'5+ wks',l:'Tournament'},{k:'No',l:'Entry Fee'}].map(s => (
+              {[{k:'104',l:'Matches'},{k:'£10K',l:'Prize Pool'},{k:'No',l:'Entry Fee'}].map(s => (
                 <div key={s.l}>
                   <div className="p26-display" style={{ fontSize: 32, color: 'var(--text)' }}>{s.k}</div>
                   <div className="p26-label">{s.l}</div>
@@ -429,17 +479,17 @@ function LandingScreen({ onNav, onSignIn }) {
           <div style={{ position: 'relative', height: 480 }}>
             <div className="p26-card" style={{ position: 'absolute', top: 0, right: 0, width: 360, padding: 24, transform: 'rotate(2deg)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Pill tone="muted">GROUP D · MD1</Pill>
-                <span className="p26-label">JUN 13 · 18:00</span>
+                <Pill tone="muted">GROUP A · MD1</Pill>
+                <span className="p26-label">JUN 11 · 20:00</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '16px 0' }}>
-                <Flag team={TEAMS.find(t => t.code === 'ENG')} />
+                <Flag team={TEAMS.find(t => t.code === 'MEX')} />
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <input className="p26-score has-value" defaultValue="2" readOnly />
                   <span className="p26-label">vs</span>
                   <input className="p26-score has-value" defaultValue="1" readOnly />
                 </div>
-                <Flag team={TEAMS.find(t => t.code === 'POR')} />
+                <Flag team={TEAMS.find(t => t.code === 'RSA')} />
               </div>
               <div style={{ borderTop: '1px solid var(--line)', paddingTop: 12, display: 'flex', justifyContent: 'space-between' }}>
                 <span className="p26-label">Your Pick</span>
@@ -469,17 +519,17 @@ function LandingScreen({ onNav, onSignIn }) {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 36, flexWrap: 'wrap', gap: 12 }}>
             <h2 className="p26-display" style={{ fontSize: 44, margin: 0 }}>How it <span style={{ color: 'var(--accent)' }}>works</span></h2>
-            <span className="p26-label">Updated for World Cup 2026</span>
+            <span className="p26-label">Updated for the 2026 tournament</span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
             {[
-              { n: '01', t: 'Pick scorelines', d: 'Predict every group match plus tournament outrights — winner, top three, golden boot.' },
+              { n: '01', t: 'Pick scorelines', d: 'Predict every group match plus tournament outrights - winner, top three, golden boot.' },
               { n: '02', t: 'Earn points', d: '3 pts for an exact score. 1 pt for the right result. Outrights pay big.' },
               { n: '03', t: 'Unlock knockouts', d: 'Each round opens once the previous completes. R32 → Final. No scrambles.' },
-              { n: '04', t: 'Win the pot', d: 'Top 10 share £10,000. Closest goals + cards predictor breaks ties.' },
+              { n: '04', t: 'Win the pot', d: 'Top 3 share the pot. Closest goals + cards predictor across the whole tournament and knockouts breaks ties.' },
             ].map(s => (
               <div key={s.n} className="p26-card" style={{ padding: 24 }}>
-                <div className="p26-display" style={{ fontSize: 32, color: 'var(--accent)', lineHeight: 1 }}>{s.n}</div>
+                <div className="p26-display" style={{ fontSize: 32, color: 'var(--accent)', lineHeight: 1.1, display: 'inline-block', paddingRight: 8 }}>{s.n}</div>
                 <h3 style={{ fontSize: 17, fontWeight: 600, margin: '14px 0 8px' }}>{s.t}</h3>
                 <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.5 }}>{s.d}</p>
               </div>
@@ -529,7 +579,7 @@ function LandingScreen({ onNav, onSignIn }) {
             ))}
             <div style={{ marginTop: 20, padding: 14, background: 'var(--surface-2)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)' }}>
               <span className="p26-label" style={{ color: 'var(--text)' }}>TIEBREAKER</span>
-              <p style={{ margin: '6px 0 0', lineHeight: 1.5 }}>Combined accuracy on Total Tournament Goals + Total Tournament Cards.</p>
+              <p style={{ margin: '6px 0 0', lineHeight: 1.5 }}>Closest combined Total Goals + Total Cards across the whole tournament and the knockouts. Applied to both pots.</p>
             </div>
           </div>
         </div>
@@ -611,17 +661,17 @@ function GroupStageScreen({ onNav, onSignIn, picks, setPick, signedIn }) {
                 <Status>OPENS JUN 11</Status>
               </div>
               <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 540 }}>
-                Predict scorelines for all 48 group matches. 3 points for an exact score, 1 for the right result. Predictions lock at kick-off.
+                Predict scorelines for all 72 group matches across 12 groups. 3 points for an exact score, 1 for the right result. Predictions lock at kick-off.
               </p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div className="p26-label">YOUR PROGRESS</div>
               <div className="p26-display" style={{ fontSize: 40, lineHeight: 1, marginTop: 4 }}>
                 <span style={{ color: 'var(--accent)' }}>{completed}</span>
-                <span style={{ color: 'var(--text-3)' }}>/48</span>
+                <span style={{ color: 'var(--text-3)' }}>/72</span>
               </div>
               <div style={{ width: 220, height: 4, background: 'var(--surface-2)', borderRadius: 999, marginTop: 8 }}>
-                <div style={{ width: `${(completed / 48) * 100}%`, height: '100%', background: 'var(--accent)', borderRadius: 999, transition: 'width .2s' }} />
+                <div style={{ width: `${(completed / 72) * 100}%`, height: '100%', background: 'var(--accent)', borderRadius: 999, transition: 'width .2s' }} />
               </div>
             </div>
           </div>
@@ -717,11 +767,11 @@ function GroupStageScreen({ onNav, onSignIn, picks, setPick, signedIn }) {
 // ============ KNOCKOUT ============
 function BracketGrid({ r32 }) {
   const rounds = [
-    { id: 'r32', label: 'ROUND OF 32', count: 8 },
-    { id: 'r16', label: 'ROUND OF 16', count: 4 },
-    { id: 'qf', label: 'QUARTERS', count: 2 },
-    { id: 'sf', label: 'SEMIS', count: 1 },
-    { id: 'f', label: 'FINAL', count: 1 },
+    { id: 'r32', label: 'ROUND OF 32', count: 16 },
+    { id: 'r16', label: 'ROUND OF 16', count: 8 },
+    { id: 'qf',  label: 'QUARTERS',    count: 4 },
+    { id: 'sf',  label: 'SEMIS',       count: 2 },
+    { id: 'f',   label: 'FINAL',       count: 1 },
   ];
   function teamRow(label, top) {
     return (
@@ -744,7 +794,7 @@ function BracketGrid({ r32 }) {
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', justifyContent: 'space-around' }}>
             {Array.from({ length: r.count }).map((_, i) => {
-              const m = r32[i] || ['—', '—'];
+              const m = r32[i] || ['-', '-'];
               const isFinal = r.id === 'f';
               return (
                 <div key={i} style={{
@@ -756,10 +806,10 @@ function BracketGrid({ r32 }) {
                   {ri === 0 ? (<>{teamRow(m[0], true)}{teamRow(m[1], false)}</>)
                     : (<>
                         <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--line)' }}>
-                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>—</span>
+                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>-</span>
                         </div>
                         <div style={{ padding: '8px 10px' }}>
-                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>—</span>
+                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>-</span>
                         </div>
                       </>)
                   }
@@ -774,7 +824,13 @@ function BracketGrid({ r32 }) {
 }
 
 function BracketScreen({ onNav, onSignIn, signedIn }) {
-  const r32 = [['A1','WC1'],['C2','D2'],['B1','WC2'],['D1','C2'],['E1','WC3'],['G2','H2'],['F1','WC4'],['H1','G2']];
+  // R32 placeholder seeding (16 fixtures · 12 group winners + 12 runners-up + 8 best 3rd-placed)
+  const r32 = [
+    ['1A','3-CDEF'], ['1B','3-AEFI'], ['1C','3-BFGH'], ['1D','3-AGHI'],
+    ['1E','2K'],     ['1F','2L'],     ['1G','2I'],     ['1H','2J'],
+    ['2A','2C'],     ['2B','2D'],     ['2E','2H'],     ['2F','2G'],
+    ['1I','3-DGHL'], ['1J','3-BGHL'], ['1K','3-CDEK'], ['1L','3-CFGL'],
+  ];
   return (
     <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
       <NavBar current="bracket" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
@@ -785,7 +841,7 @@ function BracketScreen({ onNav, onSignIn, signedIn }) {
             <Pill tone="warn"><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{I.lock} LOCKED</span></Pill>
           </div>
           <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 640 }}>
-            Round of 32 unlocks once group stage completes. Each round opens sequentially — you'll predict R32 fixtures the moment they're set.
+            Round of 32 unlocks once group stage completes. Each round opens sequentially - you'll predict R32 fixtures the moment they're set.
           </p>
         </div>
       </section>
@@ -891,7 +947,7 @@ function Tiebreaker({ outrights, setOutright }) {
         }}>=</div>
         <div>
           <div className="p26-display" style={{ fontSize: 22 }}>TIEBREAKER</div>
-          <div className="p26-label" style={{ color: 'var(--text-3)' }}>Closest combined Total Goals + Cards wins ties</div>
+          <div className="p26-label" style={{ color: 'var(--text-3)' }}>Closest combined Total Goals + Cards across the whole tournament and the knockouts</div>
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -921,7 +977,7 @@ function OutrightsScreen({ onNav, onSignIn, signedIn, outrights, setOutright }) 
             <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>TOURNAMENT <span style={{ color: 'var(--accent)' }}>OUTRIGHTS</span></h1>
           </div>
           <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 640 }}>
-            Big points pay big. Pick your podium and Golden Boot before kick-off — locks at first whistle on Jun 11.
+            Big points pay big. Pick your podium and Golden Boot before kick-off - locks at first whistle on Jun 11.
           </p>
         </div>
       </section>
@@ -1006,7 +1062,7 @@ function EmptyPicks({ onNav }) {
   return (
     <div style={{ padding: '32px 16px', textAlign: 'center', background: 'var(--surface-2)', borderRadius: 12, border: '1px dashed var(--line-2)' }}>
       <div className="p26-display" style={{ fontSize: 22, margin: '0 0 6px', color: 'var(--text-2)' }}>NO PREDICTIONS YET</div>
-      <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '0 0 16px' }}>Pick scorelines for any group match — you can edit until kick-off.</p>
+      <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '0 0 16px' }}>Pick scorelines for any group match - you can edit until kick-off.</p>
       <button className="p26-btn" onClick={() => onNav('group')}>Start with Group A {I.arrow}</button>
     </div>
   );
@@ -1015,7 +1071,7 @@ function EmptyPicks({ onNav }) {
 function DashboardScreen({ onNav, onSignIn, signedIn, picks, outrights }) {
   const filledPicks = Object.keys(picks).length;
   const filledOutrights = ['winner','second','third','boot'].filter(k => outrights[k]).length;
-  const completion = Math.round(((filledPicks / 48) * 0.7 + (filledOutrights / 4) * 0.3) * 100);
+  const completion = Math.round(((filledPicks / 72) * 0.7 + (filledOutrights / 4) * 0.3) * 100);
   return (
     <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
       <NavBar current="dashboard" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
@@ -1032,9 +1088,9 @@ function DashboardScreen({ onNav, onSignIn, signedIn, picks, outrights }) {
             </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 24 }}>
-            <KPI label="GLOBAL RANK" value="—" sub="Tournament starts Jun 11" tone="muted" />
+            <KPI label="GLOBAL RANK" value="-" sub="Tournament starts Jun 11" tone="muted" />
             <KPI label="POINTS"      value="0" sub="No matches played yet" tone="muted" />
-            <KPI label="PROGRESS"    value={`${completion}%`} sub={`${filledPicks}/48 group picks`} tone="accent" />
+            <KPI label="PROGRESS"    value={`${completion}%`} sub={`${filledPicks}/72 group picks`} tone="accent" />
             <KPI label="OUTRIGHTS"   value={`${filledOutrights}/4`} sub="Locks at first kick-off" tone={filledOutrights === 4 ? 'accent' : 'warn'} />
           </div>
         </div>
@@ -1056,7 +1112,7 @@ function DashboardScreen({ onNav, onSignIn, signedIn, picks, outrights }) {
                 ))}
               </div>
               <div style={{ marginTop: 16, padding: 12, background: 'rgba(34,197,94,0.06)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)', display: 'flex', justifyContent: 'space-between' }}>
-                <span>Group stage opens · MEX vs CAN</span>
+                <span>Group stage opens · MEX vs RSA · Estadio Azteca</span>
                 <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Set reminder →</span>
               </div>
             </div>
@@ -1146,7 +1202,6 @@ function LeaderboardScreen({ onNav, onSignIn, signedIn }) {
             <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
               <div style={{ display: 'flex', gap: 4 }}>
                 <button className="p26-tab is-active" style={{ padding: '8px 12px', fontSize: 13 }}>Global</button>
-                <button className="p26-tab" style={{ padding: '8px 12px', fontSize: 13 }}>Friends</button>
                 <button className="p26-tab" style={{ padding: '8px 12px', fontSize: 13 }}>My League</button>
               </div>
               <div style={{ flex: 1 }} />
@@ -1174,7 +1229,7 @@ function LeaderboardScreen({ onNav, onSignIn, signedIn }) {
                       <div className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>{p.handle} · {p.country}</div>
                     </div>
                   </div>
-                  <div className="p26-display" style={{ fontSize: 32, marginTop: 12, lineHeight: 1 }}>—</div>
+                  <div className="p26-display" style={{ fontSize: 32, marginTop: 12, lineHeight: 1 }}>-</div>
                   <div className="p26-label">PTS · UNRANKED</div>
                 </div>
               ))}
@@ -1211,12 +1266,12 @@ function LeaderboardScreen({ onNav, onSignIn, signedIn }) {
                         </span>
                       </td>
                       <td style={{ padding: '14px 8px', textAlign: 'right' }}>
-                        <span className="p26-mono" style={{ color: 'var(--text-3)' }}>—</span>
+                        <span className="p26-mono" style={{ color: 'var(--text-3)' }}>-</span>
                       </td>
                       <td style={{ padding: '14px 22px', textAlign: 'right' }}>
-                        {i < 3 ? (<Pill tone={i === 0 ? 'accent' : 'muted'}>{['£5,000','£2,000','£1,000'][i]}</Pill>)
-                          : i < 10 ? (<Pill tone="muted">£285</Pill>)
-                          : (<span className="p26-label" style={{ color: 'var(--text-3)' }}>—</span>)}
+                        {i < 3
+                          ? (<Pill tone={i === 0 ? 'accent' : 'muted'}>{['£5,000','£2,000','£1,000'][i]}</Pill>)
+                          : (<span className="p26-label" style={{ color: 'var(--text-3)' }}>-</span>)}
                       </td>
                     </tr>
                   ))}
@@ -1280,7 +1335,7 @@ function LeagueCard({ league }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderTop: '1px solid var(--line)' }}>
         <div>
           <div className="p26-label">YOUR RANK</div>
-          <div className="p26-display" style={{ fontSize: 22, color: 'var(--accent)' }}>—</div>
+          <div className="p26-display" style={{ fontSize: 22, color: 'var(--accent)' }}>-</div>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button className="p26-btn is-ghost is-sm">{I.copy} Copy link</button>
