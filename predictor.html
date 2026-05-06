@@ -628,6 +628,9 @@ a:hover { color: var(--fg-link-hover); }
   margin-bottom: 16px;
 }
 .pl-action {
+  appearance: none;
+  font: inherit;
+  color: inherit;
   background: #fff;
   border: 1px dashed var(--border-1);
   border-radius: 12px;
@@ -635,6 +638,7 @@ a:hover { color: var(--fg-link-hover); }
   text-align: center;
   cursor: pointer;
   transition: all .15s ease;
+  width: 100%;
 }
 .pl-action:hover {
   border-color: var(--gdc-blue-600);
@@ -691,6 +695,215 @@ a:hover { color: var(--fg-link-hover); }
 .pl-mini-row.you .mini-rank { color: var(--fg-1); }
 .pl-mini-row .mini-pts { font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* ========== KNOCKOUT BRACKET ========== */
+.bracket-wrap {
+  background: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+  padding: 20px;
+  overflow-x: auto;
+}
+.bracket {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(170px, 1fr));
+  gap: 16px;
+  min-width: 900px;
+}
+.bracket-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 8px;
+}
+.bracket-col-head {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+  color: var(--gdc-blue-600);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  text-align: center;
+}
+.bracket-match {
+  background: var(--gdc-gray-50);
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+.bracket-match .slot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 6px;
+  background: #fff;
+  border-radius: 4px;
+  border: 1px solid var(--border-1);
+}
+.bracket-match .slot .seed {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--fg-3);
+  letter-spacing: 0.5px;
+}
+.bracket-match .slot .team {
+  font-weight: 700;
+  color: var(--fg-1);
+}
+.bracket-match .vs {
+  font-size: 9px;
+  font-weight: 800;
+  color: var(--fg-muted);
+  letter-spacing: 1.5px;
+  text-align: center;
+  text-transform: uppercase;
+}
+.bracket-match.final {
+  background: linear-gradient(135deg, #FFD700, #FFA500);
+  border-color: #FFB300;
+}
+.bracket-match.final .slot { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+.bracket-match.final .vs { color: #1E202C; opacity: 0.7; }
+.bracket-legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--fg-3);
+  flex-wrap: wrap;
+}
+.bracket-legend b { color: var(--fg-1); }
+
+/* ========== DIALOG / MODAL ========== */
+dialog.modal {
+  border: none;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 460px;
+  width: calc(100% - 32px);
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+dialog.modal::backdrop {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+}
+.modal-head {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid var(--border-1);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.modal-head h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.modal-head p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--fg-3);
+}
+.modal-close {
+  appearance: none;
+  background: var(--gdc-gray-100);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  color: var(--fg-2);
+  flex-shrink: 0;
+}
+.modal-close:hover { background: var(--gdc-gray-200); }
+.modal-body { padding: 20px 24px; }
+.modal-body label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--fg-3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.modal-body input[type="text"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 12px 14px;
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  background: #fff;
+}
+.modal-body input[type="text"]:focus {
+  outline: none;
+  border-color: var(--gdc-blue-600);
+  box-shadow: 0 0 0 3px rgba(1,87,255,0.15);
+}
+.modal-body input.code-input {
+  font-family: var(--font-body);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-size: 18px;
+  text-align: center;
+}
+.modal-body .field { margin-bottom: 16px; }
+.modal-body .field:last-child { margin-bottom: 0; }
+.modal-body .field-error {
+  font-size: 12px;
+  color: var(--gdc-red-600, #FF0000);
+  margin-top: 6px;
+  font-weight: 600;
+}
+.modal-foot {
+  padding: 16px 24px 20px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-1);
+}
+.code-display {
+  background: var(--gdc-gray-50);
+  border: 1px dashed var(--gdc-blue-600);
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+  margin-top: 14px;
+}
+.code-display .code-label {
+  font-size: 11px;
+  letter-spacing: 1.4px;
+  color: var(--fg-3);
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.code-display .code-value {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--gdc-blue-600);
+  font-variant-numeric: tabular-nums;
+}
+.code-display .code-copy {
+  margin-top: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gdc-blue-600);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 /* ========== EMPTY STATE ========== */
 .empty-banner {
   background: linear-gradient(135deg, #F4F8FF, #FFFBEA);
@@ -722,76 +935,77 @@ a:hover { color: var(--fg-link-hover); }
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
 
 <script>
-/* ========== DATA ========== */
+/* ========== DATA — 2026 FIFA World Cup (per Wikipedia) ========== */
 const TEAMS = {
   MEX: { name: "Mexico", flag: "🇲🇽", code: "MEX" },
   CAN: { name: "Canada", flag: "🇨🇦", code: "CAN" },
   USA: { name: "USA", flag: "🇺🇸", code: "USA" },
-  ENG: { name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", code: "ENG" },
-  WAL: { name: "Wales", flag: "🏴󠁧󠁢󠁷󠁬󠁳󠁿", code: "WAL" },
-  IRN: { name: "Iran", flag: "🇮🇷", code: "IRN" },
-  ARG: { name: "Argentina", flag: "🇦🇷", code: "ARG" },
-  BRA: { name: "Brazil", flag: "🇧🇷", code: "BRA" },
-  FRA: { name: "France", flag: "🇫🇷", code: "FRA" },
-  GER: { name: "Germany", flag: "🇩🇪", code: "GER" },
-  ESP: { name: "Spain", flag: "🇪🇸", code: "ESP" },
-  POR: { name: "Portugal", flag: "🇵🇹", code: "POR" },
-  ITA: { name: "Italy", flag: "🇮🇹", code: "ITA" },
-  NED: { name: "Netherlands", flag: "🇳🇱", code: "NED" },
-  BEL: { name: "Belgium", flag: "🇧🇪", code: "BEL" },
-  CRO: { name: "Croatia", flag: "🇭🇷", code: "CRO" },
-  DEN: { name: "Denmark", flag: "🇩🇰", code: "DEN" },
-  SUI: { name: "Switzerland", flag: "🇨🇭", code: "SUI" },
-  POL: { name: "Poland", flag: "🇵🇱", code: "POL" },
-  AUT: { name: "Austria", flag: "🇦🇹", code: "AUT" },
-  SRB: { name: "Serbia", flag: "🇷🇸", code: "SRB" },
-  TUR: { name: "Türkiye", flag: "🇹🇷", code: "TUR" },
-  NOR: { name: "Norway", flag: "🇳🇴", code: "NOR" },
-  SWE: { name: "Sweden", flag: "🇸🇪", code: "SWE" },
-  SCO: { name: "Scotland", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", code: "SCO" },
-  IRL: { name: "Ireland", flag: "🇮🇪", code: "IRL" },
-  UKR: { name: "Ukraine", flag: "🇺🇦", code: "UKR" },
   CZE: { name: "Czechia", flag: "🇨🇿", code: "CZE" },
-  GRE: { name: "Greece", flag: "🇬🇷", code: "GRE" },
-  HUN: { name: "Hungary", flag: "🇭🇺", code: "HUN" },
-  COL: { name: "Colombia", flag: "🇨🇴", code: "COL" },
-  URU: { name: "Uruguay", flag: "🇺🇾", code: "URU" },
-  ECU: { name: "Ecuador", flag: "🇪🇨", code: "ECU" },
-  PAR: { name: "Paraguay", flag: "🇵🇾", code: "PAR" },
-  PER: { name: "Peru", flag: "🇵🇪", code: "PER" },
-  CHI: { name: "Chile", flag: "🇨🇱", code: "CHI" },
-  JPN: { name: "Japan", flag: "🇯🇵", code: "JPN" },
   KOR: { name: "South Korea", flag: "🇰🇷", code: "KOR" },
-  AUS: { name: "Australia", flag: "🇦🇺", code: "AUS" },
-  KSA: { name: "Saudi Arabia", flag: "🇸🇦", code: "KSA" },
-  QAT: { name: "Qatar", flag: "🇶🇦", code: "QAT" },
-  UAE: { name: "UAE", flag: "🇦🇪", code: "UAE" },
-  MAR: { name: "Morocco", flag: "🇲🇦", code: "MAR" },
-  TUN: { name: "Tunisia", flag: "🇹🇳", code: "TUN" },
-  EGY: { name: "Egypt", flag: "🇪🇬", code: "EGY" },
-  SEN: { name: "Senegal", flag: "🇸🇳", code: "SEN" },
-  NGA: { name: "Nigeria", flag: "🇳🇬", code: "NGA" },
-  CIV: { name: "Côte d'Ivoire", flag: "🇨🇮", code: "CIV" },
-  GHA: { name: "Ghana", flag: "🇬🇭", code: "GHA" },
-  CMR: { name: "Cameroon", flag: "🇨🇲", code: "CMR" },
-  ALG: { name: "Algeria", flag: "🇩🇿", code: "ALG" },
   RSA: { name: "South Africa", flag: "🇿🇦", code: "RSA" },
+  SUI: { name: "Switzerland", flag: "🇨🇭", code: "SUI" },
+  BIH: { name: "Bosnia & H.", flag: "🇧🇦", code: "BIH" },
+  QAT: { name: "Qatar", flag: "🇶🇦", code: "QAT" },
+  BRA: { name: "Brazil", flag: "🇧🇷", code: "BRA" },
+  MAR: { name: "Morocco", flag: "🇲🇦", code: "MAR" },
+  SCO: { name: "Scotland", flag: "🏴󠁧󠁢󠁳󠁣󠁴󠁿", code: "SCO" },
+  HAI: { name: "Haiti", flag: "🇭🇹", code: "HAI" },
+  PAR: { name: "Paraguay", flag: "🇵🇾", code: "PAR" },
+  AUS: { name: "Australia", flag: "🇦🇺", code: "AUS" },
+  TUR: { name: "Türkiye", flag: "🇹🇷", code: "TUR" },
+  GER: { name: "Germany", flag: "🇩🇪", code: "GER" },
+  CIV: { name: "Côte d'Ivoire", flag: "🇨🇮", code: "CIV" },
+  ECU: { name: "Ecuador", flag: "🇪🇨", code: "ECU" },
+  CUR: { name: "Curaçao", flag: "🇨🇼", code: "CUR" },
+  NED: { name: "Netherlands", flag: "🇳🇱", code: "NED" },
+  JPN: { name: "Japan", flag: "🇯🇵", code: "JPN" },
+  SWE: { name: "Sweden", flag: "🇸🇪", code: "SWE" },
+  TUN: { name: "Tunisia", flag: "🇹🇳", code: "TUN" },
+  BEL: { name: "Belgium", flag: "🇧🇪", code: "BEL" },
+  EGY: { name: "Egypt", flag: "🇪🇬", code: "EGY" },
+  IRN: { name: "Iran", flag: "🇮🇷", code: "IRN" },
+  NZL: { name: "New Zealand", flag: "🇳🇿", code: "NZL" },
+  ESP: { name: "Spain", flag: "🇪🇸", code: "ESP" },
+  URU: { name: "Uruguay", flag: "🇺🇾", code: "URU" },
+  KSA: { name: "Saudi Arabia", flag: "🇸🇦", code: "KSA" },
+  CPV: { name: "Cape Verde", flag: "🇨🇻", code: "CPV" },
+  FRA: { name: "France", flag: "🇫🇷", code: "FRA" },
+  NOR: { name: "Norway", flag: "🇳🇴", code: "NOR" },
+  SEN: { name: "Senegal", flag: "🇸🇳", code: "SEN" },
+  IRQ: { name: "Iraq", flag: "🇮🇶", code: "IRQ" },
+  ARG: { name: "Argentina", flag: "🇦🇷", code: "ARG" },
+  AUT: { name: "Austria", flag: "🇦🇹", code: "AUT" },
+  ALG: { name: "Algeria", flag: "🇩🇿", code: "ALG" },
+  JOR: { name: "Jordan", flag: "🇯🇴", code: "JOR" },
+  POR: { name: "Portugal", flag: "🇵🇹", code: "POR" },
+  COL: { name: "Colombia", flag: "🇨🇴", code: "COL" },
+  COD: { name: "DR Congo", flag: "🇨🇩", code: "COD" },
+  UZB: { name: "Uzbekistan", flag: "🇺🇿", code: "UZB" },
+  ENG: { name: "England", flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", code: "ENG" },
+  CRO: { name: "Croatia", flag: "🇭🇷", code: "CRO" },
+  GHA: { name: "Ghana", flag: "🇬🇭", code: "GHA" },
+  PAN: { name: "Panama", flag: "🇵🇦", code: "PAN" },
 };
 
+// Final draw groups (Wikipedia, 2026 FIFA World Cup). Host or top seed listed first.
 const GROUPS = [
-  { id: "A", teams: ["MEX", "NOR", "JPN", "MAR"] },
-  { id: "B", teams: ["CAN", "BEL", "KOR", "TUN"] },
-  { id: "C", teams: ["USA", "POL", "AUS", "EGY"] },
-  { id: "D", teams: ["ARG", "ITA", "NGA", "ECU"] },
-  { id: "E", teams: ["BRA", "CRO", "CIV", "PAR"] },
-  { id: "F", teams: ["FRA", "DEN", "SEN", "PER"] },
-  { id: "G", teams: ["GER", "SUI", "GHA", "CHI"] },
-  { id: "H", teams: ["ESP", "AUT", "CMR", "URU"] },
-  { id: "I", teams: ["POR", "SRB", "ALG", "COL"] },
-  { id: "J", teams: ["NED", "TUR", "RSA", "KSA"] },
-  { id: "K", teams: ["ENG", "SWE", "QAT", "IRL"] },
-  { id: "L", teams: ["HUN", "WAL", "UAE", "SCO"] },
+  { id: "A", teams: ["MEX", "CZE", "KOR", "RSA"] },
+  { id: "B", teams: ["CAN", "SUI", "BIH", "QAT"] },
+  { id: "C", teams: ["BRA", "MAR", "SCO", "HAI"] },
+  { id: "D", teams: ["USA", "PAR", "AUS", "TUR"] },
+  { id: "E", teams: ["GER", "CIV", "ECU", "CUR"] },
+  { id: "F", teams: ["NED", "JPN", "SWE", "TUN"] },
+  { id: "G", teams: ["BEL", "EGY", "IRN", "NZL"] },
+  { id: "H", teams: ["ESP", "URU", "KSA", "CPV"] },
+  { id: "I", teams: ["FRA", "NOR", "SEN", "IRQ"] },
+  { id: "J", teams: ["ARG", "AUT", "ALG", "JOR"] },
+  { id: "K", teams: ["POR", "COL", "COD", "UZB"] },
+  { id: "L", teams: ["ENG", "CRO", "GHA", "PAN"] },
 ];
+
+// Tournament starts 11 June 2026, opening match in Mexico (Estadio Azteca).
+// Local CDMX kickoff is mid-day; using 12:00 CDT (UTC−5) → 17:00 UTC.
+const KICKOFF_UTC = "2026-06-11T17:00:00Z";
 
 function buildFixtures(group) {
   const [a, b, c, d] = group.teams;
@@ -821,11 +1035,60 @@ const GLOBAL_LEADERBOARD = [
   { rank: 10, name: "VARWatcher", country: "🇫🇷", points: 0, predictions: 0 },
 ];
 
-window.WC_DATA = { TEAMS, GROUPS, FIXTURES, GLOBAL_LEADERBOARD, buildFixtures };
+window.WC_DATA = { TEAMS, GROUPS, FIXTURES, GLOBAL_LEADERBOARD, buildFixtures, KICKOFF_UTC };
 </script>
 
 <script type="text/babel" data-presets="react">
-const { useState } = React;
+const { useState, useEffect, useRef } = React;
+
+/* ========== COUNTDOWN ========== */
+function useCountdown(targetUtcIso) {
+  const target = new Date(targetUtcIso).getTime();
+  const compute = () => {
+    const ms = target - Date.now();
+    if (ms <= 0) return { kicked: true, days: 0, hours: 0, minutes: 0, seconds: 0 };
+    const days = Math.floor(ms / 86400000);
+    const hours = Math.floor((ms % 86400000) / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+    const seconds = Math.floor((ms % 60000) / 1000);
+    return { kicked: false, days, hours, minutes, seconds };
+  };
+  const [t, setT] = useState(compute);
+  useEffect(() => {
+    const id = setInterval(() => setT(compute()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return t;
+}
+
+function CountdownBanner() {
+  const t = useCountdown(window.WC_DATA.KICKOFF_UTC);
+  const pad = n => String(n).padStart(2, "0");
+  return (
+    <div className="stage-banner">
+      <span className="stage-dot"></span>
+      <span style={{ fontWeight: 700 }}>
+        {t.kicked ? "Tournament is live" : "Tournament kicks off in"}
+      </span>
+      {!t.kicked && (
+        <span style={{
+          marginLeft: 6,
+          fontVariantNumeric: "tabular-nums",
+          fontWeight: 800,
+          letterSpacing: "0.5px",
+        }}>
+          {t.days}d · {pad(t.hours)}h · {pad(t.minutes)}m · {pad(t.seconds)}s
+        </span>
+      )}
+      <span className="label">·</span>
+      <span className="deadline">
+        {t.kicked
+          ? "Predictions for live matches are locked"
+          : "Mexico v Czechia · Estadio Azteca · Thu 11 Jun 2026"}
+      </span>
+    </div>
+  );
+}
 
 /* ========== OVERVIEW COMPONENTS ========== */
 function PrizeHero() {
@@ -1041,6 +1304,105 @@ function PredictionsWidget() {
   );
 }
 
+/* ========== KNOCKOUT BRACKET ========== */
+// 2026 World Cup: 32 teams advance from group stage (top 2 of 12 groups + 8 best 3rds).
+// Round of 32 → Round of 16 → QF → SF → 3rd-place + Final.
+const R32_MATCHES = [
+  { id: "M73", a: "1A",       b: "3rd C/D/E/F" },
+  { id: "M74", a: "1C",       b: "3rd A/B/F/H" },
+  { id: "M75", a: "1E",       b: "3rd A/B/C/D" },
+  { id: "M76", a: "1B",       b: "3rd E/F/G/H" },
+  { id: "M77", a: "1G",       b: "2H" },
+  { id: "M78", a: "2A",       b: "2C" },
+  { id: "M79", a: "1D",       b: "2F" },
+  { id: "M80", a: "1F",       b: "2E" },
+  { id: "M81", a: "2B",       b: "2D" },
+  { id: "M82", a: "1H",       b: "3rd B/E/H/L" },
+  { id: "M83", a: "1J",       b: "3rd A/H/I/J" },
+  { id: "M84", a: "1L",       b: "3rd D/E/I/J" },
+  { id: "M85", a: "1I",       b: "3rd C/G/H/I" },
+  { id: "M86", a: "1K",       b: "2L" },
+  { id: "M87", a: "2I",       b: "2J" },
+  { id: "M88", a: "2G",       b: "2K" },
+];
+const R16_MATCHES = [
+  { id: "M89",  a: "W M73", b: "W M74" },
+  { id: "M90",  a: "W M75", b: "W M76" },
+  { id: "M91",  a: "W M77", b: "W M78" },
+  { id: "M92",  a: "W M79", b: "W M80" },
+  { id: "M93",  a: "W M81", b: "W M82" },
+  { id: "M94",  a: "W M83", b: "W M84" },
+  { id: "M95",  a: "W M85", b: "W M86" },
+  { id: "M96",  a: "W M87", b: "W M88" },
+];
+const QF_MATCHES = [
+  { id: "M97",  a: "W M89", b: "W M90" },
+  { id: "M98",  a: "W M91", b: "W M92" },
+  { id: "M99",  a: "W M93", b: "W M94" },
+  { id: "M100", a: "W M95", b: "W M96" },
+];
+const SF_MATCHES = [
+  { id: "M101", a: "W M97", b: "W M98"  },
+  { id: "M102", a: "W M99", b: "W M100" },
+];
+const FINAL_MATCH = { id: "M104", a: "W M101", b: "W M102" };
+
+function BracketSlot({ label }) {
+  return (
+    <div className="slot">
+      <span className="seed">{label.startsWith("W ") ? "WIN" : (label.includes("3rd") ? "3RD" : "SEED")}</span>
+      <span className="team">{label}</span>
+    </div>
+  );
+}
+
+function BracketMatch({ match, isFinal }) {
+  return (
+    <div className={`bracket-match ${isFinal ? "final" : ""}`}>
+      <BracketSlot label={match.a} />
+      <span className="vs">{match.id} · vs</span>
+      <BracketSlot label={match.b} />
+    </div>
+  );
+}
+
+function KnockoutBracket() {
+  return (
+    <div>
+      <div className="bracket-wrap">
+        <div className="bracket">
+          <div className="bracket-col">
+            <div className="bracket-col-head">Round of 32</div>
+            {R32_MATCHES.map(m => <BracketMatch key={m.id} match={m} />)}
+          </div>
+          <div className="bracket-col">
+            <div className="bracket-col-head">Round of 16</div>
+            {R16_MATCHES.map(m => <BracketMatch key={m.id} match={m} />)}
+          </div>
+          <div className="bracket-col">
+            <div className="bracket-col-head">Quarter-finals</div>
+            {QF_MATCHES.map(m => <BracketMatch key={m.id} match={m} />)}
+          </div>
+          <div className="bracket-col">
+            <div className="bracket-col-head">Semi-finals</div>
+            {SF_MATCHES.map(m => <BracketMatch key={m.id} match={m} />)}
+          </div>
+          <div className="bracket-col">
+            <div className="bracket-col-head">Final</div>
+            <BracketMatch match={FINAL_MATCH} isFinal />
+          </div>
+        </div>
+      </div>
+      <div className="bracket-legend">
+        <span><b>1A</b> = winner of Group A</span>
+        <span><b>2B</b> = runner-up of Group B</span>
+        <span><b>3rd A/B/F/H</b> = best third place from those groups</span>
+        <span><b>W M73</b> = winner of match 73</span>
+      </div>
+    </div>
+  );
+}
+
 function OutrightsSection() {
   const teams = Object.values(window.WC_DATA.TEAMS);
   const [picks, setPicks] = useState({ winner: "", second: "", third: "", topscorer: "", goals: "", cards: "" });
@@ -1173,38 +1535,283 @@ function GlobalLeaderboard() {
   );
 }
 
+/* ========== PRIVATE LEAGUES ========== */
+const LEAGUE_STORAGE_KEY = "wcpredictor.leagues.v1";
+
+function loadLeagues() {
+  try {
+    const raw = localStorage.getItem(LEAGUE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch { return []; }
+}
+function saveLeagues(list) {
+  try { localStorage.setItem(LEAGUE_STORAGE_KEY, JSON.stringify(list)); } catch {}
+}
+function generateCode() {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out = "";
+  for (let i = 0; i < 8; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  return out;
+}
+
+function CreateLeagueDialog({ open, onClose, onCreate }) {
+  const ref = useRef(null);
+  const [name, setName] = useState("");
+  const [code, setCode] = useState(null);
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) { setName(""); setCode(null); setError(""); setCopied(false); }
+  }, [open]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const trimmed = name.trim();
+    if (trimmed.length < 3) { setError("League name must be at least 3 characters."); return; }
+    if (trimmed.length > 40) { setError("League name must be 40 characters or fewer."); return; }
+    const newCode = generateCode();
+    const league = {
+      id: `lg-${Date.now()}`,
+      name: trimmed,
+      code: newCode,
+      members: 1,
+      yourRank: 1,
+      leader: "You",
+      createdAt: Date.now(),
+      standings: [{ rank: 1, name: "You", points: 0, isYou: true }],
+    };
+    onCreate(league);
+    setCode(newCode);
+  };
+
+  const handleCopy = () => {
+    if (!code) return;
+    try { navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 1600); } catch {}
+  };
+
+  return (
+    <dialog ref={ref} className="modal" onClose={onClose}>
+      <form onSubmit={handleSubmit} method="dialog">
+        <div className="modal-head">
+          <div>
+            <h3>Create a private league</h3>
+            <p>Spin up a code, invite friends, see who tops the table.</p>
+          </div>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className="modal-body">
+          {!code ? (
+            <div className="field">
+              <label htmlFor="league-name">League name</label>
+              <input
+                id="league-name"
+                type="text"
+                placeholder="e.g. Friday Office Pool"
+                value={name}
+                onChange={e => { setName(e.target.value); setError(""); }}
+                autoFocus
+                maxLength={40}
+              />
+              {error && <div className="field-error">{error}</div>}
+            </div>
+          ) : (
+            <div className="code-display">
+              <div className="code-label">Invite code</div>
+              <div className="code-value">{code}</div>
+              <button type="button" className="code-copy" onClick={handleCopy}>
+                {copied ? "✓ Copied" : "Copy code"}
+              </button>
+              <p style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 12, lineHeight: 1.5 }}>
+                Share this code with friends — they paste it into <b>Join with Code</b> to land in the same league.
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="modal-foot">
+          {!code ? (
+            <>
+              <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+              <button type="submit" className="btn btn-primary">Create league</button>
+            </>
+          ) : (
+            <button type="button" className="btn btn-primary" onClick={onClose}>Done</button>
+          )}
+        </div>
+      </form>
+    </dialog>
+  );
+}
+
+function JoinLeagueDialog({ open, onClose, onJoin, existingCodes }) {
+  const ref = useRef(null);
+  const [code, setCode] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (open && !d.open) d.showModal();
+    if (!open && d.open) d.close();
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) { setCode(""); setError(""); }
+  }, [open]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const c = code.trim().toUpperCase();
+    if (c.length !== 8) { setError("Codes are 8 characters."); return; }
+    if (existingCodes.includes(c)) { setError("You're already in a league with that code."); return; }
+    onJoin({
+      id: `lg-${Date.now()}`,
+      name: `League ${c.slice(0, 4)}`,
+      code: c,
+      members: 2,
+      yourRank: 2,
+      leader: "League host",
+      createdAt: Date.now(),
+      standings: [
+        { rank: 1, name: "League host", points: 0, isYou: false },
+        { rank: 2, name: "You", points: 0, isYou: true },
+      ],
+    });
+    onClose();
+  };
+
+  return (
+    <dialog ref={ref} className="modal" onClose={onClose}>
+      <form onSubmit={handleSubmit} method="dialog">
+        <div className="modal-head">
+          <div>
+            <h3>Join with code</h3>
+            <p>Paste the 8-character invite code from your friend.</p>
+          </div>
+          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className="modal-body">
+          <div className="field">
+            <label htmlFor="league-code">Invite code</label>
+            <input
+              id="league-code"
+              type="text"
+              className="code-input"
+              placeholder="XXXXXXXX"
+              value={code}
+              onChange={e => { setCode(e.target.value.toUpperCase()); setError(""); }}
+              autoFocus
+              maxLength={8}
+            />
+            {error && <div className="field-error">{error}</div>}
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+          <button type="submit" className="btn btn-primary">Join league</button>
+        </div>
+      </form>
+    </dialog>
+  );
+}
+
+function LeagueRow({ league }) {
+  return (
+    <div className="pl-card" style={{ cursor: "default" }}>
+      <div className="pl-card-head">
+        <div>
+          <h4>{league.name}</h4>
+          <div className="pl-meta">
+            <span><b>{league.members}</b> {league.members === 1 ? "member" : "members"}</span>
+            <span>Code: <b>{league.code}</b></span>
+            <span>Leader: <b>{league.leader}</b></span>
+          </div>
+        </div>
+        <span className={`pl-rank-pill ${league.yourRank === 1 ? "first" : ""}`}>
+          Your rank #{league.yourRank}
+        </span>
+      </div>
+      <div className="pl-mini">
+        {league.standings.map(s => (
+          <div key={s.rank} className={`pl-mini-row ${s.isYou ? "you" : ""}`}>
+            <span className="mini-rank">{s.rank}</span>
+            <span>{s.name}</span>
+            <span className="mini-pts">{s.points}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PrivateLeagues() {
+  const [leagues, setLeagues] = useState(loadLeagues);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [joinOpen, setJoinOpen] = useState(false);
+
+  useEffect(() => { saveLeagues(leagues); }, [leagues]);
+
+  const addLeague = (l) => setLeagues(prev => [l, ...prev]);
+  const codes = leagues.map(l => l.code);
+
   return (
     <div className="lb-card" style={{ padding: 20 }}>
       <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
         <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>Private Leagues</h3>
-        <span style={{ fontSize: 12, color: "var(--fg-3)", fontWeight: 500 }}>0 active</span>
+        <span style={{ fontSize: 12, color: "var(--fg-3)", fontWeight: 500 }}>
+          {leagues.length} {leagues.length === 1 ? "active" : "active"}
+        </span>
       </div>
 
       <div className="pl-actions">
-        <div className="pl-action">
+        <button type="button" className="pl-action" style={{ font: "inherit" }} onClick={() => setCreateOpen(true)}>
           <div className="pl-action-icon">+</div>
           <h4>Create League</h4>
           <p>Spin up a private code and invite mates</p>
-        </div>
-        <div className="pl-action">
+        </button>
+        <button type="button" className="pl-action" style={{ font: "inherit" }} onClick={() => setJoinOpen(true)}>
           <div className="pl-action-icon">→</div>
           <h4>Join with Code</h4>
           <p>Enter an 8-character invite code</p>
-        </div>
+        </button>
       </div>
 
-      <div style={{
-        padding: "32px 20px",
-        textAlign: "center",
-        background: "var(--gdc-gray-50)",
-        borderRadius: 8,
-        color: "var(--fg-3)",
-        fontSize: 14,
-      }}>
-        You haven't joined any private leagues yet. <br />
-        <span style={{ fontSize: 13 }}>Create one above or paste a code from a friend.</span>
-      </div>
+      {leagues.length > 0 ? (
+        <div className="pl-list">
+          {leagues.map(l => <LeagueRow key={l.id} league={l} />)}
+        </div>
+      ) : (
+        <div style={{
+          padding: "32px 20px",
+          textAlign: "center",
+          background: "var(--gdc-gray-50)",
+          borderRadius: 8,
+          color: "var(--fg-3)",
+          fontSize: 14,
+        }}>
+          You haven't joined any private leagues yet. <br />
+          <span style={{ fontSize: 13 }}>Create one above or paste a code from a friend.</span>
+        </div>
+      )}
+
+      <CreateLeagueDialog
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreate={addLeague}
+      />
+      <JoinLeagueDialog
+        open={joinOpen}
+        onClose={() => setJoinOpen(false)}
+        onJoin={addLeague}
+        existingCodes={codes}
+      />
     </div>
   );
 }
@@ -1236,12 +1843,7 @@ function App() {
         <button className={`tab ${tab === "leaderboards" ? "active" : ""}`} onClick={() => setTab("leaderboards")}>Leaderboards</button>
       </div>
 
-      <div className="stage-banner">
-        <span className="stage-dot"></span>
-        <span style={{ fontWeight: 700 }}>Tournament starts</span>
-        <span className="label">·</span>
-        <span className="deadline">Predictions lock when first match kicks off</span>
-      </div>
+      <CountdownBanner />
 
       {tab === "overview" ? (
         <>
@@ -1272,6 +1874,14 @@ function App() {
             </div>
 
             <PredictionsWidget />
+          </section>
+
+          <section className="section">
+            <div className="section-head">
+              <h2>Knockout bracket</h2>
+              <span className="meta">Top 2 from each group + 8 best 3rds advance to Round of 32</span>
+            </div>
+            <KnockoutBracket />
           </section>
 
           <section className="section">
