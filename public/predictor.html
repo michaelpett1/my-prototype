@@ -55,7 +55,13 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-.p26-display { font-family: var(--font-display); font-style: italic; letter-spacing: 0.01em; text-transform: uppercase; font-weight: 400; }
+.p26-display {
+  font-family: var(--font-display); font-style: italic; letter-spacing: 0.01em;
+  text-transform: uppercase; font-weight: 400;
+  /* italic Anton glyphs have right-side overhang past their advance width;
+     give every display element breathing room so the slant isn't clipped. */
+  padding-right: 0.08em;
+}
 .p26-label { font-family: var(--font-sans); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .p26-mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
 
@@ -158,6 +164,11 @@ body {
 .p26-gold-text {
   background: linear-gradient(180deg, #fde68a 0%, #f5b942 60%, #c98c2a 100%);
   -webkit-background-clip: text; background-clip: text; color: transparent;
+  /* gradient is clipped to the span's box; italic slant overhangs past
+     that box and renders as transparent. Pad and use inline-block so the
+     gradient covers the overhang. */
+  display: inline-block;
+  padding-right: 0.1em;
 }
 
 .p26-status {
@@ -428,9 +439,6 @@ function NavBar({ current, onNav, signedIn, onSignIn }) {
               onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
               onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
               {it.label}
-              {it.id === 'bracket' && (
-                <span style={{ padding: '2px 6px', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent)', background: 'var(--accent-soft)', borderRadius: 999 }}>NEW</span>
-              )}
             </button>
           );
         })}
@@ -529,7 +537,7 @@ function LandingScreen({ onNav, onSignIn }) {
               { n: '04', t: 'Win the pot', d: 'Top 3 share the pot. Closest goals + cards predictor across the whole tournament and knockouts breaks ties.' },
             ].map(s => (
               <div key={s.n} className="p26-card" style={{ padding: 24 }}>
-                <div className="p26-display" style={{ fontSize: 32, color: 'var(--accent)', lineHeight: 1.1, display: 'inline-block', paddingRight: 8 }}>{s.n}</div>
+                <div className="p26-display" style={{ fontSize: 32, color: 'var(--accent)', lineHeight: 1.1 }}>{s.n}</div>
                 <h3 style={{ fontSize: 17, fontWeight: 600, margin: '14px 0 8px' }}>{s.t}</h3>
                 <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.5 }}>{s.d}</p>
               </div>
@@ -562,6 +570,10 @@ function LandingScreen({ onNav, onSignIn }) {
                 <span className="p26-mono" style={{ fontSize: 16, fontWeight: 600 }}>{t.amount}</span>
               </div>
             ))}
+            <div style={{ marginTop: 20, padding: 14, background: 'var(--surface-2)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)' }}>
+              <span className="p26-label" style={{ color: 'var(--text)' }}>TIEBREAKER</span>
+              <p style={{ margin: '6px 0 0', lineHeight: 1.5 }}>Closest combined Total Goals + Total Cards across the whole tournament and the knockouts. Applied to both pots.</p>
+            </div>
           </div>
           <div className="p26-card" style={{ padding: 32 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20 }}>
