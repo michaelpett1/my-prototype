@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>World Cup Predictor 2026 — Gambling.com</title>
-<meta name="description" content="Free-to-play FIFA World Cup 2026 predictor game from Gambling.com. £8,250 prize pool. Pick scores, call the podium, climb the leaderboard.">
+<title>Predictor 2026 — Gambling.com</title>
+<meta name="description" content="Free-to-play tournament predictor game from Gambling.com. £8,250 prize pool. Pick scores, call the podium, climb the leaderboard.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -695,6 +695,196 @@ a:hover { color: var(--fg-link-hover); }
 .pl-mini-row.you .mini-rank { color: var(--fg-1); }
 .pl-mini-row .mini-pts { font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* ========== TAB BADGE ========== */
+.tab-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  background: var(--gdc-gray-200);
+  color: var(--fg-3);
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 40px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3px;
+}
+.tab.active .tab-badge {
+  background: var(--gdc-blue-600);
+  color: #fff;
+}
+
+/* ========== ADMIN / RESULTS CMS ========== */
+.admin-hero {
+  background: var(--gdc-gray-1000);
+  color: #fff;
+  border-radius: 12px;
+  padding: 24px 28px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.admin-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px 200px at 100% 0%, rgba(1,87,255,0.25), transparent 60%);
+  pointer-events: none;
+}
+.admin-hero > * { position: relative; }
+.admin-eyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 6px;
+}
+.admin-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 0 0 6px;
+  color: #fff;
+}
+.admin-sub {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  max-width: 560px;
+  line-height: 1.5;
+}
+.admin-stats {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+.admin-stat { text-align: center; min-width: 64px; }
+.admin-stat-val {
+  font-size: 28px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #fff;
+  line-height: 1;
+}
+.admin-stat-lbl {
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  font-weight: 700;
+  margin-top: 6px;
+}
+.admin-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.admin-actions .btn-ghost {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+.admin-actions .btn-ghost:hover { background: rgba(255,255,255,0.14); }
+.admin-actions .btn-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: rgba(255,255,255,0.05);
+}
+
+.admin-groups { display: flex; flex-direction: column; gap: 16px; }
+.admin-group {
+  background: #fff;
+  border: 1px solid var(--border-1);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.admin-group-head {
+  padding: 14px 18px;
+  background: var(--gdc-gray-50);
+  border-bottom: 1px solid var(--border-1);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.admin-group-head h4 { margin: 0; font-size: 16px; font-weight: 700; }
+.admin-group-meta { font-size: 12px; color: var(--fg-3); font-weight: 500; }
+.admin-rows { display: flex; flex-direction: column; gap: 6px; padding: 12px; }
+.admin-row {
+  display: grid;
+  grid-template-columns: 90px 1fr auto 1fr 80px;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-1);
+  border-radius: 8px;
+  background: #fff;
+}
+.admin-row.settled {
+  border-color: var(--success-green);
+  background: rgba(57,181,74,0.04);
+}
+.admin-meta { display: flex; flex-direction: column; gap: 2px; }
+.admin-id {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--fg-1);
+  letter-spacing: 0.3px;
+  font-variant-numeric: tabular-nums;
+}
+.admin-day {
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+  color: var(--fg-3);
+  text-transform: uppercase;
+}
+.admin-clear {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border-1);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 6px 10px;
+  cursor: pointer;
+  color: var(--fg-3);
+  justify-self: end;
+}
+.admin-clear:hover:not(:disabled) {
+  color: var(--gdc-red-600, #FF0000);
+  border-color: var(--gdc-red-600, #FF0000);
+}
+.admin-clear:disabled { opacity: 0.35; cursor: not-allowed; }
+
+@media (max-width: 720px) {
+  .admin-hero {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .admin-stats { justify-content: flex-start; }
+  .admin-row {
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-areas:
+      "meta meta meta"
+      "home score away"
+      "clear clear clear";
+    gap: 8px;
+  }
+  .admin-meta { grid-area: meta; flex-direction: row; gap: 10px; }
+  .admin-row .fixture-team.home { grid-area: home; }
+  .admin-row .score-input { grid-area: score; }
+  .admin-row .fixture-team.away { grid-area: away; }
+  .admin-clear { grid-area: clear; justify-self: stretch; text-align: center; }
+}
+
 /* ========== KNOCKOUT BRACKET ========== */
 .bracket-wrap {
   background: #fff;
@@ -935,7 +1125,7 @@ dialog.modal::backdrop {
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
 
 <script>
-/* ========== DATA — 2026 FIFA World Cup (per Wikipedia) ========== */
+/* ========== DATA — 48-team tournament, 12 groups of 4 ========== */
 const TEAMS = {
   MEX: { name: "Mexico", flag: "🇲🇽", code: "MEX" },
   CAN: { name: "Canada", flag: "🇨🇦", code: "CAN" },
@@ -987,7 +1177,7 @@ const TEAMS = {
   PAN: { name: "Panama", flag: "🇵🇦", code: "PAN" },
 };
 
-// Final draw groups (Wikipedia, 2026 FIFA World Cup). Host or top seed listed first.
+// Final-draw groups, top-seed first.
 const GROUPS = [
   { id: "A", teams: ["MEX", "CZE", "KOR", "RSA"] },
   { id: "B", teams: ["CAN", "SUI", "BIH", "QAT"] },
@@ -1003,8 +1193,7 @@ const GROUPS = [
   { id: "L", teams: ["ENG", "CRO", "GHA", "PAN"] },
 ];
 
-// Tournament starts 11 June 2026, opening match in Mexico (Estadio Azteca).
-// Local CDMX kickoff is mid-day; using 12:00 CDT (UTC−5) → 17:00 UTC.
+// Tournament opening match: 11 June 2026, 12:00 CDT (UTC−5) → 17:00 UTC.
 const KICKOFF_UTC = "2026-06-11T17:00:00Z";
 
 function buildFixtures(group) {
@@ -1035,11 +1224,49 @@ const GLOBAL_LEADERBOARD = [
   { rank: 10, name: "VARWatcher", country: "🇫🇷", points: 0, predictions: 0 },
 ];
 
-window.WC_DATA = { TEAMS, GROUPS, FIXTURES, GLOBAL_LEADERBOARD, buildFixtures, KICKOFF_UTC };
+window.PREDICTOR_DATA = { TEAMS, GROUPS, FIXTURES, GLOBAL_LEADERBOARD, buildFixtures, KICKOFF_UTC };
 </script>
 
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef } = React;
+
+/* ========== SHARED STATE + SCORING ========== */
+function useStoredState(key, defaultValue) {
+  const [v, setV] = useState(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : defaultValue;
+    } catch { return defaultValue; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(v)); } catch {}
+  }, [key, v]);
+  return [v, setV];
+}
+
+function isComplete(score) {
+  return score && score.home !== "" && score.away !== "" &&
+    !Number.isNaN(Number(score.home)) && !Number.isNaN(Number(score.away));
+}
+
+function pointsFor(prediction, actual) {
+  if (!isComplete(prediction) || !isComplete(actual)) return 0;
+  const ph = +prediction.home, pa = +prediction.away;
+  const ah = +actual.home, aa = +actual.away;
+  if (ph === ah && pa === aa) return 3;
+  return Math.sign(ph - pa) === Math.sign(ah - aa) ? 1 : 0;
+}
+
+function djb2(str) {
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = (((h << 5) + h) ^ str.charCodeAt(i)) >>> 0;
+  return h;
+}
+// Deterministic 0–3 score per (player, fixture) so mock players have stable predictions.
+function mockPrediction(playerName, fixtureId) {
+  const seed = djb2(playerName + ":" + fixtureId);
+  return { home: String(seed % 4), away: String((seed >>> 8) % 4) };
+}
 
 /* ========== COUNTDOWN ========== */
 function useCountdown(targetUtcIso) {
@@ -1062,7 +1289,7 @@ function useCountdown(targetUtcIso) {
 }
 
 function CountdownBanner() {
-  const t = useCountdown(window.WC_DATA.KICKOFF_UTC);
+  const t = useCountdown(window.PREDICTOR_DATA.KICKOFF_UTC);
   const pad = n => String(n).padStart(2, "0");
   return (
     <div className="stage-banner">
@@ -1084,7 +1311,7 @@ function CountdownBanner() {
       <span className="deadline">
         {t.kicked
           ? "Predictions for live matches are locked"
-          : "Mexico v Czechia · Estadio Azteca · Thu 11 Jun 2026"}
+          : "Opening fixture · Thu 11 Jun 2026"}
       </span>
     </div>
   );
@@ -1096,7 +1323,7 @@ function PrizeHero() {
     <div className="prize-hero">
       <div className="prize-hero-inner">
         <div>
-          <div className="prize-tag">FIFA World Cup 2026 · Predictor Game</div>
+          <div className="prize-tag">Tournament 2026 · Predictor Game</div>
           <h1 className="prize-headline">Pick the scores. Win the pot.</h1>
           <div className="prize-amount">£8,250</div>
           <p className="prize-sub">Total prize pool across the tournament. Free to play, no buy-in, payouts in cash.</p>
@@ -1167,12 +1394,14 @@ function HowItWorks() {
   );
 }
 
-function FixtureRow({ fixture, prediction, onChange }) {
-  const t = window.WC_DATA.TEAMS;
+function FixtureRow({ fixture, prediction, actual, onChange }) {
+  const t = window.PREDICTOR_DATA.TEAMS;
   const home = t[fixture.home];
   const away = t[fixture.away];
-  const filled = prediction && prediction.home !== "" && prediction.away !== "";
-  const cls = ["fixture", filled ? "predicted" : ""].filter(Boolean).join(" ");
+  const filled = isComplete(prediction);
+  const settled = isComplete(actual);
+  const earned = settled ? pointsFor(prediction, actual) : 0;
+  const cls = ["fixture", filled ? "predicted" : "", settled ? "locked" : ""].filter(Boolean).join(" ");
 
   return (
     <div className={cls}>
@@ -1186,6 +1415,7 @@ function FixtureRow({ fixture, prediction, onChange }) {
           className={`score-box ${filled ? "filled" : ""}`}
           value={prediction?.home ?? ""}
           onChange={e => onChange(fixture.id, "home", e.target.value)}
+          disabled={settled}
           aria-label={`${home.name} score prediction`}
         />
         <span className="score-dash">–</span>
@@ -1194,6 +1424,7 @@ function FixtureRow({ fixture, prediction, onChange }) {
           className={`score-box ${filled ? "filled" : ""}`}
           value={prediction?.away ?? ""}
           onChange={e => onChange(fixture.id, "away", e.target.value)}
+          disabled={settled}
           aria-label={`${away.name} score prediction`}
         />
       </div>
@@ -1201,16 +1432,23 @@ function FixtureRow({ fixture, prediction, onChange }) {
         <span className="flag">{away.flag}</span>
         <span className="name">{away.name}</span>
       </div>
-      <div className="fixture-meta">
-        {fixture.time} BST · Match {fixture.id}
-      </div>
+      {settled ? (
+        <div className="fixture-result points">
+          <span className="fixture-actual">FT {actual.home}–{actual.away}</span>
+          {filled ? <> · {earned} pt{earned === 1 ? "" : "s"} earned</> : <> · prediction missed</>}
+        </div>
+      ) : (
+        <div className="fixture-meta">
+          {fixture.time} BST · Match {fixture.id}
+        </div>
+      )}
     </div>
   );
 }
 
-function GroupPanel({ group, predictions, onChange }) {
-  const t = window.WC_DATA.TEAMS;
-  const fixtures = window.WC_DATA.buildFixtures(group);
+function GroupPanel({ group, predictions, results, onChange }) {
+  const t = window.PREDICTOR_DATA.TEAMS;
+  const fixtures = window.PREDICTOR_DATA.buildFixtures(group);
   const byDay = [1, 2, 3].map(d => ({ day: d, list: fixtures.filter(f => f.day === d) }));
 
   return (
@@ -1238,6 +1476,7 @@ function GroupPanel({ group, predictions, onChange }) {
                 key={f.id}
                 fixture={f}
                 prediction={predictions[f.id]}
+                actual={results[f.id]}
                 onChange={onChange}
               />
             ))}
@@ -1248,10 +1487,9 @@ function GroupPanel({ group, predictions, onChange }) {
   );
 }
 
-function PredictionsWidget() {
-  const groups = window.WC_DATA.GROUPS;
+function PredictionsWidget({ predictions, setPredictions, results }) {
+  const groups = window.PREDICTOR_DATA.GROUPS;
   const [activeGroup, setActiveGroup] = useState("A");
-  const [predictions, setPredictions] = useState({});
 
   const handleChange = (id, side, value) => {
     setPredictions(p => ({
@@ -1260,8 +1498,8 @@ function PredictionsWidget() {
     }));
   };
 
-  const totalFixtures = window.WC_DATA.FIXTURES.length;
-  const completed = Object.values(predictions).filter(p => p && p.home !== "" && p.away !== "").length;
+  const totalFixtures = window.PREDICTOR_DATA.FIXTURES.length;
+  const completed = Object.values(predictions).filter(isComplete).length;
   const pct = Math.round((completed / totalFixtures) * 100);
 
   const group = groups.find(g => g.id === activeGroup);
@@ -1281,11 +1519,8 @@ function PredictionsWidget() {
 
       <div className="group-strip">
         {groups.map(g => {
-          const fx = window.WC_DATA.buildFixtures(g);
-          const done = fx.filter(f => {
-            const p = predictions[f.id];
-            return p && p.home !== "" && p.away !== "";
-          }).length;
+          const fx = window.PREDICTOR_DATA.buildFixtures(g);
+          const done = fx.filter(f => isComplete(predictions[f.id])).length;
           return (
             <button
               key={g.id}
@@ -1299,13 +1534,13 @@ function PredictionsWidget() {
         })}
       </div>
 
-      <GroupPanel group={group} predictions={predictions} onChange={handleChange} />
+      <GroupPanel group={group} predictions={predictions} results={results} onChange={handleChange} />
     </div>
   );
 }
 
 /* ========== KNOCKOUT BRACKET ========== */
-// 2026 World Cup: 32 teams advance from group stage (top 2 of 12 groups + 8 best 3rds).
+// 32 teams advance from group stage (top 2 of 12 groups + 8 best 3rds).
 // Round of 32 → Round of 16 → QF → SF → 3rd-place + Final.
 const R32_MATCHES = [
   { id: "M73", a: "1A",       b: "3rd C/D/E/F" },
@@ -1403,10 +1638,10 @@ function KnockoutBracket() {
   );
 }
 
-function OutrightsSection() {
-  const teams = Object.values(window.WC_DATA.TEAMS);
-  const [picks, setPicks] = useState({ winner: "", second: "", third: "", topscorer: "", goals: "", cards: "" });
-  const set = (k, v) => setPicks(p => ({ ...p, [k]: v }));
+function OutrightsSection({ outrights, setOutrights }) {
+  const teams = Object.values(window.PREDICTOR_DATA.TEAMS);
+  const picks = outrights;
+  const set = (k, v) => setOutrights(p => ({ ...p, [k]: v }));
 
   const SCORERS = [
     "Kylian Mbappé (France)", "Erling Haaland (Norway)", "Harry Kane (England)",
@@ -1486,15 +1721,44 @@ function OutrightsSection() {
 }
 
 /* ========== LEADERBOARDS ========== */
-function GlobalLeaderboard() {
-  const board = window.WC_DATA.GLOBAL_LEADERBOARD;
+function GlobalLeaderboard({ predictions, results }) {
+  const fixtures = window.PREDICTOR_DATA.FIXTURES;
+  const settledFixtures = fixtures.filter(f => isComplete(results[f.id]));
   const totalPlayers = 14523;
+
+  const players = [
+    ...window.PREDICTOR_DATA.GLOBAL_LEADERBOARD.map(p => ({
+      key: p.name, name: p.name, country: p.country, isYou: false,
+    })),
+    { key: "__you", name: "You", country: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", isYou: true },
+  ];
+
+  const scored = players.map(p => {
+    let points = 0;
+    let predCount = 0;
+    fixtures.forEach(f => {
+      const pred = p.isYou ? predictions[f.id] : mockPrediction(p.name, f.id);
+      if (isComplete(pred)) predCount += 1;
+      const actual = results[f.id];
+      if (isComplete(pred) && isComplete(actual)) points += pointsFor(pred, actual);
+    });
+    return { ...p, points, predictions: predCount };
+  });
+
+  scored.sort((a, b) => b.points - a.points || b.predictions - a.predictions || a.name.localeCompare(b.name));
+  scored.forEach((row, i) => { row.rank = i + 1; });
+
+  const top = scored.slice(0, 10);
+  const you = scored.find(r => r.isYou);
+  const youInTop = top.some(r => r.isYou);
 
   return (
     <div className="lb-card">
       <div className="lb-card-head">
         <h3>Global Leaderboard</h3>
-        <span className="meta">{totalPlayers.toLocaleString()} players</span>
+        <span className="meta">
+          {totalPlayers.toLocaleString()} players · {settledFixtures.length}/{fixtures.length} matches settled
+        </span>
       </div>
       <table className="lb-table">
         <thead>
@@ -1506,8 +1770,8 @@ function GlobalLeaderboard() {
           </tr>
         </thead>
         <tbody>
-          {board.map(row => (
-            <tr key={row.rank}>
+          {top.map(row => (
+            <tr key={row.key} className={row.isYou ? "you" : ""}>
               <td><span className={`lb-rank ${row.rank <= 3 ? `r${row.rank}` : ""}`}>{row.rank}</span></td>
               <td>
                 <div className="lb-name">
@@ -1521,14 +1785,26 @@ function GlobalLeaderboard() {
           ))}
         </tbody>
       </table>
+      {!youInTop && you && (
+        <div className="lb-you-card" style={{ background: "var(--bg-2)", color: "var(--fg-1)" }}>
+          <div className="lb-name" style={{ gap: 12 }}>
+            <span className="lb-rank">{you.rank}</span>
+            <span><b>You</b></span>
+          </div>
+          <div style={{ display: "flex", gap: 24 }}>
+            <span className="lb-pts muted">{you.predictions} preds</span>
+            <span className="lb-pts">{you.points} pts</span>
+          </div>
+        </div>
+      )}
       <div className="lb-you-card">
         <div>
           <div className="label">Your rank</div>
-          <div className="val">Not ranked yet</div>
+          <div className="val">{you ? `#${you.rank}` : "Not ranked yet"}</div>
         </div>
         <div style={{ textAlign: "right" }}>
           <div className="label">Your points</div>
-          <div className="val">0</div>
+          <div className="val">{you ? you.points : 0}</div>
         </div>
       </div>
     </div>
@@ -1816,10 +2092,185 @@ function PrivateLeagues() {
   );
 }
 
+/* ========== ADMIN / RESULTS CMS ========== */
+function AdminFixtureRow({ fixture, result, onChange, onClear }) {
+  const t = window.PREDICTOR_DATA.TEAMS;
+  const home = t[fixture.home];
+  const away = t[fixture.away];
+  const settled = isComplete(result);
+  return (
+    <div className={`admin-row ${settled ? "settled" : ""}`}>
+      <div className="admin-meta">
+        <span className="admin-id">{fixture.id}</span>
+        <span className="admin-day">MD {fixture.day}</span>
+      </div>
+      <div className="fixture-team home">
+        <span className="name">{home.name}</span>
+        <span className="flag">{home.flag}</span>
+      </div>
+      <div className="score-input">
+        <input
+          type="number" min="0" max="20"
+          className={`score-box ${settled ? "filled" : ""}`}
+          value={result?.home ?? ""}
+          onChange={e => onChange(fixture.id, "home", e.target.value)}
+          aria-label={`${home.name} actual score`}
+        />
+        <span className="score-dash">–</span>
+        <input
+          type="number" min="0" max="20"
+          className={`score-box ${settled ? "filled" : ""}`}
+          value={result?.away ?? ""}
+          onChange={e => onChange(fixture.id, "away", e.target.value)}
+          aria-label={`${away.name} actual score`}
+        />
+      </div>
+      <div className="fixture-team away">
+        <span className="flag">{away.flag}</span>
+        <span className="name">{away.name}</span>
+      </div>
+      <button
+        type="button"
+        className="admin-clear"
+        onClick={() => onClear(fixture.id)}
+        disabled={!result}
+        aria-label="Clear result"
+      >Clear</button>
+    </div>
+  );
+}
+
+function AdminGroupSection({ group, results, onChange, onClear }) {
+  const t = window.PREDICTOR_DATA.TEAMS;
+  const fixtures = window.PREDICTOR_DATA.buildFixtures(group);
+  const settledCount = fixtures.filter(f => isComplete(results[f.id])).length;
+  return (
+    <div className="admin-group">
+      <div className="admin-group-head">
+        <h4>Group {group.id}</h4>
+        <span className="admin-group-meta">
+          {group.teams.map(c => t[c].flag).join(" ")} · {settledCount}/6 settled
+        </span>
+      </div>
+      <div className="admin-rows">
+        {fixtures.map(f => (
+          <AdminFixtureRow
+            key={f.id}
+            fixture={f}
+            result={results[f.id]}
+            onChange={onChange}
+            onClear={onClear}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminTab({ results, setResults }) {
+  const groups = window.PREDICTOR_DATA.GROUPS;
+  const fixtures = window.PREDICTOR_DATA.FIXTURES;
+  const settled = fixtures.filter(f => isComplete(results[f.id])).length;
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  const handleChange = (id, side, value) => {
+    setResults(r => ({
+      ...r,
+      [id]: { home: r[id]?.home ?? "", away: r[id]?.away ?? "", ...r[id], [side]: value },
+    }));
+  };
+  const handleClear = (id) => {
+    setResults(r => {
+      const next = { ...r };
+      delete next[id];
+      return next;
+    });
+  };
+  const resetAll = () => { setResults({}); setConfirmReset(false); };
+
+  // Quick-fill helper: random 0–3 results for every fixture (handy for demo).
+  const autoFill = () => {
+    const next = {};
+    fixtures.forEach(f => {
+      const seed = djb2("auto:" + f.id);
+      next[f.id] = { home: String(seed % 4), away: String((seed >>> 8) % 4) };
+    });
+    setResults(next);
+  };
+
+  return (
+    <div className="section">
+      <div className="admin-hero">
+        <div>
+          <div className="admin-eyebrow">Internal · Results CMS</div>
+          <h2 className="admin-title">Enter match results</h2>
+          <p className="admin-sub">
+            Scores entered here drive the live leaderboard. Every prediction is scored automatically:{" "}
+            <b>3 pts</b> for an exact correct score, <b>1 pt</b> for the right result (W/D/L).
+          </p>
+        </div>
+        <div className="admin-stats">
+          <div className="admin-stat">
+            <div className="admin-stat-val">{settled}</div>
+            <div className="admin-stat-lbl">Settled</div>
+          </div>
+          <div className="admin-stat">
+            <div className="admin-stat-val">{fixtures.length - settled}</div>
+            <div className="admin-stat-lbl">Pending</div>
+          </div>
+          <div className="admin-stat">
+            <div className="admin-stat-val">{Math.round((settled / fixtures.length) * 100)}%</div>
+            <div className="admin-stat-lbl">Complete</div>
+          </div>
+        </div>
+        <div className="admin-actions">
+          <button type="button" className="btn btn-ghost" onClick={autoFill}>Auto-fill demo</button>
+          {!confirmReset ? (
+            <button type="button" className="btn btn-ghost" onClick={() => setConfirmReset(true)} disabled={settled === 0}>
+              Reset all
+            </button>
+          ) : (
+            <>
+              <button type="button" className="btn btn-ghost" onClick={() => setConfirmReset(false)}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={resetAll}>Confirm reset</button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="admin-groups">
+        {groups.map(g => (
+          <AdminGroupSection
+            key={g.id}
+            group={g}
+            results={results}
+            onChange={handleChange}
+            onClear={handleClear}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ========== APP SHELL ========== */
 function App() {
   const [tab, setTab] = useState("overview");
   const [saved, setSaved] = useState(false);
+  const [predictions, setPredictions] = useStoredState("predictor.predictions.v1", {});
+  const [results, setResults] = useStoredState("predictor.results.v1", {});
+  const [outrights, setOutrights] = useStoredState("predictor.outrights.v1", {
+    winner: "", second: "", third: "", topscorer: "", goals: "", cards: "",
+  });
+
+  const settledCount = window.PREDICTOR_DATA.FIXTURES.filter(f => isComplete(results[f.id])).length;
+  const userPoints = window.PREDICTOR_DATA.FIXTURES.reduce(
+    (sum, f) => sum + pointsFor(predictions[f.id], results[f.id]),
+    0
+  );
+  const hasPredictions = Object.values(predictions).some(isComplete);
+
+  const resetPredictions = () => { setPredictions({}); setOutrights({ winner: "", second: "", third: "", topscorer: "", goals: "", cards: "" }); };
 
   return (
     <div className="app">
@@ -1828,24 +2279,27 @@ function App() {
           <div className="brand-mark">G</div>
           <div className="brand-titles">
             <div className="brand-eyebrow">Gambling.com · Free to play</div>
-            <div className="brand-name">World Cup Predictor 2026</div>
+            <div className="brand-name">Predictor 2026</div>
           </div>
         </div>
         <div className="user-pill">
           <span className="avatar">?</span>
           <span>Sign in</span>
-          <span className="points">· <b>0</b> pts</span>
+          <span className="points">· <b>{userPoints}</b> pts</span>
         </div>
       </header>
 
       <div className="tabs">
         <button className={`tab ${tab === "overview" ? "active" : ""}`} onClick={() => setTab("overview")}>Overview</button>
         <button className={`tab ${tab === "leaderboards" ? "active" : ""}`} onClick={() => setTab("leaderboards")}>Leaderboards</button>
+        <button className={`tab ${tab === "admin" ? "active" : ""}`} onClick={() => setTab("admin")}>
+          Admin <span className="tab-badge">{settledCount}/{window.PREDICTOR_DATA.FIXTURES.length}</span>
+        </button>
       </div>
 
       <CountdownBanner />
 
-      {tab === "overview" ? (
+      {tab === "overview" && (
         <>
           <section className="section">
             <PrizeHero />
@@ -1862,18 +2316,24 @@ function App() {
           <section className="section">
             <div className="section-head">
               <h2>Your predictions</h2>
-              <span className="meta">Predictions lock when the first match kicks off</span>
+              <span className="meta">Predictions lock when each match kicks off</span>
             </div>
 
-            <div className="empty-banner">
-              <div className="empty-banner-icon">!</div>
-              <div className="empty-banner-text">
-                You haven't made any predictions yet
-                <small>Pick a score for every group match below to get on the board. You can change them any time before kick-off.</small>
+            {!hasPredictions && (
+              <div className="empty-banner">
+                <div className="empty-banner-icon">!</div>
+                <div className="empty-banner-text">
+                  You haven't made any predictions yet
+                  <small>Pick a score for every group match below to get on the board. You can change them any time before kick-off.</small>
+                </div>
               </div>
-            </div>
+            )}
 
-            <PredictionsWidget />
+            <PredictionsWidget
+              predictions={predictions}
+              setPredictions={setPredictions}
+              results={results}
+            />
           </section>
 
           <section className="section">
@@ -1889,7 +2349,7 @@ function App() {
               <h2>Outrights & tiebreaker</h2>
               <span className="meta">Locked at first kick-off · 28 pts available</span>
             </div>
-            <OutrightsSection />
+            <OutrightsSection outrights={outrights} setOutrights={setOutrights} />
           </section>
 
           <div className="save-bar">
@@ -1899,12 +2359,12 @@ function App() {
               ) : (
                 <>
                   <span>Auto-save on</span>{" "}
-                  <span className="muted">· last edited just now</span>
+                  <span className="muted">· stored locally</span>
                 </>
               )}
             </div>
             <div style={{ display: "flex", gap: 8 }}>
-              <button className="btn btn-ghost">Reset all</button>
+              <button className="btn btn-ghost" onClick={resetPredictions}>Reset all</button>
               <button
                 className="btn btn-primary"
                 onClick={() => { setSaved(true); setTimeout(() => setSaved(false), 2200); }}
@@ -1912,14 +2372,18 @@ function App() {
             </div>
           </div>
         </>
-      ) : (
+      )}
+
+      {tab === "leaderboards" && (
         <section className="section">
           <div className="lb-grid">
-            <GlobalLeaderboard />
+            <GlobalLeaderboard predictions={predictions} results={results} />
             <PrivateLeagues />
           </div>
         </section>
       )}
+
+      {tab === "admin" && <AdminTab results={results} setResults={setResults} />}
     </div>
   );
 }
