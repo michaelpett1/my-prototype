@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Predictor 26 — Free WC 2026 Predictor Game · £10,000 Prize Pool</title>
+<meta name="description" content="Predict every match of World Cup 2026. Free to play. Closest predictor wins £10,000. Group stage, knockouts, outrights and private leagues." />
+<meta property="og:title" content="Predictor 26 — Predict the World Cup, Win £10K" />
+<meta property="og:description" content="Free WC 2026 predictor game. 104 matches. £10,000 prize pool. No fees." />
+<meta property="og:type" content="website" />
+<link rel="canonical" href="" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin="anonymous"></script>
+
+<style>
+/* Predictor 26 — global tokens & shared styles */
+:root {
+  --bg: #06120e;
+  --bg-2: #0a1a14;
+  --surface: #0f2118;
+  --surface-2: #14291f;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-2: rgba(255, 255, 255, 0.12);
+  --text: #e7f2ec;
+  --text-2: #9fb5a9;
+  --text-3: #6e8377;
+  --accent: #22c55e;
+  --accent-2: #16a34a;
+  --accent-soft: rgba(34, 197, 94, 0.14);
+  --gold: #fde68a;
+  --gold-2: #f5b942;
+  --silver: #d6dde2;
+  --bronze: #d8956b;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Anton', 'Bebas Neue', 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.p26-display { font-family: var(--font-display); font-style: italic; letter-spacing: 0.01em; text-transform: uppercase; font-weight: 400; }
+.p26-label { font-family: var(--font-sans); font-size: 10px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.p26-mono { font-family: var(--font-mono); letter-spacing: 0.02em; }
+
+.p26-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  background: var(--accent-soft); color: var(--accent);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+.p26-pill.is-muted { background: rgba(255,255,255,0.04); color: var(--text-2); border-color: var(--line); }
+.p26-pill.is-warn  { background: rgba(245,158,11,0.12); color: var(--warn); border-color: rgba(245,158,11,0.25); }
+.p26-pill.is-danger{ background: rgba(239,68,68,0.12); color: var(--danger); border-color: rgba(239,68,68,0.25); }
+
+.p26-dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; box-shadow: 0 0 0 3px rgba(34,197,94,0.18); }
+
+.p26-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0)), var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.p26-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 18px; border-radius: 999px;
+  font-family: var(--font-sans); font-weight: 600; font-size: 13px; letter-spacing: 0.02em;
+  border: none; cursor: pointer;
+  transition: transform .12s, background .12s, color .12s, box-shadow .12s;
+  background: var(--accent); color: #06120e;
+}
+.p26-btn:hover { background: #2bd76a; }
+.p26-btn:active { transform: translateY(1px); }
+.p26-btn.is-ghost { background: transparent; color: var(--text); border: 1px solid var(--line-2); }
+.p26-btn.is-ghost:hover { background: rgba(255,255,255,0.04); }
+.p26-btn.is-outline { background: transparent; color: var(--accent); border: 1px solid rgba(34,197,94,0.4); }
+.p26-btn.is-outline:hover { background: var(--accent-soft); }
+.p26-btn.is-sm { padding: 7px 12px; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+.p26-flag { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-sans); font-weight: 600; font-size: 13px; }
+.p26-flag .dot {
+  width: 22px; height: 16px; border-radius: 3px;
+  background: var(--surface-2);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.04em;
+  color: #06120e; flex-shrink: 0;
+}
+
+.p26-score {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line); color: var(--text);
+  font-family: var(--font-display); font-style: italic; font-size: 22px;
+  text-align: center; outline: none;
+  transition: border-color .12s, background .12s, box-shadow .12s;
+}
+.p26-score:focus, .p26-score.has-value { border-color: rgba(34,197,94,0.5); background: rgba(34,197,94,0.08); color: var(--accent); }
+.p26-score:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.p26-logo {
+  font-family: var(--font-display); font-style: italic; font-size: 22px; letter-spacing: 0.02em;
+  color: var(--text); display: inline-flex; align-items: center; gap: 6px; text-transform: uppercase;
+}
+.p26-logo .accent { color: var(--accent); }
+.p26-logo .mark {
+  width: 26px; height: 26px; border-radius: 7px;
+  background: var(--accent); color: #06120e;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; letter-spacing: 0; font-style: normal; font-family: var(--font-display);
+}
+
+.p26-input {
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 14px; color: var(--text);
+  font-family: var(--font-sans); font-size: 13px; outline: none;
+  transition: border-color .12s, background .12s;
+}
+.p26-input:focus { border-color: rgba(34,197,94,0.4); }
+.p26-input::placeholder { color: var(--text-3); }
+
+.p26-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); }
+.p26-tab {
+  font-family: var(--font-display); font-style: italic; font-size: 14px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--text-3); background: transparent; border: none;
+  padding: 12px 16px; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .12s, border-color .12s;
+}
+.p26-tab:hover { color: var(--text-2); }
+.p26-tab.is-active { color: var(--text); border-bottom-color: var(--accent); }
+
+.p26-screen::-webkit-scrollbar { display: none; }
+.p26-screen { scrollbar-width: none; }
+
+.p26-bg-dots {
+  background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.p26-gold-text {
+  background: linear-gradient(180deg, #fde68a 0%, #f5b942 60%, #c98c2a 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.p26-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--text-2);
+}
+.p26-status::before {
+  content: ''; width: 6px; height: 6px; border-radius: 999px;
+  background: var(--accent); box-shadow: 0 0 0 3px rgba(34,197,94,0.18);
+}
+
+/* Responsive: hide desktop-only and mobile-only by default */
+.p26-only-desktop { display: block; }
+.p26-only-mobile { display: none; }
+@media (max-width: 820px) {
+  .p26-only-desktop { display: none !important; }
+  .p26-only-mobile { display: block !important; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+/* =========================================================
+   Predictor 26 — production build (single-file)
+   Source: design handoff bundle, inlined.
+   ========================================================= */
+
+// ============ DATA ============
+const TEAMS = [
+  { code: 'MEX', name: 'Mexico', group: 'A', color: '#2d6a4f', alt: '#e63946' },
+  { code: 'CAN', name: 'Canada', group: 'A', color: '#d62828', alt: '#fff' },
+  { code: 'JAM', name: 'Jamaica', group: 'A', color: '#1b9e3e', alt: '#ffd60a' },
+  { code: 'NOR', name: 'Norway', group: 'A', color: '#dc2626', alt: '#1e3a8a' },
+  { code: 'USA', name: 'USA', group: 'B', color: '#1e3a8a', alt: '#dc2626' },
+  { code: 'ARG', name: 'Argentina', group: 'B', color: '#7dd3fc', alt: '#fff' },
+  { code: 'EGY', name: 'Egypt', group: 'B', color: '#dc2626', alt: '#000' },
+  { code: 'KOR', name: 'South Korea', group: 'B', color: '#dc2626', alt: '#1e3a8a' },
+  { code: 'CAN', name: 'Canada', group: 'C', color: '#d62828', alt: '#fff' },
+  { code: 'BRA', name: 'Brazil', group: 'C', color: '#fbbf24', alt: '#16a34a' },
+  { code: 'JPN', name: 'Japan', group: 'C', color: '#1e40af', alt: '#fff' },
+  { code: 'SCO', name: 'Scotland', group: 'C', color: '#1e3a8a', alt: '#fff' },
+  { code: 'ENG', name: 'England', group: 'D', color: '#fff', alt: '#dc2626' },
+  { code: 'POR', name: 'Portugal', group: 'D', color: '#16a34a', alt: '#dc2626' },
+  { code: 'ECU', name: 'Ecuador', group: 'D', color: '#fbbf24', alt: '#1e3a8a' },
+  { code: 'CIV', name: "Côte d'Ivoire", group: 'D', color: '#f97316', alt: '#16a34a' },
+  { code: 'FRA', name: 'France', group: 'E', color: '#1e3a8a', alt: '#dc2626' },
+  { code: 'GER', name: 'Germany', group: 'E', color: '#000', alt: '#dc2626' },
+  { code: 'AUS', name: 'Australia', group: 'E', color: '#fbbf24', alt: '#16a34a' },
+  { code: 'TUN', name: 'Tunisia', group: 'E', color: '#dc2626', alt: '#fff' },
+  { code: 'ESP', name: 'Spain', group: 'F', color: '#dc2626', alt: '#fbbf24' },
+  { code: 'BEL', name: 'Belgium', group: 'F', color: '#000', alt: '#fbbf24' },
+  { code: 'MAR', name: 'Morocco', group: 'F', color: '#16a34a', alt: '#dc2626' },
+  { code: 'URU', name: 'Uruguay', group: 'F', color: '#7dd3fc', alt: '#fff' },
+  { code: 'NED', name: 'Netherlands', group: 'G', color: '#f97316', alt: '#1e3a8a' },
+  { code: 'CRO', name: 'Croatia', group: 'G', color: '#dc2626', alt: '#fff' },
+  { code: 'NGA', name: 'Nigeria', group: 'G', color: '#16a34a', alt: '#fff' },
+  { code: 'PAN', name: 'Panama', group: 'G', color: '#dc2626', alt: '#1e3a8a' },
+  { code: 'ITA', name: 'Italy', group: 'H', color: '#1e40af', alt: '#fff' },
+  { code: 'SEN', name: 'Senegal', group: 'H', color: '#16a34a', alt: '#fbbf24' },
+  { code: 'CHI', name: 'Chile', group: 'H', color: '#dc2626', alt: '#1e3a8a' },
+  { code: 'NZL', name: 'New Zealand', group: 'H', color: '#000', alt: '#fff' },
+];
+const GROUPS = ['A','B','C','D','E','F','G','H'];
+
+function buildGroupFixtures() {
+  const fixtures = [];
+  let id = 1;
+  const startDates = ['Jun 11','Jun 12','Jun 13','Jun 14','Jun 15','Jun 16','Jun 17','Jun 18'];
+  GROUPS.forEach((g, gi) => {
+    const teams = TEAMS.filter(t => t.group === g);
+    const pairs = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]];
+    pairs.forEach((p, i) => {
+      const md = Math.floor(i / 2) + 1;
+      const dayBase = (md - 1) * 4 + (gi % 4);
+      fixtures.push({
+        id: `G${id++}`, group: g, matchday: md,
+        home: teams[p[0]], away: teams[p[1]],
+        date: startDates[dayBase % startDates.length] || 'Jun 18',
+        time: ['12:00','15:00','18:00','21:00'][i % 4],
+        venue: ['Mexico City','Toronto','Los Angeles','New York','Dallas','Atlanta','Seattle','Miami'][gi],
+      });
+    });
+  });
+  return fixtures;
+}
+const GROUP_FIXTURES = buildGroupFixtures();
+
+const LEADERBOARD = [
+  { rank: 1, name: 'Marco Bianchi', handle: '@marcob', pts: 0, country: 'IT', avatar: 'M' },
+  { rank: 2, name: 'Aisha Khan', handle: '@aishak', pts: 0, country: 'PK', avatar: 'A' },
+  { rank: 3, name: 'Sven Lindqvist', handle: '@svenl', pts: 0, country: 'SE', avatar: 'S' },
+  { rank: 4, name: 'Carlos Mendes', handle: '@carlosm', pts: 0, country: 'BR', avatar: 'C' },
+  { rank: 5, name: 'Yuki Tanaka', handle: '@yukit', pts: 0, country: 'JP', avatar: 'Y' },
+  { rank: 6, name: 'Olu Adebayo', handle: '@olua', pts: 0, country: 'NG', avatar: 'O' },
+  { rank: 7, name: 'Hannah Müller', handle: '@hannahm', pts: 0, country: 'DE', avatar: 'H' },
+  { rank: 8, name: 'Diego Ramírez', handle: '@diegor', pts: 0, country: 'MX', avatar: 'D' },
+  { rank: 9, name: 'Priya Sharma', handle: '@priyas', pts: 0, country: 'IN', avatar: 'P' },
+  { rank: 10, name: 'Tom Whittaker', handle: '@tomw', pts: 0, country: 'GB', avatar: 'T' },
+];
+
+const PRIZE_TIERS = [
+  { rank: '1st', amount: '£5,000', tone: 'gold' },
+  { rank: '2nd', amount: '£2,000', tone: 'silver' },
+  { rank: '3rd', amount: '£1,000', tone: 'bronze' },
+  { rank: '4th – 10th', amount: '£285 ea', tone: 'tier' },
+];
+const KO_PRIZES = [
+  { rank: '1st', amount: '£1,250' },
+  { rank: '2nd', amount: '£500' },
+  { rank: '3rd', amount: '£250' },
+];
+const TOP_SCORERS = [
+  { name: 'Kylian Mbappé', team: 'France', code: 'FRA' },
+  { name: 'Erling Haaland', team: 'Norway', code: 'NOR' },
+  { name: 'Lionel Messi', team: 'Argentina', code: 'ARG' },
+  { name: 'Harry Kane', team: 'England', code: 'ENG' },
+  { name: 'Vinícius Júnior', team: 'Brazil', code: 'BRA' },
+  { name: 'Jude Bellingham', team: 'England', code: 'ENG' },
+  { name: 'Lautaro Martínez', team: 'Argentina', code: 'ARG' },
+  { name: 'Lamine Yamal', team: 'Spain', code: 'ESP' },
+];
+
+// ============ ATOMS ============
+function Logo({ size = 22 }) {
+  return (
+    <span className="p26-logo" style={{ fontSize: size }}>
+      <span className="mark" style={{ width: size * 1.2, height: size * 1.2, fontSize: size * 0.65 }}>P</span>
+      <span>PREDICTOR<span className="accent">26</span></span>
+    </span>
+  );
+}
+function Flag({ team, size = 16 }) {
+  if (!team) return null;
+  return (
+    <span className="p26-flag">
+      <span className="dot" style={{ background: team.color, color: team.alt, width: size * 1.4, height: size }}>
+        {team.code}
+      </span>
+    </span>
+  );
+}
+function Pill({ children, tone = 'accent', icon }) {
+  const cls = tone === 'muted' ? 'p26-pill is-muted'
+            : tone === 'warn'  ? 'p26-pill is-warn'
+            : tone === 'danger'? 'p26-pill is-danger'
+            : 'p26-pill';
+  return <span className={cls}>{icon && <span className="p26-dot" />}{children}</span>;
+}
+function Status({ children = 'Live' }) {
+  return <span className="p26-status">{children}</span>;
+}
+
+const I = {
+  chevron: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  arrow: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  lock: <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M8 11V8a4 4 0 1 1 8 0v3" stroke="currentColor" strokeWidth="2"/></svg>,
+  trophy: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" stroke="currentColor" strokeWidth="2"/><path d="M17 6h3v2a3 3 0 0 1-3 3M7 6H4v2a3 3 0 0 0 3 3M9 20h6M12 14v6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  bell: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0 1 12 0c0 4 1.5 5 2 6H4c.5-1 2-2 2-6zM10 19a2 2 0 0 0 4 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  users: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3" stroke="currentColor" strokeWidth="2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 11a3 3 0 1 0 0-6M21 20c0-2.7-1.7-4.7-4-5.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  check: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  search: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6" stroke="currentColor" strokeWidth="2"/><path d="M20 20l-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  copy: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" strokeWidth="2"/></svg>,
+  ball: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/><path d="M12 3l3 5-3 4-3-4 3-5zM3 12l5 1 1 5-4 1-2-7zm18 0l-5 1-1 5 4 1 2-7z" stroke="currentColor" strokeWidth="1.5" fill="none"/></svg>,
+  close: <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  plus: <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+};
+
+// ============ NAV (desktop) ============
+function NavBar({ current, onNav, signedIn, onSignIn }) {
+  const items = [
+    { id: 'landing', label: 'How It Works' },
+    { id: 'group', label: 'Group Stage' },
+    { id: 'bracket', label: 'Knockouts' },
+    { id: 'outrights', label: 'Outrights' },
+    { id: 'leaderboard', label: 'Leaderboard' },
+    { id: 'leagues', label: 'Leagues' },
+  ];
+  return (
+    <header style={{
+      borderBottom: '1px solid var(--line)',
+      background: 'rgba(6,18,14,0.85)', backdropFilter: 'blur(12px)',
+      position: 'sticky', top: 0, zIndex: 10,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '18px 36px' }}>
+        <a href="#" onClick={(e) => { e.preventDefault(); onNav('landing'); }} style={{ textDecoration: 'none' }}>
+          <Logo size={22} />
+        </a>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Status>332,481 PLAYING</Status>
+          {signedIn ? (
+            <>
+              <button className="p26-btn is-ghost is-sm" onClick={() => onNav('dashboard')}>Dashboard</button>
+              <div style={{ width: 32, height: 32, borderRadius: 999, background: 'var(--accent)', color: '#06120e', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>M</div>
+            </>
+          ) : (
+            <button className="p26-btn is-sm" onClick={onSignIn}>Play Free</button>
+          )}
+        </div>
+      </div>
+      <nav style={{ display: 'flex', gap: 6, padding: '0 36px 14px', overflowX: 'auto', alignItems: 'center' }}>
+        {items.map(it => {
+          const active = current === it.id;
+          return (
+            <button key={it.id} onClick={() => onNav(it.id)}
+              style={{
+                background: active ? 'var(--surface)' : 'transparent',
+                border: `1px solid ${active ? 'var(--line-2)' : 'transparent'}`,
+                color: active ? 'var(--text)' : 'var(--text-2)',
+                fontSize: 12, fontWeight: 600, letterSpacing: '0.04em',
+                padding: '8px 14px', borderRadius: 999, cursor: 'pointer',
+                transition: 'color .12s, background .12s, border-color .12s',
+                fontFamily: 'var(--font-sans)', whiteSpace: 'nowrap',
+                display: 'inline-flex', alignItems: 'center', gap: 6,
+              }}
+              onMouseEnter={(e) => { if (!active) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+              onMouseLeave={(e) => { if (!active) e.currentTarget.style.background = 'transparent'; }}>
+              {it.label}
+              {it.id === 'bracket' && (
+                <span style={{ padding: '2px 6px', fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', color: 'var(--accent)', background: 'var(--accent-soft)', borderRadius: 999 }}>NEW</span>
+              )}
+            </button>
+          );
+        })}
+      </nav>
+    </header>
+  );
+}
+
+// ============ LANDING ============
+function LandingScreen({ onNav, onSignIn }) {
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="landing" onNav={onNav} signedIn={false} onSignIn={onSignIn} />
+
+      <section className="p26-bg-dots" style={{
+        padding: '64px 36px 80px', position: 'relative',
+        background: 'radial-gradient(ellipse at 30% 20%, rgba(34,197,94,0.12), transparent 50%), var(--bg)',
+      }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 60, alignItems: 'center' }}>
+          <div>
+            <Pill icon>FREE TO PLAY · OPENS JUN 11</Pill>
+            <h1 className="p26-display" style={{ fontSize: 92, lineHeight: 0.92, margin: '20px 0 24px', letterSpacing: '0.005em' }}>
+              PREDICT THE<br />
+              <span style={{ color: 'var(--accent)' }}>WORLD CUP.</span><br />
+              WIN <span className="p26-gold-text">£10,000</span>.
+            </h1>
+            <p style={{ fontSize: 17, color: 'var(--text-2)', maxWidth: 480, lineHeight: 1.55, margin: '0 0 32px' }}>
+              Pick scorelines for all 104 matches across the 2026 tournament. Closest predictor across the group stage and knockouts wins the pot. No stakes. No fees. Just football.
+            </p>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+              <button className="p26-btn" style={{ padding: '14px 24px', fontSize: 14 }} onClick={() => onNav('group')}>
+                Start Predicting {I.arrow}
+              </button>
+              <button className="p26-btn is-ghost" onClick={() => onNav('leaderboard')}>View Prize Pool</button>
+            </div>
+            <div style={{ display: 'flex', gap: 28, marginTop: 40, flexWrap: 'wrap' }}>
+              {[{k:'104',l:'Matches'},{k:'£10K',l:'Prize Pool'},{k:'5+ wks',l:'Tournament'},{k:'No',l:'Entry Fee'}].map(s => (
+                <div key={s.l}>
+                  <div className="p26-display" style={{ fontSize: 32, color: 'var(--text)' }}>{s.k}</div>
+                  <div className="p26-label">{s.l}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ position: 'relative', height: 480 }}>
+            <div className="p26-card" style={{ position: 'absolute', top: 0, right: 0, width: 360, padding: 24, transform: 'rotate(2deg)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <Pill tone="muted">GROUP D · MD1</Pill>
+                <span className="p26-label">JUN 13 · 18:00</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, padding: '16px 0' }}>
+                <Flag team={TEAMS.find(t => t.code === 'ENG')} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input className="p26-score has-value" defaultValue="2" readOnly />
+                  <span className="p26-label">vs</span>
+                  <input className="p26-score has-value" defaultValue="1" readOnly />
+                </div>
+                <Flag team={TEAMS.find(t => t.code === 'POR')} />
+              </div>
+              <div style={{ borderTop: '1px solid var(--line)', paddingTop: 12, display: 'flex', justifyContent: 'space-between' }}>
+                <span className="p26-label">Your Pick</span>
+                <span className="p26-label" style={{ color: 'var(--accent)' }}>Locked in</span>
+              </div>
+            </div>
+            <div className="p26-card" style={{ position: 'absolute', top: 200, left: 0, width: 320, padding: 20, transform: 'rotate(-3deg)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)' }}>
+              <span className="p26-label">CURRENT RANK</span>
+              <div className="p26-display" style={{ fontSize: 64, lineHeight: 1, margin: '6px 0 12px' }}>
+                #<span className="p26-gold-text">1,247</span>
+              </div>
+              <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--text-2)' }}>
+                <span><b style={{ color: 'var(--text)' }}>87</b> pts</span>
+                <span style={{ color: 'var(--accent)' }}>↑ 412 today</span>
+              </div>
+            </div>
+            <div className="p26-card" style={{ position: 'absolute', bottom: -10, right: 40, width: 280, padding: 18, transform: 'rotate(4deg)', boxShadow: '0 30px 80px rgba(0,0,0,0.5)', background: 'linear-gradient(135deg, rgba(253,230,138,0.08), rgba(245,185,66,0.04)), var(--surface)', borderColor: 'rgba(253,230,138,0.18)' }}>
+              <span className="p26-label" style={{ color: 'var(--gold-2)' }}>{I.trophy} TOP PRIZE</span>
+              <div className="p26-display p26-gold-text" style={{ fontSize: 56, lineHeight: 1, margin: '4px 0' }}>£5,000</div>
+              <div className="p26-label">to the closest predictor</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '60px 36px', borderTop: '1px solid var(--line)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 36, flexWrap: 'wrap', gap: 12 }}>
+            <h2 className="p26-display" style={{ fontSize: 44, margin: 0 }}>How it <span style={{ color: 'var(--accent)' }}>works</span></h2>
+            <span className="p26-label">Updated for World Cup 2026</span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+            {[
+              { n: '01', t: 'Pick scorelines', d: 'Predict every group match plus tournament outrights — winner, top three, golden boot.' },
+              { n: '02', t: 'Earn points', d: '3 pts for an exact score. 1 pt for the right result. Outrights pay big.' },
+              { n: '03', t: 'Unlock knockouts', d: 'Each round opens once the previous completes. R32 → Final. No scrambles.' },
+              { n: '04', t: 'Win the pot', d: 'Top 10 share £10,000. Closest goals + cards predictor breaks ties.' },
+            ].map(s => (
+              <div key={s.n} className="p26-card" style={{ padding: 24 }}>
+                <div className="p26-display" style={{ fontSize: 32, color: 'var(--accent)', lineHeight: 1 }}>{s.n}</div>
+                <h3 style={{ fontSize: 17, fontWeight: 600, margin: '14px 0 8px' }}>{s.t}</h3>
+                <p style={{ fontSize: 13, color: 'var(--text-2)', margin: 0, lineHeight: 1.5 }}>{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '60px 36px', borderTop: '1px solid var(--line)' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 32 }}>
+          <div className="p26-card" style={{ padding: 32 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20 }}>
+              <h3 className="p26-display" style={{ fontSize: 28, margin: 0 }}>WHOLE TOURNAMENT</h3>
+              <span className="p26-display p26-gold-text" style={{ fontSize: 24 }}>£10,000</span>
+            </div>
+            {PRIZE_TIERS.map((t, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderTop: i ? '1px solid var(--line)' : 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 8,
+                    background: t.tone === 'gold' ? 'linear-gradient(180deg, #fde68a, #f5b942)'
+                              : t.tone === 'silver' ? 'linear-gradient(180deg, #e5e7eb, #9ca3af)'
+                              : t.tone === 'bronze' ? 'linear-gradient(180deg, #d8956b, #92400e)'
+                              : 'var(--surface-2)',
+                    color: '#06120e', fontFamily: 'var(--font-display)', fontStyle: 'italic',
+                    fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>{i + 1}</div>
+                  <span className="p26-display" style={{ fontSize: 20 }}>{t.rank}</span>
+                </div>
+                <span className="p26-mono" style={{ fontSize: 16, fontWeight: 600 }}>{t.amount}</span>
+              </div>
+            ))}
+          </div>
+          <div className="p26-card" style={{ padding: 32 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 20 }}>
+              <h3 className="p26-display" style={{ fontSize: 28, margin: 0 }}>KNOCKOUTS ONLY</h3>
+              <span className="p26-display" style={{ fontSize: 24, color: 'var(--accent)' }}>£2,000</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--text-2)', margin: '0 0 14px', lineHeight: 1.5 }}>
+              Joined late? Bracket-only side pot opens after the group stage. Best knockout score wins.
+            </p>
+            {KO_PRIZES.map((t, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderTop: '1px solid var(--line)' }}>
+                <span className="p26-display" style={{ fontSize: 20 }}>{t.rank}</span>
+                <span className="p26-mono" style={{ fontSize: 16, fontWeight: 600 }}>{t.amount}</span>
+              </div>
+            ))}
+            <div style={{ marginTop: 20, padding: 14, background: 'var(--surface-2)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)' }}>
+              <span className="p26-label" style={{ color: 'var(--text)' }}>TIEBREAKER</span>
+              <p style={{ margin: '6px 0 0', lineHeight: 1.5 }}>Combined accuracy on Total Tournament Goals + Total Tournament Cards.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer style={{ padding: '40px 36px', borderTop: '1px solid var(--line)', color: 'var(--text-3)', fontSize: 12 }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 14 }}>
+          <Logo size={16} />
+          <div style={{ display: 'flex', gap: 24 }}>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Rules</a>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</a>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</a>
+            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>Support</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+// ============ GROUP STAGE ============
+function FixtureRow({ fixture, pick, setPick }) {
+  const [home, setHome] = React.useState(pick?.home ?? '');
+  const [away, setAway] = React.useState(pick?.away ?? '');
+  function commit(h, a) { setHome(h); setAway(a); if (h !== '' && a !== '') setPick(h, a); }
+  return (
+    <div className="p26-card" style={{
+      padding: '16px 22px', display: 'grid',
+      gridTemplateColumns: '90px 1fr auto 1fr 80px',
+      alignItems: 'center', gap: 14, marginBottom: 8,
+    }}>
+      <div>
+        <div className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)', letterSpacing: '0.05em' }}>{fixture.date}</div>
+        <div className="p26-mono" style={{ fontSize: 11, color: 'var(--text-2)' }}>{fixture.time}</div>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'flex-end' }}>
+        <span style={{ fontSize: 14, fontWeight: 500 }}>{fixture.home.name}</span>
+        <Flag team={fixture.home} />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <input className={`p26-score${home !== '' ? ' has-value' : ''}`} type="text" inputMode="numeric" maxLength={1}
+          value={home} onChange={(e) => commit(e.target.value.replace(/[^\d]/g, ''), away)} placeholder="–" />
+        <span style={{ color: 'var(--text-3)', fontSize: 11, fontFamily: 'var(--font-mono)' }}>vs</span>
+        <input className={`p26-score${away !== '' ? ' has-value' : ''}`} type="text" inputMode="numeric" maxLength={1}
+          value={away} onChange={(e) => commit(home, e.target.value.replace(/[^\d]/g, ''))} placeholder="–" />
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Flag team={fixture.away} />
+        <span style={{ fontSize: 14, fontWeight: 500 }}>{fixture.away.name}</span>
+      </div>
+      <div style={{ textAlign: 'right' }}>
+        {pick ? (
+          <span style={{ color: 'var(--accent)', display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>
+            {I.check} Saved
+          </span>
+        ) : (
+          <span className="p26-label" style={{ color: 'var(--text-3)' }}>OPEN</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function GroupStageScreen({ onNav, onSignIn, picks, setPick, signedIn }) {
+  const [activeGroup, setActiveGroup] = React.useState('A');
+  const fixtures = GROUP_FIXTURES.filter(f => f.group === activeGroup);
+  const completed = Object.keys(picks).filter(k => k.startsWith('G')).length;
+
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="group" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24, flexWrap: 'wrap', gap: 14 }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+                <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>GROUP <span style={{ color: 'var(--accent)' }}>STAGE</span></h1>
+                <Status>OPENS JUN 11</Status>
+              </div>
+              <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 540 }}>
+                Predict scorelines for all 48 group matches. 3 points for an exact score, 1 for the right result. Predictions lock at kick-off.
+              </p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <div className="p26-label">YOUR PROGRESS</div>
+              <div className="p26-display" style={{ fontSize: 40, lineHeight: 1, marginTop: 4 }}>
+                <span style={{ color: 'var(--accent)' }}>{completed}</span>
+                <span style={{ color: 'var(--text-3)' }}>/48</span>
+              </div>
+              <div style={{ width: 220, height: 4, background: 'var(--surface-2)', borderRadius: 999, marginTop: 8 }}>
+                <div style={{ width: `${(completed / 48) * 100}%`, height: '100%', background: 'var(--accent)', borderRadius: 999, transition: 'width .2s' }} />
+              </div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: 4, borderBottom: '1px solid var(--line)', overflowX: 'auto' }}>
+            {GROUPS.map(g => {
+              const grpFixtures = GROUP_FIXTURES.filter(f => f.group === g);
+              const grpDone = grpFixtures.filter(f => picks[f.id]).length;
+              return (
+                <button key={g} onClick={() => setActiveGroup(g)} className="p26-tab" style={{ position: 'relative' }}>
+                  <span style={{
+                    color: activeGroup === g ? 'var(--text)' : 'var(--text-3)',
+                    borderBottom: activeGroup === g ? '2px solid var(--accent)' : 'none',
+                    paddingBottom: 10, marginBottom: -10,
+                  }}>GROUP {g}</span>
+                  {grpDone > 0 && (
+                    <span style={{
+                      marginLeft: 8, padding: '1px 6px', fontSize: 9, fontWeight: 700,
+                      color: grpDone === 6 ? 'var(--accent)' : 'var(--text-2)',
+                      background: grpDone === 6 ? 'var(--accent-soft)' : 'var(--surface-2)',
+                      borderRadius: 999, fontFamily: 'var(--font-mono)',
+                    }}>{grpDone}/6</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ padding: '24px 36px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {[1, 2, 3].map(md => (
+              <div key={md}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 4px 10px' }}>
+                  <span className="p26-label">MATCHDAY {md}</span>
+                  <div style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+                  <span className="p26-label" style={{ color: 'var(--text-3)' }}>
+                    {fixtures.filter(f => f.matchday === md && picks[f.id]).length}/2 PREDICTED
+                  </span>
+                </div>
+                {fixtures.filter(f => f.matchday === md).map(f => (
+                  <FixtureRow key={f.id} fixture={f} pick={picks[f.id]} setPick={(h, a) => setPick(f.id, h, a)} />
+                ))}
+              </div>
+            ))}
+          </div>
+          <div>
+            <div className="p26-card" style={{ padding: 22 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                <h3 className="p26-display" style={{ fontSize: 22, margin: 0 }}>YOUR PREDICTED TABLE</h3>
+                <Pill tone="muted">GROUP {activeGroup}</Pill>
+              </div>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ color: 'var(--text-3)' }}>
+                    <th style={{ textAlign: 'left', padding: '8px 4px', fontWeight: 600, letterSpacing: '0.1em' }}>#</th>
+                    <th style={{ textAlign: 'left', padding: '8px 4px', fontWeight: 600, letterSpacing: '0.1em' }}>TEAM</th>
+                    <th style={{ padding: '8px 4px', fontWeight: 600, letterSpacing: '0.1em' }}>P</th>
+                    <th style={{ padding: '8px 4px', fontWeight: 600, letterSpacing: '0.1em' }}>GD</th>
+                    <th style={{ padding: '8px 4px', fontWeight: 600, letterSpacing: '0.1em' }}>PTS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TEAMS.filter(t => t.group === activeGroup).map((team, i) => (
+                    <tr key={team.code + i} style={{
+                      borderTop: '1px solid var(--line)',
+                      background: i < 2 ? 'rgba(34,197,94,0.04)' : 'transparent',
+                    }}>
+                      <td style={{ padding: '12px 4px', color: i < 2 ? 'var(--accent)' : 'var(--text-3)', fontWeight: 600 }}>{i + 1}</td>
+                      <td style={{ padding: '12px 4px' }}><Flag team={team} /></td>
+                      <td style={{ padding: '12px 4px', textAlign: 'center', color: 'var(--text-2)' }}>0</td>
+                      <td style={{ padding: '12px 4px', textAlign: 'center', color: 'var(--text-2)' }}>0</td>
+                      <td style={{ padding: '12px 4px', textAlign: 'center', fontWeight: 700 }}>0</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <div style={{ marginTop: 14, padding: 12, background: 'var(--surface-2)', borderRadius: 10, fontSize: 11, color: 'var(--text-2)', lineHeight: 1.5 }}>
+                <span style={{ color: 'var(--accent)' }}>●</span> Top two advance to Round of 32. Updates as you predict.
+              </div>
+            </div>
+            <button className="p26-btn" style={{ width: '100%', marginTop: 14, padding: 14 }} onClick={onSignIn}>
+              {completed > 0 ? 'Lock In Predictions' : 'Save & Continue'} {I.arrow}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============ KNOCKOUT ============
+function BracketGrid({ r32 }) {
+  const rounds = [
+    { id: 'r32', label: 'ROUND OF 32', count: 8 },
+    { id: 'r16', label: 'ROUND OF 16', count: 4 },
+    { id: 'qf', label: 'QUARTERS', count: 2 },
+    { id: 'sf', label: 'SEMIS', count: 1 },
+    { id: 'f', label: 'FINAL', count: 1 },
+  ];
+  function teamRow(label, top) {
+    return (
+      <div style={{
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+        padding: '8px 10px', borderBottom: top ? '1px solid var(--line)' : 'none',
+      }}>
+        <span style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>{label}</span>
+        <input className="p26-score" disabled style={{ width: 28, height: 28, fontSize: 16, opacity: 0.4 }} placeholder="–" />
+      </div>
+    );
+  }
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 16, alignItems: 'stretch', overflowX: 'auto' }}>
+      {rounds.map((r, ri) => (
+        <div key={r.id}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+            <span className="p26-display" style={{ fontSize: 16, color: ri === 0 ? 'var(--text)' : 'var(--text-3)' }}>{r.label}</span>
+            {ri === 0 && <span style={{ width: 6, height: 6, borderRadius: 999, background: 'var(--warn)' }} />}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', justifyContent: 'space-around' }}>
+            {Array.from({ length: r.count }).map((_, i) => {
+              const m = r32[i] || ['—', '—'];
+              const isFinal = r.id === 'f';
+              return (
+                <div key={i} style={{
+                  background: isFinal ? 'linear-gradient(180deg, rgba(253,230,138,0.06), rgba(245,185,66,0.02))' : 'var(--surface-2)',
+                  border: `1px solid ${isFinal ? 'rgba(253,230,138,0.25)' : 'var(--line)'}`,
+                  borderRadius: 10, opacity: ri === 0 ? 1 : 0.55,
+                  flex: r.count === 1 ? 'none' : 1, alignSelf: 'center', width: '100%',
+                }}>
+                  {ri === 0 ? (<>{teamRow(m[0], true)}{teamRow(m[1], false)}</>)
+                    : (<>
+                        <div style={{ padding: '8px 10px', borderBottom: '1px solid var(--line)' }}>
+                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>—</span>
+                        </div>
+                        <div style={{ padding: '8px 10px' }}>
+                          <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>—</span>
+                        </div>
+                      </>)
+                  }
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function BracketScreen({ onNav, onSignIn, signedIn }) {
+  const r32 = [['A1','WC1'],['C2','D2'],['B1','WC2'],['D1','C2'],['E1','WC3'],['G2','H2'],['F1','WC4'],['H1','G2']];
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="bracket" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 8, flexWrap: 'wrap' }}>
+            <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>KNOCKOUT <span style={{ color: 'var(--accent)' }}>BRACKET</span></h1>
+            <Pill tone="warn"><span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{I.lock} LOCKED</span></Pill>
+          </div>
+          <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 640 }}>
+            Round of 32 unlocks once group stage completes. Each round opens sequentially — you'll predict R32 fixtures the moment they're set.
+          </p>
+        </div>
+      </section>
+      <section style={{ padding: '32px 36px 60px' }}>
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <div className="p26-card" style={{ padding: 28, position: 'relative', overflow: 'hidden' }}>
+            <BracketGrid r32={r32} />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============ OUTRIGHTS ============
+function PodiumPicker({ title, subtitle, position, tone, picked, options, onPick }) {
+  const team = options.find(t => t.code === picked);
+  const accent = tone === 'gold' ? 'linear-gradient(180deg, #fde68a, #f5b942)'
+              : tone === 'silver' ? 'linear-gradient(180deg, #e5e7eb, #9ca3af)'
+              : 'linear-gradient(180deg, #d8956b, #92400e)';
+  return (
+    <div className="p26-card" style={{ padding: 22 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <div style={{
+            width: 44, height: 44, borderRadius: 10, background: accent,
+            color: '#06120e', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 18,
+          }}>{position}</div>
+          <div>
+            <div className="p26-display" style={{ fontSize: 22 }}>{title}</div>
+            <div className="p26-label" style={{ color: 'var(--text-3)' }}>{subtitle}</div>
+          </div>
+        </div>
+        {team && (
+          <button onClick={() => onPick(null)} style={{ background: 'transparent', border: 'none', color: 'var(--text-3)', cursor: 'pointer', fontSize: 11, letterSpacing: '0.08em', textTransform: 'uppercase', fontWeight: 600 }}>Clear</button>
+        )}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+        {options.map((t, i) => {
+          const sel = picked === t.code;
+          return (
+            <button key={t.code + i} onClick={() => onPick(t.code)} style={{
+              padding: '8px 12px', borderRadius: 8,
+              background: sel ? 'var(--accent-soft)' : 'var(--surface-2)',
+              border: `1px solid ${sel ? 'rgba(34,197,94,0.5)' : 'var(--line)'}`,
+              color: sel ? 'var(--accent)' : 'var(--text-2)',
+              fontSize: 12, fontWeight: 600, cursor: 'pointer', transition: 'all .12s',
+              fontFamily: 'var(--font-mono)', letterSpacing: '0.05em',
+            }}>{t.code}</button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function GoldenBoot({ picked, onPick }) {
+  return (
+    <div className="p26-card" style={{ padding: 22 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 10,
+          background: 'linear-gradient(180deg, #fde68a, #c98c2a)',
+          color: '#06120e', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>{I.ball}</div>
+        <div>
+          <div className="p26-display" style={{ fontSize: 22 }}>GOLDEN BOOT</div>
+          <div className="p26-label" style={{ color: 'var(--text-3)' }}>10 points · Tournament top scorer</div>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 8 }}>
+        {TOP_SCORERS.map(p => {
+          const sel = picked === p.name;
+          return (
+            <button key={p.name} onClick={() => onPick(p.name)} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '10px 12px', borderRadius: 10,
+              background: sel ? 'var(--accent-soft)' : 'var(--surface-2)',
+              border: `1px solid ${sel ? 'rgba(34,197,94,0.5)' : 'var(--line)'}`,
+              color: sel ? 'var(--accent)' : 'var(--text)',
+              cursor: 'pointer', fontSize: 13, fontWeight: 500, textAlign: 'left',
+              fontFamily: 'var(--font-sans)',
+            }}>
+              <span>{p.name}</span>
+              <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', letterSpacing: '0.06em' }}>{p.code}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Tiebreaker({ outrights, setOutright }) {
+  return (
+    <div className="p26-card" style={{ padding: 22 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 16 }}>
+        <div style={{
+          width: 44, height: 44, borderRadius: 10, background: 'var(--surface-2)',
+          color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          border: '1px solid var(--line)',
+        }}>=</div>
+        <div>
+          <div className="p26-display" style={{ fontSize: 22 }}>TIEBREAKER</div>
+          <div className="p26-label" style={{ color: 'var(--text-3)' }}>Closest combined Total Goals + Cards wins ties</div>
+        </div>
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <label>
+          <div className="p26-label" style={{ marginBottom: 6 }}>TOTAL GOALS</div>
+          <input className="p26-input" style={{ width: '100%' }} placeholder="e.g. 168"
+            value={outrights.goals || ''} onChange={(e) => setOutright('goals', e.target.value.replace(/[^\d]/g, ''))} />
+        </label>
+        <label>
+          <div className="p26-label" style={{ marginBottom: 6 }}>TOTAL CARDS</div>
+          <input className="p26-input" style={{ width: '100%' }} placeholder="e.g. 240"
+            value={outrights.cards || ''} onChange={(e) => setOutright('cards', e.target.value.replace(/[^\d]/g, ''))} />
+        </label>
+      </div>
+    </div>
+  );
+}
+
+function OutrightsScreen({ onNav, onSignIn, signedIn, outrights, setOutright }) {
+  const podiumTeams = TEAMS.slice(0, 32);
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="outrights" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 12 }}>
+            <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>TOURNAMENT <span style={{ color: 'var(--accent)' }}>OUTRIGHTS</span></h1>
+          </div>
+          <p style={{ color: 'var(--text-2)', fontSize: 14, margin: 0, maxWidth: 640 }}>
+            Big points pay big. Pick your podium and Golden Boot before kick-off — locks at first whistle on Jun 11.
+          </p>
+        </div>
+      </section>
+      <section style={{ padding: '32px 36px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 360px)', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <PodiumPicker title="WINNER"     subtitle="10 points if correct" position="1st" tone="gold"   picked={outrights.winner} options={podiumTeams} onPick={(c) => setOutright('winner', c)} />
+            <PodiumPicker title="RUNNER-UP"  subtitle="5 points if correct"  position="2nd" tone="silver" picked={outrights.second} options={podiumTeams} onPick={(c) => setOutright('second', c)} />
+            <PodiumPicker title="THIRD PLACE" subtitle="3 points if correct" position="3rd" tone="bronze" picked={outrights.third}  options={podiumTeams} onPick={(c) => setOutright('third', c)} />
+            <GoldenBoot picked={outrights.boot} onPick={(p) => setOutright('boot', p)} />
+            <Tiebreaker outrights={outrights} setOutright={setOutright} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="p26-card" style={{ padding: 20 }}>
+              <span className="p26-label">YOUR OUTRIGHTS</span>
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {[
+                  { l: 'Winner', v: outrights.winner, pts: 10 },
+                  { l: 'Runner-up', v: outrights.second, pts: 5 },
+                  { l: 'Third', v: outrights.third, pts: 3 },
+                  { l: 'Golden Boot', v: outrights.boot, pts: 10 },
+                ].map((r, i) => {
+                  const team = TEAMS.find(t => t.code === r.v);
+                  return (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderTop: i ? '1px solid var(--line)' : 'none' }}>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 500 }}>{r.l}</div>
+                        <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{r.pts} pts</div>
+                      </div>
+                      <div>
+                        {r.v ? (team ? <Flag team={team} /> : <span style={{ fontSize: 13, fontWeight: 500 }}>{r.v}</span>) : (<span className="p26-label" style={{ color: 'var(--text-3)' }}>NOT SET</span>)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="p26-card" style={{ padding: 20, background: 'linear-gradient(135deg, rgba(253,230,138,0.05), transparent), var(--surface)' }}>
+              <span className="p26-label" style={{ color: 'var(--gold-2)' }}>POTENTIAL</span>
+              <div className="p26-display p26-gold-text" style={{ fontSize: 44, lineHeight: 1, marginTop: 4 }}>+28 pts</div>
+              <p style={{ fontSize: 12, color: 'var(--text-2)', margin: '8px 0 0', lineHeight: 1.5 }}>
+                Outrights alone could push you up the leaderboard. Cap is 28 from podium + boot.
+              </p>
+            </div>
+            <button className="p26-btn" style={{ padding: 14 }} onClick={onSignIn}>
+              Lock In Outrights {I.arrow}
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============ DASHBOARD ============
+function KPI({ label, value, sub, tone }) {
+  const accent = tone === 'accent' ? 'var(--accent)' : tone === 'warn' ? 'var(--warn)' : 'var(--text)';
+  return (
+    <div className="p26-card" style={{ padding: 20 }}>
+      <span className="p26-label">{label}</span>
+      <div className="p26-display" style={{ fontSize: 38, color: accent, lineHeight: 1, margin: '8px 0 4px' }}>{value}</div>
+      <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{sub}</div>
+    </div>
+  );
+}
+function Reminder({ label, on }) {
+  const [active, setActive] = React.useState(on);
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: 13 }}>
+      <span style={{ color: 'var(--text-2)' }}>{label}</span>
+      <button onClick={() => setActive(!active)} style={{
+        width: 32, height: 18, borderRadius: 999, border: 'none', cursor: 'pointer',
+        background: active ? 'var(--accent)' : 'var(--surface-2)',
+        position: 'relative', transition: 'background .15s',
+      }}>
+        <span style={{ position: 'absolute', top: 2, left: active ? 16 : 2, width: 14, height: 14, borderRadius: 999, background: '#06120e', transition: 'left .15s' }} />
+      </button>
+    </div>
+  );
+}
+function EmptyPicks({ onNav }) {
+  return (
+    <div style={{ padding: '32px 16px', textAlign: 'center', background: 'var(--surface-2)', borderRadius: 12, border: '1px dashed var(--line-2)' }}>
+      <div className="p26-display" style={{ fontSize: 22, margin: '0 0 6px', color: 'var(--text-2)' }}>NO PREDICTIONS YET</div>
+      <p style={{ fontSize: 13, color: 'var(--text-3)', margin: '0 0 16px' }}>Pick scorelines for any group match — you can edit until kick-off.</p>
+      <button className="p26-btn" onClick={() => onNav('group')}>Start with Group A {I.arrow}</button>
+    </div>
+  );
+}
+
+function DashboardScreen({ onNav, onSignIn, signedIn, picks, outrights }) {
+  const filledPicks = Object.keys(picks).length;
+  const filledOutrights = ['winner','second','third','boot'].filter(k => outrights[k]).length;
+  const completion = Math.round(((filledPicks / 48) * 0.7 + (filledOutrights / 4) * 0.3) * 100);
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="dashboard" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <span className="p26-label">WELCOME BACK</span>
+              <h1 className="p26-display" style={{ fontSize: 56, margin: '6px 0 0' }}>HEY <span style={{ color: 'var(--accent)' }}>MARCUS</span></h1>
+            </div>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button className="p26-btn is-ghost is-sm">{I.bell} 2 reminders</button>
+              <button className="p26-btn is-sm" onClick={() => onNav('group')}>Continue Predicting</button>
+            </div>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 24 }}>
+            <KPI label="GLOBAL RANK" value="—" sub="Tournament starts Jun 11" tone="muted" />
+            <KPI label="POINTS"      value="0" sub="No matches played yet" tone="muted" />
+            <KPI label="PROGRESS"    value={`${completion}%`} sub={`${filledPicks}/48 group picks`} tone="accent" />
+            <KPI label="OUTRIGHTS"   value={`${filledOutrights}/4`} sub="Locks at first kick-off" tone={filledOutrights === 4 ? 'accent' : 'warn'} />
+          </div>
+        </div>
+      </section>
+      <section style={{ padding: '0 36px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1.6fr) minmax(0, 1fr)', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="p26-card" style={{ padding: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                <h3 className="p26-display" style={{ fontSize: 22, margin: 0 }}>NEXT UP</h3>
+                <span className="p26-label">DEADLINE COUNTDOWN</span>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+                {[{d:'36',l:'DAYS'},{d:'04',l:'HOURS'},{d:'12',l:'MINS'},{d:'48',l:'SECS'}].map(t => (
+                  <div key={t.l} style={{ background: 'var(--surface-2)', borderRadius: 10, padding: 16, textAlign: 'center' }}>
+                    <div className="p26-display" style={{ fontSize: 38, color: 'var(--accent)', lineHeight: 1 }}>{t.d}</div>
+                    <div className="p26-label" style={{ marginTop: 4 }}>{t.l}</div>
+                  </div>
+                ))}
+              </div>
+              <div style={{ marginTop: 16, padding: 12, background: 'rgba(34,197,94,0.06)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Group stage opens · MEX vs CAN</span>
+                <span style={{ color: 'var(--accent)', fontWeight: 600 }}>Set reminder →</span>
+              </div>
+            </div>
+            <div className="p26-card" style={{ padding: 24 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+                <h3 className="p26-display" style={{ fontSize: 22, margin: 0 }}>YOUR PREDICTIONS</h3>
+                <button className="p26-btn is-ghost is-sm" onClick={() => onNav('group')}>View all →</button>
+              </div>
+              {filledPicks === 0 ? (<EmptyPicks onNav={onNav} />) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {Object.entries(picks).slice(0, 4).map(([fid, p]) => {
+                    const f = GROUP_FIXTURES.find(x => x.id === fid);
+                    if (!f) return null;
+                    return (
+                      <div key={fid} style={{ display: 'grid', gridTemplateColumns: '60px 1fr auto 1fr 80px', alignItems: 'center', gap: 14, padding: '10px 14px', background: 'var(--surface-2)', borderRadius: 10 }}>
+                        <span className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>{f.date}</span>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}><Flag team={f.home} /></div>
+                        <span className="p26-display" style={{ fontSize: 18, color: 'var(--accent)' }}>{p.home}–{p.away}</span>
+                        <Flag team={f.away} />
+                        <span className="p26-label" style={{ textAlign: 'right', color: 'var(--accent)' }}>{I.check} SAVED</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="p26-card" style={{ padding: 22, background: 'linear-gradient(135deg, rgba(253,230,138,0.06), transparent), var(--surface)' }}>
+              <span className="p26-label" style={{ color: 'var(--gold-2)' }}>{I.trophy} CURRENT PRIZE TIER</span>
+              <div className="p26-display p26-gold-text" style={{ fontSize: 38, lineHeight: 1.1, margin: '8px 0' }}>UNRANKED</div>
+              <p style={{ fontSize: 12, color: 'var(--text-2)', margin: '0 0 12px' }}>Ranks unlock when group stage kicks off. £10,000 pot waiting.</p>
+              <button className="p26-btn is-ghost is-sm" style={{ width: '100%' }} onClick={() => onNav('leaderboard')}>See prize tiers</button>
+            </div>
+            <div className="p26-card" style={{ padding: 22 }}>
+              <span className="p26-label">YOUR LEAGUES</span>
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                {[{name:'The Pub Crew',members:14},{name:'Office Footy',members:28}].map(l => (
+                  <div key={l.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: 'var(--surface-2)', borderRadius: 10 }}>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500 }}>{l.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{l.members} members</div>
+                    </div>
+                    <span style={{ color: 'var(--text-3)' }}>{I.chevron}</span>
+                  </div>
+                ))}
+              </div>
+              <button className="p26-btn is-outline is-sm" style={{ width: '100%', marginTop: 12 }} onClick={() => onNav('leagues')}>{I.plus} New League</button>
+            </div>
+            <div className="p26-card" style={{ padding: 22 }}>
+              <span className="p26-label">{I.bell} REMINDERS</span>
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <Reminder label="Match-day deadlines" on />
+                <Reminder label="Knockout round unlocks" on />
+                <Reminder label="Post-match scoring" on={false} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============ LEADERBOARD ============
+function LeaderboardScreen({ onNav, onSignIn, signedIn }) {
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="leaderboard" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12, flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>LEADER<span style={{ color: 'var(--accent)' }}>BOARD</span></h1>
+              <p style={{ color: 'var(--text-2)', fontSize: 14, margin: '8px 0 0' }}>Live rank, points, and prize position. Goes live Jun 11.</p>
+            </div>
+            <div style={{ textAlign: 'right' }}>
+              <span className="p26-label">PRIZE POOL</span>
+              <div className="p26-display p26-gold-text" style={{ fontSize: 44, lineHeight: 1 }}>£10,000</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section style={{ padding: '24px 36px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 320px)', gap: 24 }}>
+          <div className="p26-card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div style={{ padding: '16px 22px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <button className="p26-tab is-active" style={{ padding: '8px 12px', fontSize: 13 }}>Global</button>
+                <button className="p26-tab" style={{ padding: '8px 12px', fontSize: 13 }}>Friends</button>
+                <button className="p26-tab" style={{ padding: '8px 12px', fontSize: 13 }}>My League</button>
+              </div>
+              <div style={{ flex: 1 }} />
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: 12, top: 11, color: 'var(--text-3)' }}>{I.search}</span>
+                <input className="p26-input" placeholder="Search players" style={{ paddingLeft: 36, width: 220 }} />
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, borderBottom: '1px solid var(--line)' }}>
+              {LEADERBOARD.slice(0, 3).map((p, i) => (
+                <div key={p.handle} style={{
+                  padding: '20px 22px',
+                  borderRight: i < 2 ? '1px solid var(--line)' : 'none',
+                  background: i === 0 ? 'linear-gradient(180deg, rgba(253,230,138,0.06), transparent)'
+                            : i === 1 ? 'linear-gradient(180deg, rgba(214,221,226,0.04), transparent)'
+                            : 'linear-gradient(180deg, rgba(216,149,107,0.04), transparent)',
+                }}>
+                  <span className="p26-label" style={{ color: ['var(--gold-2)', 'var(--silver)', 'var(--bronze)'][i] }}>
+                    {['1ST · £5,000', '2ND · £2,000', '3RD · £1,000'][i]}
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginTop: 12 }}>
+                    <div style={{ width: 44, height: 44, borderRadius: 999, background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 18 }}>{p.avatar}</div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 14 }}>{p.name}</div>
+                      <div className="p26-mono" style={{ fontSize: 11, color: 'var(--text-3)' }}>{p.handle} · {p.country}</div>
+                    </div>
+                  </div>
+                  <div className="p26-display" style={{ fontSize: 32, marginTop: 12, lineHeight: 1 }}>—</div>
+                  <div className="p26-label">PTS · UNRANKED</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead style={{ background: 'var(--surface-2)' }}>
+                  <tr style={{ color: 'var(--text-3)' }}>
+                    <th style={{ textAlign: 'left',  padding: '12px 22px', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>RANK</th>
+                    <th style={{ textAlign: 'left',  padding: '12px 8px',  fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>PLAYER</th>
+                    <th style={{ textAlign: 'right', padding: '12px 8px',  fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>PROGRESS</th>
+                    <th style={{ textAlign: 'right', padding: '12px 8px',  fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>POINTS</th>
+                    <th style={{ textAlign: 'right', padding: '12px 22px', fontSize: 10, fontWeight: 600, letterSpacing: '0.12em' }}>PRIZE</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {LEADERBOARD.map((p, i) => (
+                    <tr key={p.handle} style={{ borderTop: '1px solid var(--line)', background: p.handle === '@marcob' ? 'rgba(34,197,94,0.04)' : 'transparent' }}>
+                      <td style={{ padding: '14px 22px' }}>
+                        <span className="p26-display" style={{ fontSize: 20, color: i === 0 ? 'var(--gold-2)' : i === 1 ? 'var(--silver)' : i === 2 ? 'var(--bronze)' : 'var(--text-2)' }}>#{p.rank}</span>
+                      </td>
+                      <td style={{ padding: '14px 8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ width: 30, height: 30, borderRadius: 999, background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'var(--font-display)', fontStyle: 'italic', fontSize: 13 }}>{p.avatar}</div>
+                          <div>
+                            <div style={{ fontWeight: 500 }}>{p.name}</div>
+                            <div className="p26-mono" style={{ fontSize: 10, color: 'var(--text-3)' }}>{p.country}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '14px 8px', textAlign: 'right' }}>
+                        <span style={{ display: 'inline-block', width: 80, height: 4, background: 'var(--surface-2)', borderRadius: 999, position: 'relative', verticalAlign: 'middle' }}>
+                          <span style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${20 + i * 7}%`, background: 'var(--accent)', borderRadius: 999 }} />
+                        </span>
+                      </td>
+                      <td style={{ padding: '14px 8px', textAlign: 'right' }}>
+                        <span className="p26-mono" style={{ color: 'var(--text-3)' }}>—</span>
+                      </td>
+                      <td style={{ padding: '14px 22px', textAlign: 'right' }}>
+                        {i < 3 ? (<Pill tone={i === 0 ? 'accent' : 'muted'}>{['£5,000','£2,000','£1,000'][i]}</Pill>)
+                          : i < 10 ? (<Pill tone="muted">£285</Pill>)
+                          : (<span className="p26-label" style={{ color: 'var(--text-3)' }}>—</span>)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div style={{ padding: '12px 22px', borderTop: '1px solid var(--line)', textAlign: 'center', color: 'var(--text-3)', fontSize: 12 }}>
+              332,481 players · Showing top 10
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div className="p26-card" style={{ padding: 22 }}>
+              <h3 className="p26-display" style={{ fontSize: 22, margin: '0 0 14px' }}>PRIZE TIERS</h3>
+              {PRIZE_TIERS.map((t, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderTop: i ? '1px solid var(--line)' : 'none' }}>
+                  <span style={{ fontSize: 13, fontWeight: 500 }}>{t.rank}</span>
+                  <span className="p26-mono" style={{ fontWeight: 600 }}>{t.amount}</span>
+                </div>
+              ))}
+            </div>
+            <div className="p26-card" style={{ padding: 22 }}>
+              <span className="p26-label">SCORING RULES</span>
+              <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10, fontSize: 13 }}>
+                {[['Exact score','+3 pts'],['Right result (W/D/L)','+1 pt'],['Tournament winner','+10 pts'],['Runner-up / 3rd','+5 / +3 pts'],['Golden Boot','+10 pts']].map(r => (
+                  <div key={r[0]} style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--text-2)' }}>{r[0]}</span>
+                    <span className="p26-mono" style={{ color: 'var(--accent)', fontWeight: 600 }}>{r[1]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ============ LEAGUES ============
+function LeagueCard({ league }) {
+  return (
+    <div className="p26-card" style={{ padding: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+        <div>
+          <h3 className="p26-display" style={{ fontSize: 24, margin: 0 }}>{league.name}</h3>
+          <span className="p26-label" style={{ color: 'var(--text-3)' }}>CODE · {league.code}</span>
+        </div>
+        {league.owner && <Pill>OWNER</Pill>}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
+        {[1,2,3,4,5].map(i => (
+          <div key={i} style={{
+            width: 28, height: 28, borderRadius: 999, background: 'var(--surface-2)',
+            border: '2px solid var(--surface)', marginLeft: i > 1 ? -10 : 0,
+            fontFamily: 'var(--font-display)', fontStyle: 'italic',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11,
+          }}>{['M','A','S','C','Y'][i-1]}</div>
+        ))}
+        <span style={{ fontSize: 12, color: 'var(--text-2)', marginLeft: 8 }}>{league.members} members</span>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 0', borderTop: '1px solid var(--line)' }}>
+        <div>
+          <div className="p26-label">YOUR RANK</div>
+          <div className="p26-display" style={{ fontSize: 22, color: 'var(--accent)' }}>—</div>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="p26-btn is-ghost is-sm">{I.copy} Copy link</button>
+          <button className="p26-btn is-outline is-sm">View →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CreateLeagueModal({ onClose }) {
+  return (
+    <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100 }}>
+      <div onClick={(e) => e.stopPropagation()} className="p26-card" style={{ width: 460, maxWidth: 'calc(100% - 32px)', padding: 28 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+          <h2 className="p26-display" style={{ fontSize: 28, margin: 0 }}>CREATE LEAGUE</h2>
+          <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-3)', cursor: 'pointer' }}>{I.close}</button>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <label>
+            <div className="p26-label" style={{ marginBottom: 6 }}>LEAGUE NAME</div>
+            <input className="p26-input" placeholder="e.g. The Pub Crew" style={{ width: '100%' }} />
+          </label>
+          <label>
+            <div className="p26-label" style={{ marginBottom: 6 }}>VISIBILITY</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="p26-btn is-outline is-sm" style={{ flex: 1 }}>{I.lock} Private</button>
+              <button className="p26-btn is-ghost is-sm" style={{ flex: 1 }}>Public</button>
+            </div>
+          </label>
+          <div style={{ padding: 12, background: 'var(--surface-2)', borderRadius: 10, fontSize: 12, color: 'var(--text-2)', lineHeight: 1.5 }}>
+            You'll get a shareable invite link. Members can join until first kick-off.
+          </div>
+          <button className="p26-btn" style={{ padding: 12 }}>Create & Get Invite Link {I.arrow}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LeaguesScreen({ onNav, onSignIn, signedIn }) {
+  const [showCreate, setShowCreate] = React.useState(false);
+  return (
+    <div className="p26-screen" style={{ background: 'var(--bg)', minHeight: '100%' }}>
+      <NavBar current="leagues" onNav={onNav} signedIn={signedIn} onSignIn={onSignIn} />
+      <section style={{ padding: '36px 36px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 12 }}>
+          <div>
+            <h1 className="p26-display" style={{ fontSize: 56, margin: 0 }}>PRIVATE <span style={{ color: 'var(--accent)' }}>LEAGUES</span></h1>
+            <p style={{ color: 'var(--text-2)', fontSize: 14, margin: '8px 0 0' }}>Build a side-pot with friends, family, or the office. No limits.</p>
+          </div>
+          <button className="p26-btn" onClick={() => setShowCreate(true)}>{I.plus} New League</button>
+        </div>
+      </section>
+      <section style={{ padding: '32px 36px 60px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 16 }}>
+          {[
+            { name: 'The Pub Crew', code: 'PUB-A4F7', members: 14, you: 1, owner: true },
+            { name: 'Office Footy', code: 'OFC-B82K', members: 28, you: 1, owner: false },
+            { name: 'WhatsApp Group of Doom', code: 'WGD-9X2E', members: 7, you: 1, owner: false },
+          ].map(l => (<LeagueCard key={l.code} league={l} />))}
+          <div style={{ background: 'var(--surface)', borderRadius: 16, border: '1px dashed var(--line-2)', padding: 28, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', minHeight: 220 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: 'var(--surface-2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent)' }}>{I.users}</div>
+            <h3 className="p26-display" style={{ fontSize: 20, margin: '14px 0 6px' }}>JOIN A LEAGUE</h3>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', margin: '0 0 14px' }}>Got an invite code? Drop it here.</p>
+            <input className="p26-input" placeholder="ABC-123" style={{ width: 180, textAlign: 'center', textTransform: 'uppercase', fontFamily: 'var(--font-mono)' }} />
+          </div>
+        </div>
+      </section>
+      {showCreate && <CreateLeagueModal onClose={() => setShowCreate(false)} />}
+    </div>
+  );
+}
+
+// ============ SIGN-UP MODAL ============
+function SignUpModal({ onClose, onSignUp, picks, outrights }) {
+  const filledPicks = Object.keys(picks).length;
+  const filledOutrights = ['winner','second','third','boot'].filter(k => outrights[k]).length;
+  return (
+    <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: 16 }}>
+      <div onClick={(e) => e.stopPropagation()} className="p26-card" style={{ width: 480, maxWidth: '100%', padding: 32 }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <Pill icon>LOCK IN YOUR PICKS</Pill>
+          <h2 className="p26-display" style={{ fontSize: 36, margin: '14px 0 8px' }}>
+            ONE MORE <span style={{ color: 'var(--accent)' }}>STEP</span>
+          </h2>
+          <p style={{ color: 'var(--text-2)', fontSize: 13, margin: 0 }}>
+            Sign up to save your {filledPicks} picks{filledOutrights > 0 && ` + ${filledOutrights} outrights`}, get reminders, and join the leaderboard.
+          </p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <button className="p26-btn is-ghost" style={{ padding: 12, justifyContent: 'flex-start', paddingLeft: 18 }}>
+            <span style={{ width: 16 }}>G</span> Continue with Google
+          </button>
+          <button className="p26-btn is-ghost" style={{ padding: 12, justifyContent: 'flex-start', paddingLeft: 18 }}>
+            <span style={{ width: 16 }}></span> Continue with Apple
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '6px 0', color: 'var(--text-3)', fontSize: 11 }}>
+            <span style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+            <span>OR EMAIL</span>
+            <span style={{ flex: 1, height: 1, background: 'var(--line)' }} />
+          </div>
+          <input className="p26-input" placeholder="you@email.com" />
+          <button className="p26-btn" style={{ padding: 12 }} onClick={onSignUp}>Lock In My Predictions {I.arrow}</button>
+        </div>
+        <p style={{ fontSize: 11, color: 'var(--text-3)', textAlign: 'center', margin: '18px 0 0', lineHeight: 1.5 }}>
+          By continuing you agree to our Terms. We'll only message you about deadlines, scoring, and the prize draw.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ============ APP SHELL ============
+function App() {
+  const [screen, setScreen] = React.useState('landing');
+  const [signedIn, setSignedIn] = React.useState(false);
+  const [showSignUp, setShowSignUp] = React.useState(false);
+  const [picks, setPicks] = React.useState({
+    G1: { home: 1, away: 1 },
+    G2: { home: 2, away: 0 },
+    G7: { home: 0, away: 1 },
+    G13: { home: 1, away: 2 },
+  });
+  const [outrights, setOutrights] = React.useState({
+    winner: 'ARG', second: 'FRA', third: 'ENG',
+    boot: 'Kylian Mbappé', goals: '168', cards: '240',
+  });
+
+  function setPick(fid, home, away) {
+    setPicks(p => ({ ...p, [fid]: { home: parseInt(home, 10) || 0, away: parseInt(away, 10) || 0 } }));
+  }
+  function setOutright(k, v) { setOutrights(o => ({ ...o, [k]: v })); }
+  function onSignIn() { setShowSignUp(true); }
+  function onSignUp() { setSignedIn(true); setShowSignUp(false); setScreen('dashboard'); }
+  function onNav(s) { setScreen(s); window.scrollTo({ top: 0, behavior: 'instant' }); }
+
+  const props = { onNav, onSignIn, signedIn, picks, setPick, outrights, setOutright };
+
+  let content;
+  switch (screen) {
+    case 'group':       content = <GroupStageScreen  {...props} />; break;
+    case 'bracket':     content = <BracketScreen     {...props} />; break;
+    case 'outrights':   content = <OutrightsScreen   {...props} />; break;
+    case 'dashboard':   content = <DashboardScreen   {...props} signedIn={true} />; break;
+    case 'leaderboard': content = <LeaderboardScreen {...props} />; break;
+    case 'leagues':     content = <LeaguesScreen     {...props} />; break;
+    default:            content = <LandingScreen     {...props} />;
+  }
+
+  return (
+    <div style={{ minHeight: '100%', position: 'relative' }}>
+      {content}
+      {showSignUp && (
+        <SignUpModal onClose={() => setShowSignUp(false)} onSignUp={onSignUp} picks={picks} outrights={outrights} />
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
