@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #f9f0ff;
+  --navy: #101722;
+  --breeze: #4541fe;
+  --neon: #fe0e83;
+  --lavender: #d9c6ff;
+  --lavender-light: #ece4fe;
+  --lavender-dark: #7733ff;
+  --mint: #0ac9c0;
+  --neon-blue: #3ff5ff;
+  --green: #33c458;
+  --blue: #0073ff;
+  --gray: #e6e6eb;
+}
+
+body {
+  background-color: var(--cream);
+  color: var(--navy);
+  font-family: Inter, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

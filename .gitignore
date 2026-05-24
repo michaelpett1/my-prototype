@@ -36,6 +36,13 @@ yarn-error.log*
 # vercel
 .vercel
 
+# playspace (scratch experiments, never committed)
+/playspace/*
+!/playspace/.gitkeep
+
+# per-user Claude config
+CLAUDE.local.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
