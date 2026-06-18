@@ -220,11 +220,14 @@
         <p class="text-white/50 text-sm">Earn chips. Win real stuff. Climb the ranks.</p>
       </div>
 
-      <div class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-br from-amber-500/25 to-pink-600/25 border border-amber-300/30">
-        <div class="absolute -right-3 -top-3 text-7xl opacity-25">📱</div>
-        <p class="text-[11px] uppercase tracking-wider text-amber-200 font-bold">Grand prize wheel</p>
-        <p class="font-display font-extrabold text-lg mt-0.5">Spin to win an iPhone 17</p>
-        <p class="text-white/65 text-xs mt-1">Earn a free wheel spin at every level you reach.</p>
+      <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-fuchsia-600/45 via-amber-500/30 to-cyan-500/30 border border-amber-300/40 shadow-xl shadow-fuchsia-900/30">
+        <div class="absolute -right-2 -top-3 text-6xl opacity-30 rotate-12">✈️</div>
+        <div class="absolute right-12 bottom-1 text-5xl opacity-20">🎰</div>
+        <div class="absolute right-1 bottom-2 text-4xl opacity-20">🌴</div>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-amber-200 bg-amber-500/25 px-2.5 py-1 rounded-full">★ Grand prize</span>
+        <p class="font-display font-extrabold text-2xl mt-2 leading-tight">Win a trip to Vegas ✈️</p>
+        <p class="text-white/80 text-sm mt-1">Flights + 5 nights on the Strip, for two.</p>
+        <p class="text-amber-200/90 text-xs mt-2.5 font-semibold">Every level you hit: keep your pack — or gamble it on the wheel for Vegas.</p>
       </div>
 
       <div id="ladder" class="space-y-3"></div>
@@ -355,11 +358,37 @@
     </div>
   </div>
 
+  <!-- ===== Level-up choice overlay (pack vs gamble for Vegas) ===== -->
+  <div id="choiceOverlay" class="hidden absolute inset-0 z-40 bg-black/75 flex items-end">
+    <div class="w-full bg-cosmo-deep rounded-t-3xl p-5 pb-8 fadein border-t border-white/10">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <p class="text-center text-[11px] uppercase tracking-widest text-amber-200 font-bold">🎉 Level <span id="chLvl">1</span> reached</p>
+      <p class="text-center font-display font-extrabold text-xl mt-1"><span id="chName">Cosmo Cadet</span> reward</p>
+      <p class="text-center text-white/55 text-sm mt-1">Take the pack — or gamble it for Vegas. One or the other.</p>
+      <div class="grid grid-cols-2 gap-3 mt-4">
+        <button onclick="choosePack()" class="glass rounded-2xl p-4 text-left active:scale-95 transition">
+          <div class="text-3xl">🎁</div>
+          <p class="font-bold text-sm mt-2">Take the pack</p>
+          <p class="text-white/45 text-[11px] mt-1 leading-snug" id="chItems">Items…</p>
+          <p class="text-emerald-300 text-[11px] font-bold mt-2">✓ Guaranteed</p>
+        </button>
+        <button onclick="chooseWheel()" class="relative overflow-hidden rounded-2xl p-4 text-left active:scale-95 transition bg-gradient-to-br from-fuchsia-600/50 to-amber-500/40 border border-amber-300/50">
+          <div class="absolute -right-2 -top-2 text-4xl opacity-25 rotate-12">✈️</div>
+          <div class="text-3xl">🎡</div>
+          <p class="font-bold text-sm mt-2">Gamble for Vegas</p>
+          <p class="text-white/65 text-[11px] mt-1 leading-snug">Spin to win a trip to Las Vegas.</p>
+          <p class="text-amber-200 text-[11px] font-bold mt-2">★ Big risk, big prize</p>
+        </button>
+      </div>
+      <button onclick="closeChoice()" class="w-full text-white/40 text-sm py-3 mt-1">Decide later</button>
+    </div>
+  </div>
+
   <!-- ===== Wheel overlay ===== -->
-  <div id="wheelOverlay" class="hidden absolute inset-0 z-30 bg-cosmo-ink flex flex-col items-center justify-center px-6">
+  <div id="wheelOverlay" class="hidden absolute inset-0 z-40 bg-cosmo-ink flex flex-col items-center justify-center px-6">
     <button onclick="document.getElementById('wheelOverlay').classList.add('hidden')" class="absolute top-12 left-5 glass w-9 h-9 rounded-full grid place-items-center">‹</button>
-    <p class="font-display font-extrabold text-xl mb-1">Spin the Wheel</p>
-    <p class="text-white/50 text-sm mb-6">Level reward · one free spin</p>
+    <p class="font-display font-extrabold text-xl mb-1">Spin for Vegas ✈️</p>
+    <p class="text-white/50 text-sm mb-6 text-center">You gave up your pack — land Vegas to win the trip!</p>
     <div class="relative w-64 h-64 mb-8">
       <div class="absolute -top-2 left-1/2 -translate-x-1/2 text-2xl z-10">🔻</div>
       <div id="wheel" class="wheel w-full h-full rounded-full border-4 border-white/20"
@@ -429,13 +458,13 @@ const CONVERT = [
   { game:'Slingo Cash Eruption',         provider:'Gaming Realms',  op:'StarSpins',  bonus:'100% up to £50' },
 ];
 
-const DEFAULT = { chips:238, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], offersClaimed:0 };
+const DEFAULT = { chips:248, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0 };
 let S = load();
 let activeGame = 0, lbGame = 2;
 
 function load(){ try { return Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('cosmo')||'{}')); } catch(e){ return {...DEFAULT}; } }
 function save(){ localStorage.setItem('cosmo', JSON.stringify(S)); }
-function resetDemo(){ S = {...DEFAULT, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[]}; save(); renderAll(); toast('Demo reset ↺'); }
+function resetDemo(){ S = {...DEFAULT, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0}; save(); renderAll(); toast('Demo reset ↺'); }
 
 // ---------- Helpers ----------
 function reachedLevel(){ let r=null; for(const l of LEVELS){ if(S.chips>=l.cost) r=l; } return r; }
@@ -494,7 +523,9 @@ function renderLadder(){
     const reached = S.chips>=l.cost;
     const prev = LEVELS[l.n-2]?LEVELS[l.n-2].cost:0;
     const pct = Math.max(0,Math.min(100, Math.round(((S.chips-prev)/(l.cost-prev))*100)));
-    const wheelDone = S.wheelLevels.includes(l.n);
+    const tookPack = (S.claimedPacks||[]).includes(l.n);
+    const spun = (S.wheelLevels||[]).includes(l.n);
+    const dec = tookPack || spun;
     return `<div class="glass rounded-3xl p-4 ${reached?'border-amber-300/40':''}">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -505,7 +536,9 @@ function renderLadder(){
           </div>
         </div>
         ${reached
-          ? `<button onclick="openWheel(${l.n})" class="text-xs font-bold px-3 py-2 rounded-xl ${wheelDone?'bg-white/10 text-white/40':'bg-gradient-to-r from-amber-400 to-fuchsia-500'}">${wheelDone?'Spun ✓':'Spin 🎡'}</button>`
+          ? (dec
+              ? `<span class="text-xs font-bold px-3 py-2 rounded-xl bg-white/10 text-white/40">${tookPack?'Pack 📦':'Vegas 🎡'} ✓</span>`
+              : `<button onclick="openChoice(${l.n})" class="text-xs font-bold px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-fuchsia-500">Claim 🎁</button>`)
           : `<span class="text-[11px] text-white/40">${pct}%</span>`}
       </div>
       <p class="text-white/45 text-[11px] mt-2">${l.items}</p>
@@ -555,6 +588,7 @@ function renderOffers(){
     </div>`).join('');
 }
 function openConvert(idx){
+  if(!document.getElementById('choiceOverlay').classList.contains('hidden')) return;
   const c = CONVERT[idx] || CONVERT[2];
   document.getElementById('cvGame').textContent = c.game;
   document.getElementById('cvOp').textContent = c.op;
@@ -587,6 +621,7 @@ function renderAll(){ renderChips(); renderStreak(); renderLevel(); renderSpins(
 // ---------- Actions ----------
 function claimDaily(){
   if(S.claimed) return;
+  const prev = S.chips;
   let gain = 2; let msg = '+2 chips claimed';
   if(S.streak+1===3){ gain+=1; }
   if(S.streak+1===7){ gain+=3; msg='+2 chips · 7-day bonus +3!'; }
@@ -594,6 +629,7 @@ function claimDaily(){
   document.getElementById('chipPill').classList.add('pop');
   save(); renderAll(); toast('🪙 '+msg);
   setTimeout(()=>document.getElementById('chipPill').classList.remove('pop'),400);
+  maybeLevelUp(prev);
 }
 
 function openGame(id){
@@ -642,7 +678,7 @@ function spin(){
   });
 }
 function finishSpin(result){
-  const id=activeGame; let chipGain=1, msg='+1 chip', rankJump=2;
+  const id=activeGame; const prevChips=S.chips; let chipGain=1, msg='+1 chip', rankJump=2;
   const allSame=result[0]===result[1]&&result[1]===result[2];
   const twoSame=result[0]===result[1]||result[1]===result[2]||result[0]===result[2];
   if(allSame){ chipGain=15; rankJump=40; msg='🎉 JACKPOT! +15 chips · big leaderboard jump!'; }
@@ -660,6 +696,7 @@ function finishSpin(result){
   // Conversion moment: strike while engagement is hot (big win, or out of free spins)
   if(allSame){ setTimeout(()=>openConvert(id),1900); }
   else if(S.spins[id]===0){ setTimeout(()=>openConvert(id),2100); }
+  maybeLevelUp(prevChips);
 }
 
 // ---------- Wheel ----------
@@ -675,17 +712,42 @@ function openWheel(lvl){
 }
 function spinWheel(){
   if(S.wheelLevels.includes(wheelLevel)) return;
-  const prizes=['+50 chips','+20 chips','Bonus spins ×5','+100 chips','Mystery box','iPhone 17 entry'];
+  const prizes=['Trip to Vegas ✈️','+100 chips','Bonus spins ×10','+50 chips','Mystery box','+20 chips'];
   const idx=Math.floor(Math.random()*6);
   const deg=360*5 + idx*60 + 30;
   document.getElementById('wheel').style.transform=`rotate(${deg}deg)`;
   document.getElementById('wheelBtn').disabled=true;
   setTimeout(()=>{
-    document.getElementById('wheelMsg').textContent='🎉 '+prizes[idx]+'!';
+    document.getElementById('wheelMsg').textContent=(idx===0?'✈️ JACKPOT — ':'🎉 ')+prizes[idx]+'!';
     if(prizes[idx].includes('chips')){ S.chips+=parseInt(prizes[idx].replace(/\D/g,'')); }
     S.wheelLevels.push(wheelLevel); save(); renderAll(); renderChips();
   },4200);
 }
+
+// ---------- Level-up choice: keep the pack, or gamble it for Vegas ----------
+let choiceLevel = null;
+function decided(n){ return (S.claimedPacks||[]).includes(n) || (S.wheelLevels||[]).includes(n); }
+function maybeLevelUp(prev){
+  for(const l of LEVELS){
+    if(prev < l.cost && S.chips >= l.cost && !decided(l.n)){ setTimeout(()=>openChoice(l.n), 650); break; }
+  }
+}
+function openChoice(lvl){
+  choiceLevel = lvl; const l = LEVELS[lvl-1];
+  document.getElementById('chLvl').textContent = l.n;
+  document.getElementById('chName').textContent = l.name;
+  document.getElementById('chItems').textContent = l.items;
+  document.getElementById('choiceOverlay').classList.remove('hidden');
+}
+function closeChoice(){ document.getElementById('choiceOverlay').classList.add('hidden'); }
+function choosePack(){
+  if(choiceLevel==null) return; const l = LEVELS[choiceLevel-1];
+  S.claimedPacks = S.claimedPacks||[];
+  if(!S.claimedPacks.includes(choiceLevel)) S.claimedPacks.push(choiceLevel);
+  closeChoice(); save(); renderAll();
+  toast('📦 '+l.name+' Pack — on its way!');
+}
+function chooseWheel(){ closeChoice(); openWheel(choiceLevel); }
 
 // ---------- Init ----------
 renderAll();
