@@ -220,6 +220,12 @@
       </div>
       <div id="gameGrid" class="grid grid-cols-2 gap-3"></div>
       <p class="text-center text-white/30 text-xs pt-2">Every spin earns chips for your rewards — win or lose.</p>
+
+      <div class="pt-3 mt-1 border-t border-white/10">
+        <h2 class="font-display font-extrabold text-xl">Free to play</h2>
+        <p class="text-white/45 text-sm">More slots, free forever — just for fun.</p>
+      </div>
+      <div id="catalogue" class="space-y-5"></div>
     </section>
 
     <!-- ============ REWARDS ============ -->
@@ -340,9 +346,9 @@
 
     <div class="flex-1 px-6 flex flex-col justify-center">
       <div class="text-center mb-4">
-        <p class="text-white/50 text-xs uppercase tracking-wider">Playing for</p>
+        <p id="gPrizeLabel" class="text-white/50 text-xs uppercase tracking-wider">Playing for</p>
         <p id="gPrize" class="font-display font-extrabold text-3xl text-emerald-300">£1,000</p>
-        <p class="text-white/60 text-sm mt-1">You're <b id="gRank" class="text-white">#128</b> today</p>
+        <p id="gRankLine" class="text-white/60 text-sm mt-1">You're <b id="gRank" class="text-white">#128</b> today</p>
       </div>
 
       <div class="bg-gradient-to-b from-violet-900/60 to-fuchsia-900/30 rounded-3xl p-4 border border-fuchsia-400/20">
@@ -356,14 +362,15 @@
 
       <div class="flex items-center justify-between mt-5">
         <div class="text-sm">
-          <p class="text-white/45 text-xs">Free spins left</p>
-          <p class="font-bold text-lg"><span id="gSpins">10</span> <span class="text-white/40 text-sm">/ 10</span></p>
+          <p id="gSpinsLabel" class="text-white/45 text-xs">Free spins left</p>
+          <p class="font-bold text-lg"><span id="gSpins">10</span> <span id="gSpinsMax" class="text-white/40 text-sm">/ 10</span></p>
         </div>
         <button id="spinBtn" onclick="spin()" class="bg-gradient-to-r from-amber-400 to-fuchsia-500 text-white font-extrabold text-lg px-10 py-4 rounded-3xl shadow-xl shadow-fuchsia-600/40 active:scale-95 transition disabled:opacity-40 disabled:grayscale">
           SPIN
         </button>
       </div>
-      <p class="text-center text-white/40 text-xs mt-4">Match 3 to climb the leaderboard · every spin earns chips</p>
+      <button id="nextBtn" class="hidden w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-extrabold py-3.5 rounded-2xl mt-4 active:scale-95 transition">Next →</button>
+      <p id="gHint" class="text-center text-white/40 text-xs mt-4">Match 3 to climb the leaderboard · every spin earns chips</p>
     </div>
   </div>
 
@@ -466,10 +473,30 @@ const CONVERT = [
   { game:"Tut's Treasure Tower",         provider:'Pragmatic Play', op:'RoyalReels', bonus:'200 spins on first deposit' },
   { game:'Slingo Cash Eruption',         provider:'Gaming Realms',  op:'StarSpins',  bonus:'100% up to £50' },
 ];
+// Free-to-play slots catalogue (below Cosmo Spins) — real titles, free-for-fun
+const CATALOGUE = [
+  { section:'Best New Slots', games:[
+    { title:"Huff N' Even More Puff Grand", provider:'Light & Wonder', emoji:'☁️', grad:'from-sky-500 to-indigo-700' },
+    { title:'Zeus vs Hades — Gods of War',  provider:'Pragmatic Play', emoji:'⚡', grad:'from-orange-500 to-red-700' },
+  ]},
+  { section:'Bronze Medal Games', games:[
+    { title:"Tut's Treasure Tower",   provider:'Pragmatic Play', emoji:'🪙', grad:'from-amber-600 to-rose-700' },
+    { title:'4 Supercharged Clovers', provider:'Playson',        emoji:'🍀', grad:'from-fuchsia-500 to-purple-700' },
+  ]},
+  { section:'Gold Medal Games', games:[
+    { title:"Huff N' More Puff", provider:'Light & Wonder', emoji:'🐷', grad:'from-emerald-500 to-green-700' },
+    { title:'Le Fisherman',      provider:'Hacksaw Gaming', emoji:'🎣', grad:'from-teal-500 to-cyan-700' },
+  ]},
+  { section:'Highest Rated', games:[
+    { title:'Jin Ji Bao Xi Endless Treasure', provider:'Light & Wonder', emoji:'🧧', grad:'from-red-600 to-rose-800' },
+    { title:'Slingo Cash Eruption',           provider:'Gaming Realms',  emoji:'🌋', grad:'from-orange-500 to-amber-700' },
+  ]},
+];
+const FREE = CATALOGUE.flatMap(s=>s.games);
 
 const DEFAULT = { chips:248, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0 };
 let S = load();
-let activeGame = 0, lbGame = 2;
+let activeGame = 0, lbGame = 2, freePlay = false;
 
 function load(){ try { return Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('cosmo')||'{}')); } catch(e){ return {...DEFAULT}; } }
 function save(){ localStorage.setItem('cosmo', JSON.stringify(S)); }
@@ -639,19 +666,52 @@ function claimDaily(){
 }
 
 function openGame(id){
-  activeGame=id; const g=GAMES[id];
+  freePlay=false; activeGame=id; const g=GAMES[id];
   document.getElementById('gName').textContent=g.name;
-  document.getElementById('gPrize').textContent=g.prize;
+  document.getElementById('gPrizeLabel').textContent='Playing for';
+  const gp=document.getElementById('gPrize'); gp.textContent=g.prize; gp.className='font-display font-extrabold text-3xl text-emerald-300';
+  document.getElementById('gRankLine').style.display='';
   document.getElementById('gRank').textContent='#'+S.ranks[id];
+  document.getElementById('gSpinsLabel').textContent='Free spins left';
   document.getElementById('gSpins').textContent=S.spins[id];
-  document.getElementById('gMsg').textContent='';
+  document.getElementById('gSpinsMax').style.display='';
+  document.getElementById('gHint').textContent='Match 3 to climb the leaderboard · every spin earns chips';
+  document.getElementById('gMsg').textContent = S.spins[id]<=0 ? 'No spins left here — jump to your next game!' : '';
   setReels([SYMBOLS[id%8],SYMBOLS[(id+2)%8],SYMBOLS[(id+4)%8]]);
-  document.getElementById('spinBtn').disabled = S.spins[id]<=0;
-  if(S.spins[id]<=0) document.getElementById('gMsg').textContent='No spins left — back tomorrow!';
+  updateSpinUI(id);
   renderChips();
   document.getElementById('gameOverlay').classList.remove('hidden');
 }
-function closeGame(){ document.getElementById('gameOverlay').classList.add('hidden'); renderAll(); }
+function closeGame(){ document.getElementById('gameOverlay').classList.add('hidden'); freePlay=false; renderAll(); }
+function nextGameWithSpins(id){ for(let i=1;i<=GAMES.length;i++){ const j=(id+i)%GAMES.length; if(S.spins[j]>0) return j; } return null; }
+function updateSpinUI(id){
+  const out = S.spins[id]<=0;
+  document.getElementById('spinBtn').disabled = out;
+  const nb=document.getElementById('nextBtn');
+  if(out){
+    const nxt=nextGameWithSpins(id);
+    if(nxt!==null){ nb.textContent='Next: '+GAMES[nxt].name+' →'; nb.onclick=()=>openGame(nxt); }
+    else { nb.textContent='Out of free spins — try a free slot →'; nb.onclick=()=>{ closeGame(); go('play'); }; }
+    nb.classList.remove('hidden');
+  } else { nb.classList.add('hidden'); }
+}
+function openFreeGame(idx){
+  freePlay=true; const g=FREE[idx];
+  document.getElementById('gName').textContent=g.title;
+  document.getElementById('gPrizeLabel').textContent='Free to play';
+  const gp=document.getElementById('gPrize'); gp.textContent='Just for fun 🎉'; gp.className='font-display font-extrabold text-2xl text-fuchsia-300';
+  document.getElementById('gRankLine').style.display='none';
+  document.getElementById('gSpinsLabel').textContent='Spins';
+  document.getElementById('gSpins').textContent='∞';
+  document.getElementById('gSpinsMax').style.display='none';
+  document.getElementById('gHint').textContent='Free to play · no limits · just for fun';
+  document.getElementById('nextBtn').classList.add('hidden');
+  document.getElementById('gMsg').textContent='';
+  document.getElementById('spinBtn').disabled=false;
+  setReels([g.emoji,g.emoji,g.emoji]);
+  document.getElementById('gChips').textContent=S.chips;
+  document.getElementById('gameOverlay').classList.remove('hidden');
+}
 
 function setReels(arr){
   for(let i=0;i<3;i++){
@@ -662,9 +722,11 @@ function setReels(arr){
 }
 function spin(){
   const id=activeGame;
-  if(S.spins[id]<=0) return;
-  S.spins[id]--;
-  document.getElementById('gSpins').textContent=S.spins[id];
+  if(!freePlay){
+    if(S.spins[id]<=0) return;
+    S.spins[id]--;
+    document.getElementById('gSpins').textContent=S.spins[id];
+  }
   document.getElementById('gMsg').textContent='';
   const btn=document.getElementById('spinBtn'); btn.disabled=true;
   for(let i=0;i<3;i++) document.getElementById('reel'+i).classList.add('spinning');
@@ -684,9 +746,16 @@ function spin(){
   });
 }
 function finishSpin(result){
-  const id=activeGame; const prevChips=S.chips; let chipGain=1, msg='+1 chip', rankJump=2;
+  const id=activeGame;
   const allSame=result[0]===result[1]&&result[1]===result[2];
   const twoSame=result[0]===result[1]||result[1]===result[2]||result[0]===result[2];
+  // Free-to-play: just for fun, no chips, no limits
+  if(freePlay){
+    document.getElementById('gMsg').textContent = allSame?'🎉 Big win — nice one!':(twoSame?'So close! Spin again':'Spin again →');
+    document.getElementById('spinBtn').disabled=false;
+    return;
+  }
+  const prevChips=S.chips; let chipGain=1, msg='+1 chip', rankJump=2;
   if(allSame){ chipGain=15; rankJump=40; msg='🎉 JACKPOT! +15 chips · big leaderboard jump!'; }
   else if(twoSame){ chipGain=4; rankJump=12; msg='Nice! Two match · +4 chips'; }
   S.chips+=chipGain;
@@ -696,12 +765,14 @@ function finishSpin(result){
   document.getElementById('chipPill').classList.add('pop');
   save(); renderChips();
   setTimeout(()=>document.getElementById('chipPill').classList.remove('pop'),400);
-  const btn=document.getElementById('spinBtn');
-  if(S.spins[id]>0){ btn.disabled=false; }
-  else { btn.disabled=true; setTimeout(()=>{document.getElementById('gMsg').textContent='All 10 spins used — come back tomorrow for more!';},1400); }
-  // Conversion moment: strike while engagement is hot (big win, or out of free spins)
+  updateSpinUI(id);
+  // Out of spins on this game: push to the next Cosmo with one tap
+  if(S.spins[id]===0){
+    const nxt=nextGameWithSpins(id);
+    setTimeout(()=>{ document.getElementById('gMsg').textContent = nxt!==null ? 'All 10 spins used here — jump to your next game!' : 'All your free spins are used — back tomorrow!'; },1300);
+  }
+  // Conversion moment: strike while engagement is hot (big win)
   if(allSame){ setTimeout(()=>openConvert(id),1900); }
-  else if(S.spins[id]===0){ setTimeout(()=>openConvert(id),2100); }
   maybeLevelUp(prevChips);
 }
 
@@ -755,8 +826,28 @@ function choosePack(){
 }
 function chooseWheel(){ closeChoice(); openWheel(choiceLevel); }
 
+// ---------- Free-to-play catalogue ----------
+function renderCatalogue(){
+  let flat = 0;
+  document.getElementById('catalogue').innerHTML = CATALOGUE.map(sec=>{
+    const cards = sec.games.map(g=>{
+      const idx = flat++;
+      return `<div class="rounded-2xl overflow-hidden glass">
+        <div class="h-24 bg-gradient-to-br ${g.grad} grid place-items-center text-4xl">${g.emoji}</div>
+        <div class="p-2.5">
+          <p class="text-xs font-semibold truncate">${g.title}</p>
+          <p class="text-[10px] text-white/40 mb-2 truncate">${g.provider}</p>
+          <button onclick="openFreeGame(${idx})" class="w-full bg-blue-600 text-white text-xs font-bold py-2 rounded-lg active:scale-95 transition">Play Now</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div><p class="font-semibold text-sm mb-2">${sec.section}</p><div class="grid grid-cols-2 gap-3">${cards}</div></div>`;
+  }).join('');
+}
+
 // ---------- Init ----------
 renderAll();
+renderCatalogue();
 go('home');
 </script>
 </body>
