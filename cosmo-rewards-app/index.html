@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Cosmo · Gambling.com Rewards — Daily App Prototype</title>
+<meta name="description" content="Interactive prototype: the Gambling.com Rewards programme as a daily-habit app. Earn chips, keep your streak, play Cosmo Spins for real cash and climb the rewards ladder." />
+<meta property="og:title" content="Cosmo — Gambling.com Rewards app prototype" />
+<meta property="og:description" content="Earn chips. Win real stuff. The daily app that brings players back." />
+<meta property="og:type" content="website" />
+<link rel="canonical" href="https://example.com/cosmo-rewards-app/" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { display: ['Sora', 'system-ui', 'sans-serif'] },
+        colors: {
+          cosmo: { ink: '#070718', deep: '#0d0b2e', mid: '#160d3a' },
+        },
+      },
+    },
+  };
+</script>
+<style>
+  html, body { -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Sora', system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, #2a1466 0%, transparent 55%),
+      radial-gradient(1000px 600px at 90% 10%, #5b1f7a55 0%, transparent 50%),
+      linear-gradient(160deg, #0d0b2e 0%, #160d3a 45%, #070718 100%);
+    background-attachment: fixed;
+  }
+  /* Starfield */
+  .stars::before, .stars::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background-image:
+      radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 140px 80px, #fff8, transparent),
+      radial-gradient(1px 1px at 260px 160px, #fff, transparent),
+      radial-gradient(1.5px 1.5px at 80px 220px, #fffa, transparent),
+      radial-gradient(1px 1px at 320px 300px, #fff7, transparent),
+      radial-gradient(1.5px 1.5px at 200px 360px, #fff, transparent);
+    background-repeat: repeat; background-size: 360px 400px; opacity: .5;
+  }
+  .stars::after { background-size: 520px 520px; opacity: .3; animation: twinkle 6s ease-in-out infinite alternate; }
+  @keyframes twinkle { from { opacity: .15; } to { opacity: .45; } }
+
+  /* Phone frame */
+  .phone {
+    width: 100%; max-width: 412px; position: relative; z-index: 1;
+    background: linear-gradient(180deg, #120f33 0%, #0a0820 100%);
+    box-shadow: 0 30px 80px -20px rgba(0,0,0,.8), 0 0 0 1px rgba(255,255,255,.06) inset;
+  }
+  @media (min-width: 480px) {
+    .phone { border-radius: 44px; border: 10px solid #05040f; height: 880px; overflow: hidden; }
+  }
+  .app-scroll { overflow-y: auto; scrollbar-width: none; }
+  .app-scroll::-webkit-scrollbar { display: none; }
+
+  .glass { background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.09); backdrop-filter: blur(8px); }
+  .chip-gold { background: linear-gradient(135deg, #ffe066 0%, #f0a500 100%); }
+
+  /* Reels */
+  .reel { height: 84px; overflow: hidden; border-radius: 14px;
+    background: linear-gradient(180deg,#1c1640,#0e0a26); border:1px solid rgba(255,255,255,.12); }
+  .reel-strip { display:flex; flex-direction:column; transition: transform .1s; }
+  .reel-cell { height:84px; display:flex; align-items:center; justify-content:center; font-size:44px; }
+  .spinning .reel-strip { animation: reelspin .5s linear infinite; }
+  @keyframes reelspin { from { transform: translateY(0);} to { transform: translateY(-336px);} }
+
+  .tab-active { color:#fff; }
+  .tab-active .tab-ico { background: linear-gradient(135deg,#a855f7,#ec4899); box-shadow:0 8px 20px -6px #d946ef; }
+  .pop { animation: pop .35s cubic-bezier(.2,1.4,.4,1); }
+  @keyframes pop { 0%{transform:scale(.6);opacity:0} 100%{transform:scale(1);opacity:1} }
+  .fadein { animation: fadein .35s ease; }
+  @keyframes fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+  .toast { animation: toastin .3s ease, toastout .3s ease 2.4s forwards; }
+  @keyframes toastin { from{opacity:0;transform:translate(-50%,20px)} to{opacity:1;transform:translate(-50%,0)} }
+  @keyframes toastout { to{opacity:0;transform:translate(-50%,20px)} }
+  .ticker-track { display:inline-block; white-space:nowrap; animation: ticker 22s linear infinite; }
+  @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .wheel { transition: transform 4s cubic-bezier(.17,.67,.3,1); }
+</style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-0 sm:p-6 text-white stars">
+
+<div class="phone flex flex-col">
+
+  <!-- Status bar -->
+  <div class="flex items-center justify-between px-6 pt-3 pb-1 text-[12px] text-white/70 shrink-0">
+    <span class="font-semibold">9:41</span>
+    <div class="flex items-center gap-1.5">
+      <span>●●●</span><span>📶</span><span>🔋</span>
+    </div>
+  </div>
+
+  <!-- App header -->
+  <header class="flex items-center justify-between px-5 py-3 shrink-0">
+    <div class="flex items-center gap-2.5">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 grid place-items-center text-lg shadow-lg shadow-fuchsia-500/30">🪐</div>
+      <div class="leading-tight">
+        <p class="font-bold text-[15px]">Cosmo Rewards</p>
+        <p class="text-[10px] text-white/50 -mt-0.5">Earn chips. Win real stuff.</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <div id="chipPill" class="chip-gold text-amber-950 font-extrabold text-sm pl-2 pr-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg shadow-amber-500/30">
+        <span class="text-base">🪙</span><span id="chipCount">238</span>
+      </div>
+      <button onclick="resetDemo()" title="Reset demo" class="w-8 h-8 rounded-full glass grid place-items-center text-white/60 text-sm">↺</button>
+    </div>
+  </header>
+
+  <!-- Scrollable app body -->
+  <main class="app-scroll flex-1 px-5 pb-28">
+
+    <!-- ============ HOME ============ -->
+    <section data-screen="home" class="space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl leading-tight">Evening, Mike 👋</h1>
+        <p class="text-white/50 text-sm">Here's what's waiting for you today</p>
+      </div>
+
+      <!-- Daily claim / streak -->
+      <div class="glass rounded-3xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <p class="font-semibold text-sm flex items-center gap-1.5">🔥 <span id="streakLabel">6-day streak</span></p>
+            <p class="text-white/45 text-xs">Keep it alive — day 7 pays <b class="text-amber-300">+3 chips</b></p>
+          </div>
+          <button id="claimBtn" onclick="claimDaily()" class="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-sm px-4 py-2.5 rounded-2xl shadow-lg shadow-fuchsia-500/30 active:scale-95 transition">
+            Claim +2
+          </button>
+        </div>
+        <div id="streakDots" class="flex justify-between gap-1.5"></div>
+      </div>
+
+      <!-- Level progress -->
+      <div class="glass rounded-3xl p-4" onclick="go('rewards')">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🎖️</span>
+            <div>
+              <p id="lvlHeader" class="font-semibold text-sm">Getting started</p>
+              <p id="lvlSub" class="text-white/45 text-xs">12 chips to your first reward pack 🎁</p>
+            </div>
+          </div>
+          <span class="text-white/40 text-lg">›</span>
+        </div>
+        <div class="h-2.5 rounded-full bg-white/10 overflow-hidden">
+          <div id="lvlBar" class="h-full chip-gold rounded-full transition-all duration-500" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Cosmo Spins hook -->
+      <div onclick="go('play')" class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-br from-fuchsia-600/40 to-violet-700/40 border border-fuchsia-400/30 cursor-pointer active:scale-[.99] transition">
+        <div class="absolute -right-4 -top-4 text-7xl opacity-20 rotate-12">🎰</div>
+        <p class="text-[11px] uppercase tracking-wider text-fuchsia-200/80 font-bold">Today's free play</p>
+        <p class="font-display font-extrabold text-xl mt-0.5">Cosmo Spins</p>
+        <p class="text-white/70 text-sm mt-1"><b id="totalSpins" class="text-white">60</b> free spins ready · 6 games · real cash up top</p>
+        <div class="mt-3 inline-flex items-center gap-1.5 bg-white text-violet-900 font-bold text-sm px-4 py-2 rounded-2xl">Play now →</div>
+      </div>
+
+      <!-- Tournament -->
+      <div class="glass rounded-3xl p-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl">🏆</span>
+          <div>
+            <p class="font-semibold text-sm">Weekly Tournament</p>
+            <p class="text-white/45 text-xs">Ends in 2d 4h · finish to earn <b class="text-amber-300">+3 chips</b></p>
+          </div>
+        </div>
+        <button onclick="go('leaderboard')" class="glass text-xs font-semibold px-3 py-2 rounded-xl">View</button>
+      </div>
+
+      <!-- Conversion: today's exclusive operator offer -->
+      <div onclick="go('offers')" class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-r from-emerald-600/30 to-cyan-600/20 border border-emerald-300/25 active:scale-[.99] transition cursor-pointer">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-[10px] uppercase tracking-wider text-emerald-200 font-bold">💸 Today's exclusive offer</p>
+            <p class="font-semibold text-sm mt-0.5">200 free spins + £50 at RoyalReels</p>
+            <p class="text-white/45 text-xs">Exclusive to Cosmo members · 18+</p>
+          </div>
+          <span class="bg-white text-emerald-900 font-bold text-xs px-3 py-2 rounded-xl shrink-0">Claim →</span>
+        </div>
+      </div>
+
+      <!-- Winners ticker -->
+      <div class="glass rounded-2xl py-2.5 overflow-hidden">
+        <div class="ticker-track text-sm text-white/70">
+          <span class="px-4">🎉 Sarah from Leeds won <b class="text-emerald-300">£500</b> on Nova Sevens</span>
+          <span class="px-4">⭐ Dev from Cardiff hit <b class="text-emerald-300">£1,000</b> on Galaxy Gold</span>
+          <span class="px-4">🚀 Aisha from Glasgow unlocked the <b class="text-amber-300">Astronaut Pack</b></span>
+          <span class="px-4">🎉 Sarah from Leeds won <b class="text-emerald-300">£500</b> on Nova Sevens</span>
+          <span class="px-4">⭐ Dev from Cardiff hit <b class="text-emerald-300">£1,000</b> on Galaxy Gold</span>
+          <span class="px-4">🚀 Aisha from Glasgow unlocked the <b class="text-amber-300">Astronaut Pack</b></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLAY ============ -->
+    <section data-screen="play" class="hidden space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl">Cosmo Spins</h1>
+        <p class="text-white/50 text-sm">10 free spins on each game, every day. Real cash up top.</p>
+      </div>
+      <div id="gameGrid" class="grid grid-cols-2 gap-3"></div>
+      <p class="text-center text-white/30 text-xs pt-2">Every spin earns chips for your rewards — win or lose.</p>
+    </section>
+
+    <!-- ============ REWARDS ============ -->
+    <section data-screen="rewards" class="hidden space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl">Rewards</h1>
+        <p class="text-white/50 text-sm">Earn chips. Win real stuff. Climb the ranks.</p>
+      </div>
+
+      <div class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-br from-amber-500/25 to-pink-600/25 border border-amber-300/30">
+        <div class="absolute -right-3 -top-3 text-7xl opacity-25">📱</div>
+        <p class="text-[11px] uppercase tracking-wider text-amber-200 font-bold">Grand prize wheel</p>
+        <p class="font-display font-extrabold text-lg mt-0.5">Spin to win an iPhone 17</p>
+        <p class="text-white/65 text-xs mt-1">Earn a free wheel spin at every level you reach.</p>
+      </div>
+
+      <div id="ladder" class="space-y-3"></div>
+    </section>
+
+    <!-- ============ LEADERBOARD ============ -->
+    <section data-screen="leaderboard" class="hidden space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl">Leaderboard</h1>
+        <p class="text-white/50 text-sm">Resets tonight — everyone starts level tomorrow.</p>
+      </div>
+      <div class="glass rounded-2xl p-1 flex gap-1" id="lbTabs"></div>
+      <div class="glass rounded-3xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <p class="font-semibold text-sm" id="lbTitle">Nova Sevens · £1,000</p>
+          <p class="text-xs text-amber-300 font-semibold">⏳ 5h 22m left</p>
+        </div>
+        <div id="lbList" class="space-y-1.5"></div>
+      </div>
+      <p class="text-center text-white/30 text-xs">Daily reset keeps everyone in with a shout — no runaway leaders.</p>
+    </section>
+
+    <!-- ============ OFFERS (conversion to operators) ============ -->
+    <section data-screen="offers" class="hidden space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl">Exclusive Offers</h1>
+        <p class="text-white/50 text-sm">Real-cash welcome bonuses, picked for you. 18+</p>
+      </div>
+
+      <!-- Hero: today's exclusive -->
+      <div class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-br from-emerald-500/25 to-cyan-600/20 border border-emerald-300/30">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-200 bg-emerald-500/20 px-2 py-1 rounded-full">Today's exclusive</span>
+          <span class="text-amber-300 text-xs font-semibold">⏳ 6h 12m left</span>
+        </div>
+        <p class="font-display font-extrabold text-lg mt-2">👑 RoyalReels Casino</p>
+        <p class="text-emerald-300 font-semibold">200 free spins + 100% up to £50</p>
+        <p class="text-white/50 text-xs mt-1">Exclusive to Cosmo Rewards members</p>
+        <button onclick="claimOffer('RoyalReels')" class="w-full bg-white text-emerald-900 font-extrabold py-3 rounded-2xl mt-3 active:scale-95 transition">Claim offer →</button>
+      </div>
+
+      <!-- Play the real version -->
+      <div>
+        <p class="font-semibold text-sm mb-1">🎰 Play the real version</p>
+        <p class="text-white/45 text-xs mb-3">You've been spinning Cosmo Spins — here are the real-money originals.</p>
+        <div id="realGames" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Top operators -->
+      <div>
+        <p class="font-semibold text-sm mb-2">🏆 Top welcome bonuses</p>
+        <div id="opList" class="space-y-2.5"></div>
+      </div>
+
+      <!-- Chips → boosted bonus -->
+      <div class="glass rounded-3xl p-4">
+        <p class="font-semibold text-sm">💎 Spend chips on boosted bonuses</p>
+        <p class="text-white/45 text-xs mt-0.5 mb-3">Turn your loyalty chips into enhanced operator offers.</p>
+        <div class="flex items-center justify-between bg-white/5 rounded-2xl p-3">
+          <div>
+            <p class="text-sm font-semibold">Enhanced £75 bonus</p>
+            <p class="text-white/40 text-xs">StarSpins · normally £50</p>
+          </div>
+          <button onclick="unlockBoost()" class="chip-gold text-amber-950 font-bold text-xs px-3 py-2 rounded-xl active:scale-95 transition">50 🪙</button>
+        </div>
+      </div>
+
+      <p class="text-center text-white/30 text-[10px] leading-relaxed px-4 pt-1">18+ · New customers only · Gamble responsibly · T&amp;Cs apply · <span class="underline">BeGambleAware.org</span></p>
+    </section>
+
+  </main>
+
+  <!-- Bottom nav -->
+  <nav class="absolute bottom-0 inset-x-0 px-4 pt-2 pb-5 bg-gradient-to-t from-cosmo-ink via-cosmo-ink/95 to-transparent">
+    <div class="glass rounded-3xl flex items-center justify-around py-2 px-1">
+      <button data-tab="home" onclick="go('home')" class="nav-btn tab-active flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
+        <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">🏠</span>Home
+      </button>
+      <button data-tab="play" onclick="go('play')" class="nav-btn flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
+        <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">🎰</span>Play
+      </button>
+      <button data-tab="offers" onclick="go('offers')" class="nav-btn flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
+        <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">💸</span>Offers
+      </button>
+      <button data-tab="rewards" onclick="go('rewards')" class="nav-btn flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
+        <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">🎁</span>Rewards
+      </button>
+      <button data-tab="leaderboard" onclick="go('leaderboard')" class="nav-btn flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
+        <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">🏆</span>Ranks
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== Slot game overlay ===== -->
+  <div id="gameOverlay" class="hidden absolute inset-0 z-30 bg-cosmo-ink flex flex-col">
+    <div class="flex items-center justify-between px-5 pt-12 pb-2">
+      <button onclick="closeGame()" class="glass w-9 h-9 rounded-full grid place-items-center">‹</button>
+      <p id="gName" class="font-display font-bold">Cosmo Spins</p>
+      <div class="chip-gold text-amber-950 font-extrabold text-xs px-3 py-1.5 rounded-full flex items-center gap-1">🪙 <span id="gChips">238</span></div>
+    </div>
+
+    <div class="flex-1 px-6 flex flex-col justify-center">
+      <div class="text-center mb-4">
+        <p class="text-white/50 text-xs uppercase tracking-wider">Playing for</p>
+        <p id="gPrize" class="font-display font-extrabold text-3xl text-emerald-300">£1,000</p>
+        <p class="text-white/60 text-sm mt-1">You're <b id="gRank" class="text-white">#128</b> today</p>
+      </div>
+
+      <div class="bg-gradient-to-b from-violet-900/60 to-fuchsia-900/30 rounded-3xl p-4 border border-fuchsia-400/20">
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="reel" id="reel0"><div class="reel-strip"></div></div>
+          <div class="reel" id="reel1"><div class="reel-strip"></div></div>
+          <div class="reel" id="reel2"><div class="reel-strip"></div></div>
+        </div>
+        <p id="gMsg" class="text-center h-6 mt-3 text-sm font-semibold text-amber-300"></p>
+      </div>
+
+      <div class="flex items-center justify-between mt-5">
+        <div class="text-sm">
+          <p class="text-white/45 text-xs">Free spins left</p>
+          <p class="font-bold text-lg"><span id="gSpins">10</span> <span class="text-white/40 text-sm">/ 10</span></p>
+        </div>
+        <button id="spinBtn" onclick="spin()" class="bg-gradient-to-r from-amber-400 to-fuchsia-500 text-white font-extrabold text-lg px-10 py-4 rounded-3xl shadow-xl shadow-fuchsia-600/40 active:scale-95 transition disabled:opacity-40 disabled:grayscale">
+          SPIN
+        </button>
+      </div>
+      <p class="text-center text-white/40 text-xs mt-4">Match 3 to climb the leaderboard · every spin earns chips</p>
+    </div>
+  </div>
+
+  <!-- ===== Wheel overlay ===== -->
+  <div id="wheelOverlay" class="hidden absolute inset-0 z-30 bg-cosmo-ink flex flex-col items-center justify-center px-6">
+    <button onclick="document.getElementById('wheelOverlay').classList.add('hidden')" class="absolute top-12 left-5 glass w-9 h-9 rounded-full grid place-items-center">‹</button>
+    <p class="font-display font-extrabold text-xl mb-1">Spin the Wheel</p>
+    <p class="text-white/50 text-sm mb-6">Level reward · one free spin</p>
+    <div class="relative w-64 h-64 mb-8">
+      <div class="absolute -top-2 left-1/2 -translate-x-1/2 text-2xl z-10">🔻</div>
+      <div id="wheel" class="wheel w-full h-full rounded-full border-4 border-white/20"
+        style="background: conic-gradient(#f59e0b 0 60deg,#ec4899 60deg 120deg,#8b5cf6 120deg 180deg,#22d3ee 180deg 240deg,#22c55e 240deg 300deg,#f43f5e 300deg 360deg);"></div>
+      <div class="absolute inset-0 grid place-items-center pointer-events-none"><div class="w-14 h-14 rounded-full bg-cosmo-ink border-2 border-white/20 grid place-items-center text-2xl">🪐</div></div>
+    </div>
+    <button id="wheelBtn" onclick="spinWheel()" class="bg-gradient-to-r from-amber-400 to-fuchsia-500 text-white font-extrabold px-10 py-3.5 rounded-3xl shadow-xl active:scale-95 transition">Spin</button>
+    <p id="wheelMsg" class="h-6 mt-4 font-semibold text-amber-300"></p>
+  </div>
+
+  <!-- ===== Conversion hand-off (fires at peak engagement) ===== -->
+  <div id="convertOverlay" class="hidden absolute inset-0 z-40 bg-black/70 flex items-end">
+    <div class="w-full bg-cosmo-deep rounded-t-3xl p-5 pb-8 fadein border-t border-white/10">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <p class="text-3xl">🔥</p>
+      <p class="font-display font-extrabold text-xl mt-1">Loved that? Play it for real.</p>
+      <p class="text-white/60 text-sm mt-1"><span id="cvGame">Zeus vs Hades</span> is live for real money at <b id="cvOp" class="text-white">RoyalReels</b>.</p>
+      <div class="glass rounded-2xl p-4 mt-4 flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-fuchsia-500 grid place-items-center text-2xl">🎰</div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm" id="cvOp2">RoyalReels Casino</p>
+          <p class="text-emerald-300 text-sm font-semibold truncate" id="cvBonus">100% up to £50 + 50 spins</p>
+        </div>
+        <span class="text-amber-300 text-xs shrink-0">★ 4.9</span>
+      </div>
+      <button onclick="claimOffer()" class="w-full bg-gradient-to-r from-emerald-400 to-emerald-600 text-white font-extrabold py-3.5 rounded-2xl mt-4 active:scale-95 transition">Claim my bonus →</button>
+      <button onclick="closeConvert()" class="w-full text-white/50 text-sm py-3">Maybe later</button>
+      <p class="text-white/30 text-[10px] text-center">18+ · New players only · T&amp;Cs apply · BeGambleAware.org</p>
+    </div>
+  </div>
+
+  <div id="toast" class="hidden absolute bottom-28 left-1/2 z-50 chip-gold text-amber-950 font-bold text-sm px-5 py-2.5 rounded-full shadow-xl"></div>
+</div>
+
+<script>
+// ---------- State ----------
+const LEVELS = [
+  { n:1, name:'Cosmo Cadet',     cost:250,  items:'Bottle · stress ball · tote · pen · opener' },
+  { n:2, name:'Cosmo Voyager',   cost:600,  items:'Keyring · canvas bag · cards · tag · mug' },
+  { n:3, name:'Cosmo Ranger',    cost:1200, items:'Zip hoodie · drawstring bag · straw · lunchbox · cap' },
+  { n:4, name:'Cosmo Commander', cost:2000, items:'Adidas backpack · beanie · socks · cup · charger' },
+  { n:5, name:'Cosmo Astronaut', cost:4000, items:'JBL earbuds · apron · notebook · brolly · towel set' },
+];
+const GAMES = [
+  { id:0, name:'Cosmo Classic', icon:'🍒', prize:'£500',   rank:142 },
+  { id:1, name:'Galaxy Gold',   icon:'🌟', prize:'£250',   rank:88  },
+  { id:2, name:'Nova Sevens',   icon:'7️⃣', prize:'£1,000', rank:128 },
+  { id:3, name:'Meteor Mania',  icon:'☄️', prize:'£100',   rank:64  },
+  { id:4, name:'Lucky Lunar',   icon:'🌙', prize:'£750',   rank:203 },
+  { id:5, name:'Star Diamonds', icon:'💎', prize:'£2,000', rank:311 },
+];
+const SYMBOLS = ['🍒','🌟','7️⃣','☄️','🌙','💎','🪐','🚀'];
+// Conversion: real-money operators (gambling.com's affiliate partners) + real catalogue games
+const OPERATORS = [
+  { name:'RoyalReels', emoji:'👑', rating:'4.9', bonus:'200 free spins + 100% up to £50', tag:'Best for slots' },
+  { name:'StarSpins',  emoji:'⭐', rating:'4.7', bonus:'100% deposit match up to £100',   tag:'Top rated' },
+  { name:'LuckyOrbit', emoji:'🪐', rating:'4.6', bonus:'50 free spins — no deposit',       tag:'No deposit' },
+  { name:'MoonBet',    emoji:'🌙', rating:'4.5', bonus:'£30 in free bets',                 tag:'' },
+];
+// Each Cosmo Spins variant maps to a real-money original the user can be converted to
+const CONVERT = [
+  { game:"Huff N' More Puff",            provider:'Light & Wonder', op:'RoyalReels', bonus:'100% up to £50 + 50 spins' },
+  { game:'Jin Ji Bao Xi Endless Treasure', provider:'Light & Wonder', op:'StarSpins',  bonus:'100% deposit match up to £100' },
+  { game:'Zeus vs Hades',                provider:'Pragmatic Play', op:'LuckyOrbit', bonus:'50 free spins, no deposit' },
+  { game:'Le Fisherman',                 provider:'Hacksaw Gaming', op:'MoonBet',    bonus:'£30 in free bets' },
+  { game:"Tut's Treasure Tower",         provider:'Pragmatic Play', op:'RoyalReels', bonus:'200 spins on first deposit' },
+  { game:'Slingo Cash Eruption',         provider:'Gaming Realms',  op:'StarSpins',  bonus:'100% up to £50' },
+];
+
+const DEFAULT = { chips:238, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], offersClaimed:0 };
+let S = load();
+let activeGame = 0, lbGame = 2;
+
+function load(){ try { return Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('cosmo')||'{}')); } catch(e){ return {...DEFAULT}; } }
+function save(){ localStorage.setItem('cosmo', JSON.stringify(S)); }
+function resetDemo(){ S = {...DEFAULT, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[]}; save(); renderAll(); toast('Demo reset ↺'); }
+
+// ---------- Helpers ----------
+function reachedLevel(){ let r=null; for(const l of LEVELS){ if(S.chips>=l.cost) r=l; } return r; }
+function nextLevel(){ for(const l of LEVELS){ if(S.chips < l.cost) return l; } return null; }
+function totalSpins(){ return S.spins.reduce((a,b)=>a+b,0); }
+
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.className='absolute bottom-28 left-1/2 z-40 chip-gold text-amber-950 font-bold text-sm px-5 py-2.5 rounded-full shadow-xl toast'; setTimeout(()=>t.classList.add('hidden'),2800); }
+
+// ---------- Navigation ----------
+function go(screen){
+  document.querySelectorAll('[data-screen]').forEach(s=>s.classList.toggle('hidden', s.dataset.screen!==screen));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('tab-active', b.dataset.tab===screen));
+  document.querySelector('main').scrollTop = 0;
+}
+
+// ---------- Render ----------
+function renderChips(){ document.getElementById('chipCount').textContent=S.chips; document.getElementById('gChips').textContent=S.chips; }
+function renderStreak(){
+  document.getElementById('streakLabel').textContent = S.streak+'-day streak';
+  const dots = document.getElementById('streakDots');
+  const bonus = {3:'+1',7:'+3'};
+  dots.innerHTML = Array.from({length:7},(_,i)=>{
+    const day=i+1, done=day<=S.streak;
+    const b = bonus[day];
+    return `<div class="flex-1 flex flex-col items-center gap-1">
+      <div class="w-8 h-8 rounded-full grid place-items-center text-sm ${done?'chip-gold text-amber-950':'bg-white/10 text-white/40'}">${done?'🔥':day}</div>
+      <span class="text-[9px] ${b?'text-amber-300':'text-white/30'}">${b||'·'}</span></div>`;
+  }).join('');
+}
+function renderLevel(){
+  const reached = reachedLevel(), nx = nextLevel();
+  document.getElementById('lvlHeader').textContent = reached ? `Level ${reached.n} · ${reached.name}` : 'Getting started · no pack yet';
+  const prev = reached ? reached.cost : 0;
+  const target = nx ? nx.cost : (reached ? reached.cost : 250);
+  const pct = Math.min(100, Math.max(0, Math.round(((S.chips-prev)/(target-prev))*100)));
+  document.getElementById('lvlBar').style.width = pct+'%';
+  document.getElementById('lvlSub').innerHTML = nx ? `<b>${nx.cost-S.chips}</b> chips to ${nx.name} 🎁` : `Top rank reached — legend 🚀`;
+}
+function renderSpins(){ document.getElementById('totalSpins').textContent = totalSpins(); }
+function renderGames(){
+  document.getElementById('gameGrid').innerHTML = GAMES.map(g=>{
+    const left = S.spins[g.id];
+    return `<button onclick="openGame(${g.id})" class="glass rounded-3xl p-3.5 text-left active:scale-95 transition fadein">
+      <div class="flex items-start justify-between">
+        <span class="text-3xl">${g.icon}</span>
+        <span class="text-[10px] font-bold ${left>0?'text-emerald-300':'text-white/30'} bg-white/10 px-2 py-0.5 rounded-full">${left} spins</span>
+      </div>
+      <p class="font-semibold text-sm mt-2">${g.name}</p>
+      <p class="text-emerald-300 font-display font-extrabold text-lg leading-tight">${g.prize}</p>
+      <p class="text-white/40 text-[11px] mt-0.5">You're #${S.ranks[g.id]} today</p>
+    </button>`;
+  }).join('');
+}
+function renderLadder(){
+  document.getElementById('ladder').innerHTML = LEVELS.map(l=>{
+    const reached = S.chips>=l.cost;
+    const prev = LEVELS[l.n-2]?LEVELS[l.n-2].cost:0;
+    const pct = Math.max(0,Math.min(100, Math.round(((S.chips-prev)/(l.cost-prev))*100)));
+    const wheelDone = S.wheelLevels.includes(l.n);
+    return `<div class="glass rounded-3xl p-4 ${reached?'border-amber-300/40':''}">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-2xl grid place-items-center text-lg ${reached?'chip-gold':'bg-white/10'}">${reached?'✓':'🔒'}</div>
+          <div>
+            <p class="font-semibold text-sm">Lvl ${l.n} · ${l.name}</p>
+            <p class="text-white/40 text-[11px]">${l.cost.toLocaleString()} chips</p>
+          </div>
+        </div>
+        ${reached
+          ? `<button onclick="openWheel(${l.n})" class="text-xs font-bold px-3 py-2 rounded-xl ${wheelDone?'bg-white/10 text-white/40':'bg-gradient-to-r from-amber-400 to-fuchsia-500'}">${wheelDone?'Spun ✓':'Spin 🎡'}</button>`
+          : `<span class="text-[11px] text-white/40">${pct}%</span>`}
+      </div>
+      <p class="text-white/45 text-[11px] mt-2">${l.items}</p>
+      ${!reached?`<div class="h-1.5 rounded-full bg-white/10 overflow-hidden mt-2"><div class="h-full chip-gold rounded-full" style="width:${pct}%"></div></div>`:''}
+    </div>`;
+  }).join('');
+}
+function renderLeaderboard(){
+  document.getElementById('lbTabs').innerHTML = GAMES.map(g=>
+    `<button onclick="setLb(${g.id})" class="flex-1 text-[11px] font-semibold py-2 rounded-xl ${g.id===lbGame?'bg-white/15':'text-white/50'}">${g.icon}</button>`
+  ).join('');
+  const g = GAMES[lbGame];
+  document.getElementById('lbTitle').textContent = `${g.name} · ${g.prize}`;
+  const me = S.ranks[g.id];
+  const rows = [];
+  const names = ['Sarah_L','Dev_C','AishaG','TomW','PriyaK','JoeM','LucyB','RaviN','EllaT','MoH'];
+  for(let i=1;i<=5;i++) rows.push({rank:i, name:names[i-1], you:false, pts:5000-i*420});
+  rows.push({rank:me, name:'You', you:true, pts:Math.max(180, 2600-(me-5)*16)});
+  document.getElementById('lbList').innerHTML = rows.map(r=>
+    `<div class="flex items-center justify-between rounded-xl px-3 py-2 ${r.you?'chip-gold text-amber-950 font-bold':'bg-white/5'}">
+      <div class="flex items-center gap-2.5"><span class="w-6 text-center font-bold">${r.rank}</span><span class="text-sm">${r.name}</span></div>
+      <span class="text-sm font-semibold">${r.pts.toLocaleString()} pts</span>
+    </div>`).join('');
+}
+function setLb(id){ lbGame=id; renderLeaderboard(); }
+
+// ---------- Conversion ----------
+function renderOffers(){
+  document.getElementById('realGames').innerHTML = CONVERT.slice(0,4).map(c=>
+    `<div class="glass rounded-2xl p-3 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 grid place-items-center text-xl shrink-0">🎰</div>
+      <div class="flex-1 min-w-0">
+        <p class="text-sm font-semibold truncate">${c.game}</p>
+        <p class="text-white/40 text-[11px] truncate">${c.provider} · play at ${c.op}</p>
+      </div>
+      <button onclick="claimOffer('${c.op}')" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 active:scale-95 transition">Play real</button>
+    </div>`).join('');
+  document.getElementById('opList').innerHTML = OPERATORS.map(o=>
+    `<div class="glass rounded-2xl p-3 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-white/10 grid place-items-center text-xl shrink-0">${o.emoji}</div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2"><p class="text-sm font-semibold">${o.name}</p>${o.tag?`<span class="text-[9px] bg-fuchsia-500/30 text-fuchsia-200 px-1.5 py-0.5 rounded-full whitespace-nowrap">${o.tag}</span>`:''}</div>
+        <p class="text-emerald-300 text-xs font-semibold truncate">${o.bonus}</p>
+        <p class="text-amber-300 text-[10px]">★ ${o.rating}</p>
+      </div>
+      <button onclick="claimOffer('${o.name}')" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 active:scale-95 transition">Claim</button>
+    </div>`).join('');
+}
+function openConvert(idx){
+  const c = CONVERT[idx] || CONVERT[2];
+  document.getElementById('cvGame').textContent = c.game;
+  document.getElementById('cvOp').textContent = c.op;
+  document.getElementById('cvOp2').textContent = c.op + ' Casino';
+  document.getElementById('cvBonus').textContent = c.bonus;
+  const ov = document.getElementById('convertOverlay');
+  ov.dataset.op = c.op;
+  ov.classList.remove('hidden');
+}
+function closeConvert(){ document.getElementById('convertOverlay').classList.add('hidden'); }
+function claimOffer(op){
+  const ov = document.getElementById('convertOverlay');
+  const name = op || (ov && !ov.classList.contains('hidden') ? ov.dataset.op : 'operator');
+  closeConvert();
+  S.offersClaimed = (S.offersClaimed||0) + 1; save();
+  toast('🔗 Opening ' + name + '… (hand-off + conversion tracked)');
+}
+function unlockBoost(){
+  if(S.chips < 50){ toast('Need 50 chips to unlock this'); return; }
+  S.chips -= 50; S.offersClaimed = (S.offersClaimed||0) + 1; save(); renderAll();
+  toast('🔓 Boosted £75 bonus unlocked at StarSpins!');
+}
+
+function renderAll(){ renderChips(); renderStreak(); renderLevel(); renderSpins(); renderGames(); renderLadder(); renderLeaderboard(); renderOffers();
+  document.getElementById('claimBtn').disabled = S.claimed;
+  document.getElementById('claimBtn').textContent = S.claimed ? 'Claimed ✓' : 'Claim +2';
+  document.getElementById('claimBtn').classList.toggle('opacity-50', S.claimed);
+}
+
+// ---------- Actions ----------
+function claimDaily(){
+  if(S.claimed) return;
+  let gain = 2; let msg = '+2 chips claimed';
+  if(S.streak+1===3){ gain+=1; }
+  if(S.streak+1===7){ gain+=3; msg='+2 chips · 7-day bonus +3!'; }
+  S.chips += gain; S.streak += 1; S.claimed = true;
+  document.getElementById('chipPill').classList.add('pop');
+  save(); renderAll(); toast('🪙 '+msg);
+  setTimeout(()=>document.getElementById('chipPill').classList.remove('pop'),400);
+}
+
+function openGame(id){
+  activeGame=id; const g=GAMES[id];
+  document.getElementById('gName').textContent=g.name;
+  document.getElementById('gPrize').textContent=g.prize;
+  document.getElementById('gRank').textContent='#'+S.ranks[id];
+  document.getElementById('gSpins').textContent=S.spins[id];
+  document.getElementById('gMsg').textContent='';
+  setReels([SYMBOLS[id%8],SYMBOLS[(id+2)%8],SYMBOLS[(id+4)%8]]);
+  document.getElementById('spinBtn').disabled = S.spins[id]<=0;
+  if(S.spins[id]<=0) document.getElementById('gMsg').textContent='No spins left — back tomorrow!';
+  renderChips();
+  document.getElementById('gameOverlay').classList.remove('hidden');
+}
+function closeGame(){ document.getElementById('gameOverlay').classList.add('hidden'); renderAll(); }
+
+function setReels(arr){
+  for(let i=0;i<3;i++){
+    const strip=document.querySelector('#reel'+i+' .reel-strip');
+    strip.innerHTML=`<div class="reel-cell">${arr[i]}</div>`;
+    strip.style.transform='translateY(0)';
+  }
+}
+function spin(){
+  const id=activeGame;
+  if(S.spins[id]<=0) return;
+  S.spins[id]--;
+  document.getElementById('gSpins').textContent=S.spins[id];
+  document.getElementById('gMsg').textContent='';
+  const btn=document.getElementById('spinBtn'); btn.disabled=true;
+  for(let i=0;i<3;i++) document.getElementById('reel'+i).classList.add('spinning');
+
+  const result=[0,1,2].map(()=>SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]);
+  // bias a little fun: ~18% two-match, ~7% jackpot
+  const r=Math.random();
+  if(r<0.07){ const s=SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)]; result[0]=result[1]=result[2]=s; }
+  else if(r<0.25){ result[1]=result[0]; }
+
+  [0,1,2].forEach((i)=>{
+    setTimeout(()=>{
+      document.getElementById('reel'+i).classList.remove('spinning');
+      setReels(result.map((s,idx)=> idx<=i?s:'❔'));
+      if(i===2) finishSpin(result);
+    }, 600+i*350);
+  });
+}
+function finishSpin(result){
+  const id=activeGame; let chipGain=1, msg='+1 chip', rankJump=2;
+  const allSame=result[0]===result[1]&&result[1]===result[2];
+  const twoSame=result[0]===result[1]||result[1]===result[2]||result[0]===result[2];
+  if(allSame){ chipGain=15; rankJump=40; msg='🎉 JACKPOT! +15 chips · big leaderboard jump!'; }
+  else if(twoSame){ chipGain=4; rankJump=12; msg='Nice! Two match · +4 chips'; }
+  S.chips+=chipGain;
+  S.ranks[id]=Math.max(1,S.ranks[id]-rankJump);
+  document.getElementById('gMsg').textContent=msg;
+  document.getElementById('gRank').textContent='#'+S.ranks[id];
+  document.getElementById('chipPill').classList.add('pop');
+  save(); renderChips();
+  setTimeout(()=>document.getElementById('chipPill').classList.remove('pop'),400);
+  const btn=document.getElementById('spinBtn');
+  if(S.spins[id]>0){ btn.disabled=false; }
+  else { btn.disabled=true; setTimeout(()=>{document.getElementById('gMsg').textContent='All 10 spins used — come back tomorrow for more!';},1400); }
+  // Conversion moment: strike while engagement is hot (big win, or out of free spins)
+  if(allSame){ setTimeout(()=>openConvert(id),1900); }
+  else if(S.spins[id]===0){ setTimeout(()=>openConvert(id),2100); }
+}
+
+// ---------- Wheel ----------
+let wheelLevel=null;
+function openWheel(lvl){
+  wheelLevel=lvl;
+  const done=S.wheelLevels.includes(lvl);
+  document.getElementById('wheel').style.transform='rotate(0deg)';
+  document.getElementById('wheelMsg').textContent = done?'Already spun this level ✓':'';
+  document.getElementById('wheelBtn').disabled=done;
+  document.getElementById('wheelBtn').classList.toggle('opacity-40',done);
+  document.getElementById('wheelOverlay').classList.remove('hidden');
+}
+function spinWheel(){
+  if(S.wheelLevels.includes(wheelLevel)) return;
+  const prizes=['+50 chips','+20 chips','Bonus spins ×5','+100 chips','Mystery box','iPhone 17 entry'];
+  const idx=Math.floor(Math.random()*6);
+  const deg=360*5 + idx*60 + 30;
+  document.getElementById('wheel').style.transform=`rotate(${deg}deg)`;
+  document.getElementById('wheelBtn').disabled=true;
+  setTimeout(()=>{
+    document.getElementById('wheelMsg').textContent='🎉 '+prizes[idx]+'!';
+    if(prizes[idx].includes('chips')){ S.chips+=parseInt(prizes[idx].replace(/\D/g,'')); }
+    S.wheelLevels.push(wheelLevel); save(); renderAll(); renderChips();
+  },4200);
+}
+
+// ---------- Init ----------
+renderAll();
+go('home');
+</script>
+</body>
+</html>
