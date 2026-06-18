@@ -128,14 +128,9 @@
 
       <!-- Daily claim / streak -->
       <div class="glass rounded-3xl p-4">
-        <div class="flex items-center justify-between mb-3">
-          <div>
-            <p class="font-semibold text-sm flex items-center gap-1.5">🔥 <span id="streakLabel">6-day streak</span></p>
-            <p class="text-white/45 text-xs">Keep it alive — day 7 pays <b class="text-amber-300">+3 chips</b></p>
-          </div>
-          <button id="claimBtn" onclick="claimDaily()" class="bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-sm px-4 py-2.5 rounded-2xl shadow-lg shadow-fuchsia-500/30 active:scale-95 transition">
-            Claim +2
-          </button>
+        <div class="mb-3">
+          <p class="font-semibold text-sm flex items-center gap-1.5">🔥 <span id="streakLabel">6-day streak</span></p>
+          <p class="text-white/45 text-xs">Keep it alive — day 7 pays <b class="text-amber-300">+3 chips</b></p>
         </div>
         <div id="streakDots" class="flex justify-between gap-1.5"></div>
       </div>
@@ -627,9 +622,6 @@ function unlockBoost(){
 }
 
 function renderAll(){ renderChips(); renderStreak(); renderLevel(); renderSpins(); renderGames(); renderLadder(); renderLeaderboard(); renderOffers();
-  document.getElementById('claimBtn').disabled = S.claimed;
-  document.getElementById('claimBtn').textContent = S.claimed ? 'Claimed ✓' : 'Claim +2';
-  document.getElementById('claimBtn').classList.toggle('opacity-50', S.claimed);
 }
 
 // ---------- Actions ----------
