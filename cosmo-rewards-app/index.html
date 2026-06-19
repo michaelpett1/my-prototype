@@ -110,7 +110,10 @@
     </div>
     <div class="flex items-center gap-2">
       <div id="chipPill" class="chip-gold text-amber-950 font-extrabold text-sm pl-2 pr-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg shadow-amber-500/30">
-        <span class="text-base">🪙</span><span id="chipCount">238</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="w-4 h-4">
+          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.6"/>
+          <path d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.64 5.64l1.84 1.84M16.52 16.52l1.84 1.84M18.36 5.64l-1.84 1.84M7.48 16.52l-1.84 1.84"/>
+        </svg><span id="chipCount">238</span>
       </div>
       <button onclick="resetDemo()" title="Reset demo" class="w-8 h-8 rounded-full glass grid place-items-center text-white/60 text-sm">↺</button>
     </div>
@@ -327,7 +330,11 @@
     <div class="flex items-center justify-between px-5 pt-12 pb-2">
       <button onclick="closeGame()" class="glass w-9 h-9 rounded-full grid place-items-center">‹</button>
       <p id="gName" class="font-display font-bold">Cosmo Spins</p>
-      <div class="chip-gold text-amber-950 font-extrabold text-xs px-3 py-1.5 rounded-full flex items-center gap-1">🪙 <span id="gChips">238</span></div>
+      <div class="chip-gold text-amber-950 font-extrabold text-xs px-3 py-1.5 rounded-full flex items-center gap-1">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="w-3.5 h-3.5">
+          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.6"/>
+          <path d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.64 5.64l1.84 1.84M16.52 16.52l1.84 1.84M18.36 5.64l-1.84 1.84M7.48 16.52l-1.84 1.84"/>
+        </svg><span id="gChips">238</span></div>
     </div>
 
     <div class="flex-1 px-6 flex flex-col justify-center">
