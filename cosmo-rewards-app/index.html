@@ -109,18 +109,65 @@
       </div>
     </div>
     <div class="flex items-center gap-2">
+      <button id="signupPill" onclick="openGate()" class="hidden bg-white text-violet-900 font-extrabold text-sm px-4 py-1.5 rounded-full active:scale-95 transition">Sign up</button>
       <div id="chipPill" class="chip-gold text-amber-950 font-extrabold text-sm pl-2 pr-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg shadow-amber-500/30">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" class="w-4 h-4">
           <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.6"/>
           <path d="M12 3v2.6M12 18.4V21M3 12h2.6M18.4 12H21M5.64 5.64l1.84 1.84M16.52 16.52l1.84 1.84M18.36 5.64l-1.84 1.84M7.48 16.52l-1.84 1.84"/>
         </svg><span id="chipCount">238</span>
       </div>
+      <button id="signOutBtn" onclick="signOutDemo()" title="Sign out (demo)" class="w-8 h-8 rounded-full glass grid place-items-center text-white/60 text-xs">⎋</button>
       <button onclick="resetDemo()" title="Reset demo" class="w-8 h-8 rounded-full glass grid place-items-center text-white/60 text-sm">↺</button>
     </div>
   </header>
 
   <!-- Scrollable app body -->
   <main class="app-scroll flex-1 px-5 pb-28">
+
+    <!-- ============ SIGNED-OUT LANDING ============ -->
+    <section id="signedOut" class="hidden space-y-4">
+      <div class="pt-1">
+        <h1 class="font-display font-extrabold text-2xl leading-tight">Earn chips.<br>Win real stuff.</h1>
+        <p class="text-white/55 text-sm mt-1">Play free every day, climb the ranks and win real prizes — topped off with a holiday.</p>
+      </div>
+
+      <!-- Holiday grand-prize hero -->
+      <div class="relative overflow-hidden rounded-3xl p-5 bg-gradient-to-br from-fuchsia-600/45 via-amber-500/30 to-cyan-500/30 border border-amber-300/40 shadow-xl shadow-fuchsia-900/30">
+        <div class="absolute -right-2 -top-3 text-6xl opacity-30 rotate-12">✈️</div>
+        <div class="absolute right-12 bottom-1 text-5xl opacity-20">🎰</div>
+        <div class="absolute right-1 bottom-2 text-4xl opacity-20">🌴</div>
+        <span class="text-[10px] font-bold uppercase tracking-widest text-amber-200 bg-amber-500/25 px-2.5 py-1 rounded-full">★ Grand prize</span>
+        <p class="font-display font-extrabold text-2xl mt-2 leading-tight">Win a trip to Vegas ✈️</p>
+        <p class="text-white/80 text-sm mt-1">Flights + 5 nights on the Strip, for two.</p>
+      </div>
+
+      <!-- Double points sign-up message -->
+      <div class="rounded-3xl p-4 bg-gradient-to-r from-violet-600/50 to-fuchsia-600/40 border border-fuchsia-300/30 text-center">
+        <p class="font-display font-extrabold text-lg">🎉 Sign up today for DOUBLE points</p>
+        <p class="text-white/70 text-xs mt-1">New members get 2× points on everything to kick-start the climb.</p>
+        <button onclick="openGate()" class="w-full bg-white text-violet-900 font-extrabold py-3 rounded-2xl mt-3 active:scale-95 transition">Sign up free →</button>
+      </div>
+
+      <!-- Try a Cosmo game (no sign-up needed) -->
+      <div onclick="tryGame()" class="relative overflow-hidden rounded-3xl p-4 bg-gradient-to-br from-fuchsia-600/40 to-violet-700/40 border border-fuchsia-400/30 cursor-pointer active:scale-[.99] transition">
+        <div class="absolute -right-4 -top-4 text-7xl opacity-20 rotate-12">🎰</div>
+        <p class="text-[11px] uppercase tracking-wider text-fuchsia-200/80 font-bold">No sign-up needed to try</p>
+        <p class="font-display font-extrabold text-xl mt-0.5">Play Cosmo Spins free</p>
+        <p class="text-white/70 text-sm mt-1">Take a spin on the house — see if you've got the touch.</p>
+        <div class="mt-3 inline-flex items-center gap-1.5 bg-white text-violet-900 font-bold text-sm px-4 py-2 rounded-2xl">Spin now →</div>
+      </div>
+
+      <!-- What you can win -->
+      <div>
+        <p class="font-semibold text-sm mb-2">What you can win</p>
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="glass rounded-2xl p-3"><div class="text-2xl">🎁</div><p class="text-[11px] font-semibold mt-1">Merch packs</p><p class="text-[9px] text-white/40">5 levels</p></div>
+          <div class="glass rounded-2xl p-3"><div class="text-2xl">🎡</div><p class="text-[11px] font-semibold mt-1">Spin the wheel</p><p class="text-[9px] text-white/40">Every level</p></div>
+          <div class="glass rounded-2xl p-3"><div class="text-2xl">✈️</div><p class="text-[11px] font-semibold mt-1">Vegas trip</p><p class="text-[9px] text-white/40">Grand prize</p></div>
+        </div>
+      </div>
+      <p class="text-center text-white/30 text-[10px] px-4 pt-1">18+ · Free to play · Gamble responsibly · BeGambleAware.org</p>
+    </section>
 
     <!-- ============ HOME ============ -->
     <section data-screen="home" class="space-y-4">
@@ -305,7 +352,7 @@
   </main>
 
   <!-- Bottom nav -->
-  <nav class="absolute bottom-0 inset-x-0 px-4 pt-2 pb-5 bg-gradient-to-t from-cosmo-ink via-cosmo-ink/95 to-transparent">
+  <nav id="bottomNav" class="absolute bottom-0 inset-x-0 px-4 pt-2 pb-5 bg-gradient-to-t from-cosmo-ink via-cosmo-ink/95 to-transparent">
     <div class="glass rounded-3xl flex items-center justify-around py-2 px-1">
       <button data-tab="home" onclick="go('home')" class="nav-btn tab-active flex flex-col items-center gap-1 text-[9px] text-white/55 w-14">
         <span class="tab-ico w-9 h-9 rounded-2xl grid place-items-center text-lg transition-all">🏠</span>Home
@@ -429,6 +476,23 @@
     </div>
   </div>
 
+  <!-- ===== Sign-up gate (after a signed-out player has a go) ===== -->
+  <div id="gateOverlay" class="hidden absolute inset-0 z-50 bg-black/80 flex items-end">
+    <div class="w-full bg-cosmo-deep rounded-t-3xl p-5 pb-8 fadein border-t border-white/10">
+      <div class="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4"></div>
+      <p class="text-3xl text-center">🎁</p>
+      <p class="font-display font-extrabold text-xl mt-1 text-center">Sign up to keep your winnings</p>
+      <p class="text-white/60 text-sm mt-1 text-center">Create a free account to bank your chips, climb the levels and go for the Vegas trip.</p>
+      <div class="rounded-2xl p-3 mt-4 bg-gradient-to-r from-violet-600/50 to-fuchsia-600/40 border border-fuchsia-300/30 text-center">
+        <p class="font-bold text-sm">🎉 Today only: DOUBLE points</p>
+        <p class="text-white/70 text-xs">Sign up now and start with 2× points.</p>
+      </div>
+      <button onclick="signUp()" class="w-full bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-extrabold py-3.5 rounded-2xl mt-4 active:scale-95 transition">Sign up &amp; claim →</button>
+      <button onclick="closeGate()" class="w-full text-white/50 text-sm py-3">Maybe later</button>
+      <p class="text-white/30 text-[10px] text-center">18+ · Free to play · BeGambleAware.org</p>
+    </div>
+  </div>
+
   <div id="toast" class="hidden absolute bottom-28 left-1/2 z-50 chip-gold text-amber-950 font-bold text-sm px-5 py-2.5 rounded-full shadow-xl"></div>
 </div>
 
@@ -487,13 +551,13 @@ const CATALOGUE = [
 ];
 const FREE = CATALOGUE.flatMap(s=>s.games);
 
-const DEFAULT = { chips:248, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0 };
+const DEFAULT = { chips:248, streak:6, claimed:false, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0, signedIn:false };
 let S = load();
 let activeGame = 0, lbGame = 'wk', freePlay = false;
 
 function load(){ try { return Object.assign({}, DEFAULT, JSON.parse(localStorage.getItem('cosmo')||'{}')); } catch(e){ return {...DEFAULT}; } }
 function save(){ localStorage.setItem('cosmo', JSON.stringify(S)); }
-function resetDemo(){ S = {...DEFAULT, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0}; save(); renderAll(); toast('Demo reset ↺'); }
+function resetDemo(){ S = {...DEFAULT, spins:[10,10,10,10,10,10], ranks:GAMES.map(g=>g.rank), wheelLevels:[], claimedPacks:[], offersClaimed:0, signedIn:false}; save(); renderAll(); setAuth(); toast('Demo reset ↺'); }
 
 // ---------- Helpers ----------
 function reachedLevel(){ let r=null; for(const l of LEVELS){ if(S.chips>=l.cost) r=l; } return r; }
@@ -760,6 +824,13 @@ function finishSpin(result){
     document.getElementById('spinBtn').disabled=false;
     return;
   }
+  // Signed-out taster: let them feel a spin, then gate the reward behind sign-up
+  if(!S.signedIn){
+    document.getElementById('gMsg').textContent = allSame?'🎉 JACKPOT! Sign up to claim it':(twoSame?'Nice — two match!':'Good spin!');
+    document.getElementById('spinBtn').disabled=true;
+    setTimeout(()=>openGate(), 1300);
+    return;
+  }
   const prevChips=S.chips; let chipGain=1, msg='+1 chip', rankJump=2;
   if(allSame){ chipGain=15; rankJump=40; msg='🎉 JACKPOT! +15 chips · big leaderboard jump!'; }
   else if(twoSame){ chipGain=4; rankJump=12; msg='Nice! Two match · +4 chips'; }
@@ -850,10 +921,36 @@ function renderCatalogue(){
   }).join('');
 }
 
+// ---------- Auth: signed-out version + sign-up gate ----------
+function setAuth(){
+  const out = !S.signedIn;
+  document.getElementById('signedOut').classList.toggle('hidden', !out);
+  document.getElementById('bottomNav').classList.toggle('hidden', out);
+  document.getElementById('chipPill').classList.toggle('hidden', out);
+  document.getElementById('signOutBtn').classList.toggle('hidden', out);
+  document.getElementById('signupPill').classList.toggle('hidden', !out);
+  if(out){
+    document.querySelectorAll('[data-screen]').forEach(s=>s.classList.add('hidden'));
+    document.querySelector('main').scrollTop = 0; try{ window.scrollTo(0,0); }catch(e){}
+  } else {
+    go('home');
+  }
+}
+function tryGame(){ openGame(2); }                 // Nova Sevens taster
+function openGate(){ document.getElementById('gateOverlay').classList.remove('hidden'); }
+function closeGate(){ document.getElementById('gateOverlay').classList.add('hidden'); document.getElementById('gameOverlay').classList.add('hidden'); }
+function signUp(){
+  S.signedIn = true; S.chips += 50;               // double-points welcome kick-start
+  closeGate(); save(); renderAll(); setAuth();
+  toast('🎉 Welcome! Double points active');
+}
+function signOutDemo(){ S.signedIn = false; document.getElementById('gameOverlay').classList.add('hidden'); closeGate(); save(); setAuth(); }
+
 // ---------- Init ----------
 renderAll();
 renderCatalogue();
 go('home');
+setAuth();
 </script>
 </body>
 </html>
