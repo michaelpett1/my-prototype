@@ -295,6 +295,18 @@
         <p class="text-amber-200/90 text-xs mt-2.5 font-semibold">Every level you hit: keep your pack — or gamble it on the wheel for Vegas.</p>
       </div>
 
+      <!-- How to earn chips -->
+      <div class="glass rounded-3xl p-4">
+        <p class="font-semibold text-sm mb-3">💰 How to earn chips</p>
+        <div class="space-y-2.5">
+          <div class="flex items-center gap-3"><span class="text-xl w-7 text-center">🎉</span><div><p class="text-sm font-semibold">Sign up</p><p class="text-white/45 text-[11px]">Join free and get double points to start</p></div></div>
+          <div class="flex items-center gap-3"><span class="text-xl w-7 text-center">📅</span><div><p class="text-sm font-semibold">Return daily</p><p class="text-white/45 text-[11px]">+2 chips every day you log in</p></div></div>
+          <div class="flex items-center gap-3"><span class="text-xl w-7 text-center">🔥</span><div><p class="text-sm font-semibold">Hit login streaks</p><p class="text-white/45 text-[11px]">3-day +1 · 7-day +3 · 30-day +15</p></div></div>
+          <div class="flex items-center gap-3"><span class="text-xl w-7 text-center">🎰</span><div><p class="text-sm font-semibold">Play games on the app</p><p class="text-white/45 text-[11px]">Earn chips on every Cosmo Spins game</p></div></div>
+        </div>
+      </div>
+
+      <p class="font-semibold text-sm pt-1">Levels &amp; packs</p>
       <div id="ladder" class="space-y-3"></div>
     </section>
 
@@ -331,13 +343,6 @@
         <p class="text-emerald-300 font-semibold">200 free spins + 100% up to £50</p>
         <p class="text-white/50 text-xs mt-1">Exclusive to Cosmo Rewards members</p>
         <button onclick="claimOffer('RoyalReels')" class="w-full bg-white text-emerald-900 font-extrabold py-3 rounded-2xl mt-3 active:scale-95 transition">Claim offer →</button>
-      </div>
-
-      <!-- Play the real version -->
-      <div>
-        <p class="font-semibold text-sm mb-1">🎰 Play the real version</p>
-        <p class="text-white/45 text-xs mb-3">You've been spinning Cosmo Spins — here are the real-money originals.</p>
-        <div id="realGames" class="space-y-2.5"></div>
       </div>
 
       <!-- Top operators -->
@@ -617,18 +622,27 @@ function renderGames(){
       </div>
       <p class="font-semibold text-sm mt-2">${g.name}</p>
       <p class="text-emerald-300 font-display font-extrabold text-lg leading-tight">${g.prize}</p>
-      <p class="text-white/40 text-[11px] mt-0.5">You're #${S.ranks[g.id]} today</p>
+      ${S.signedIn?`<p class="text-white/40 text-[11px] mt-0.5">You're #${S.ranks[g.id]} today</p>`:''}
     </button>`;
   }).join('');
 }
 function renderLadder(){
+  const out = !S.signedIn;
   document.getElementById('ladder').innerHTML = LEVELS.map(l=>{
-    const reached = S.chips>=l.cost;
+    const reached = !out && S.chips>=l.cost;
     const prev = LEVELS[l.n-2]?LEVELS[l.n-2].cost:0;
-    const pct = Math.max(0,Math.min(100, Math.round(((S.chips-prev)/(l.cost-prev))*100)));
+    const pct = out?0:Math.max(0,Math.min(100, Math.round(((S.chips-prev)/(l.cost-prev))*100)));
     const tookPack = (S.claimedPacks||[]).includes(l.n);
     const spun = (S.wheelLevels||[]).includes(l.n);
     const dec = tookPack || spun;
+    let right = '';
+    if(!out){
+      right = reached
+        ? (dec
+            ? `<span class="text-xs font-bold px-3 py-2 rounded-xl bg-white/10 text-white/40">${tookPack?'Pack 📦':'Vegas 🎡'} ✓</span>`
+            : `<button onclick="openChoice(${l.n})" class="text-xs font-bold px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-fuchsia-500">Claim 🎁</button>`)
+        : `<span class="text-[11px] text-white/40">${pct}%</span>`;
+    }
     return `<div class="glass rounded-3xl p-4 ${reached?'border-amber-300/40':''}">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
@@ -638,14 +652,10 @@ function renderLadder(){
             <p class="text-white/40 text-[11px]">${l.cost.toLocaleString()} chips</p>
           </div>
         </div>
-        ${reached
-          ? (dec
-              ? `<span class="text-xs font-bold px-3 py-2 rounded-xl bg-white/10 text-white/40">${tookPack?'Pack 📦':'Vegas 🎡'} ✓</span>`
-              : `<button onclick="openChoice(${l.n})" class="text-xs font-bold px-3 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-fuchsia-500">Claim 🎁</button>`)
-          : `<span class="text-[11px] text-white/40">${pct}%</span>`}
+        ${right}
       </div>
       <p class="text-white/45 text-[11px] mt-2">${l.items}</p>
-      ${!reached?`<div class="h-1.5 rounded-full bg-white/10 overflow-hidden mt-2"><div class="h-full chip-gold rounded-full" style="width:${pct}%"></div></div>`:''}
+      ${(!out && !reached)?`<div class="h-1.5 rounded-full bg-white/10 overflow-hidden mt-2"><div class="h-full chip-gold rounded-full" style="width:${pct}%"></div></div>`:''}
     </div>`;
   }).join('');
 }
@@ -665,14 +675,14 @@ function renderLeaderboard(){
     const yourTotal = GAMES.reduce((s,g)=> s + yourGamePts(g.id), 0);
     const leaders = [24580, 22140, 19760, 17300, 15120];
     for(let i=0;i<5;i++) rows.push({rank:i+1, name:names[i], you:false, pts:leaders[i]});
-    rows.push({rank:Math.max(6, Math.round(520 - yourTotal/40)), name:'You', you:true, pts:yourTotal});
+    if(S.signedIn) rows.push({rank:Math.max(6, Math.round(520 - yourTotal/40)), name:'You', you:true, pts:yourTotal});
     document.getElementById('lbTitle').textContent = 'Weekly Tournament · all 6 games';
     document.getElementById('lbTimer').textContent = '⏳ Ends in 2d 4h';
     document.getElementById('lbSubtitle').textContent = 'One combined table across every Cosmo Spins game.';
   } else {
     const g = GAMES[lbGame]; const me = S.ranks[g.id];
     for(let i=1;i<=5;i++) rows.push({rank:i, name:names[i-1], you:false, pts:5000-i*420});
-    rows.push({rank:me, name:'You', you:true, pts:yourGamePts(g.id)});
+    if(S.signedIn) rows.push({rank:me, name:'You', you:true, pts:yourGamePts(g.id)});
     document.getElementById('lbTitle').textContent = `${g.name} · ${g.prize}`;
     document.getElementById('lbTimer').textContent = '⏳ 5h 22m left';
     document.getElementById('lbSubtitle').textContent = 'This game resets tonight — everyone starts level tomorrow.';
@@ -687,15 +697,6 @@ function setLb(id){ lbGame=id; renderLeaderboard(); }
 
 // ---------- Conversion ----------
 function renderOffers(){
-  document.getElementById('realGames').innerHTML = CONVERT.slice(0,4).map(c=>
-    `<div class="glass rounded-2xl p-3 flex items-center gap-3">
-      <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 grid place-items-center text-xl shrink-0">🎰</div>
-      <div class="flex-1 min-w-0">
-        <p class="text-sm font-semibold truncate">${c.game}</p>
-        <p class="text-white/40 text-[11px] truncate">${c.provider} · play at ${c.op}</p>
-      </div>
-      <button onclick="claimOffer('${c.op}')" class="bg-blue-600 text-white text-xs font-bold px-3 py-2 rounded-xl shrink-0 active:scale-95 transition">Play real</button>
-    </div>`).join('');
   document.getElementById('opList').innerHTML = OPERATORS.map(o=>
     `<div class="glass rounded-2xl p-3 flex items-center gap-3">
       <div class="w-11 h-11 rounded-xl bg-white/10 grid place-items-center text-xl shrink-0">${o.emoji}</div>
@@ -749,7 +750,7 @@ function openGame(id){
   document.getElementById('gName').textContent=g.name;
   document.getElementById('gPrizeLabel').textContent='Playing for';
   const gp=document.getElementById('gPrize'); gp.textContent=g.prize; gp.className='font-display font-extrabold text-3xl text-emerald-300';
-  document.getElementById('gRankLine').style.display='';
+  document.getElementById('gRankLine').style.display = S.signedIn ? '' : 'none';
   document.getElementById('gRank').textContent='#'+S.ranks[id];
   document.getElementById('gSpinsLabel').textContent='Free spins left';
   document.getElementById('gSpins').textContent=S.spins[id];
@@ -948,7 +949,7 @@ function signUp(){
   closeGate(); save(); renderAll(); setAuth();
   toast('🎉 Welcome! Double points active');
 }
-function signOutDemo(){ S.signedIn = false; document.getElementById('gameOverlay').classList.add('hidden'); closeGate(); save(); setAuth(); }
+function signOutDemo(){ S.signedIn = false; document.getElementById('gameOverlay').classList.add('hidden'); closeGate(); save(); renderAll(); setAuth(); }
 
 // ---------- Init ----------
 renderAll();
