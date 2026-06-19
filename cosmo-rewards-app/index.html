@@ -568,9 +568,19 @@ function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg
 
 // ---------- Navigation ----------
 function go(screen){
+  const out = !S.signedIn;
   document.querySelectorAll('[data-screen]').forEach(s=>s.classList.toggle('hidden', s.dataset.screen!==screen));
+  const so = document.getElementById('signedOut');
+  if(out && screen==='home'){
+    // Signed-out users get the landing in place of the personalised home
+    document.querySelector('[data-screen="home"]').classList.add('hidden');
+    so.classList.remove('hidden');
+  } else {
+    so.classList.add('hidden');
+  }
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('tab-active', b.dataset.tab===screen));
   document.querySelector('main').scrollTop = 0;
+  try{ window.scrollTo(0,0); }catch(e){}
 }
 
 // ---------- Render ----------
@@ -924,17 +934,11 @@ function renderCatalogue(){
 // ---------- Auth: signed-out version + sign-up gate ----------
 function setAuth(){
   const out = !S.signedIn;
-  document.getElementById('signedOut').classList.toggle('hidden', !out);
-  document.getElementById('bottomNav').classList.toggle('hidden', out);
+  // Bottom nav stays visible in both states; only the header chrome changes
   document.getElementById('chipPill').classList.toggle('hidden', out);
   document.getElementById('signOutBtn').classList.toggle('hidden', out);
   document.getElementById('signupPill').classList.toggle('hidden', !out);
-  if(out){
-    document.querySelectorAll('[data-screen]').forEach(s=>s.classList.add('hidden'));
-    document.querySelector('main').scrollTop = 0; try{ window.scrollTo(0,0); }catch(e){}
-  } else {
-    go('home');
-  }
+  go('home');
 }
 function tryGame(){ openGame(2); }                 // Nova Sevens taster
 function openGate(){ document.getElementById('gateOverlay').classList.remove('hidden'); }
